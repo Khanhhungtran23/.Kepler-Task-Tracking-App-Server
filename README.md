@@ -193,5 +193,5 @@ A postman collection has been added for better understanding.
 
 ## Support
 
-For support, email chiragmehta900@gmial.com or join our Slack channel.
+For support, email tvkhhung03@gmail.com.
 

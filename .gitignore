@@ -1,1 +1,22 @@
-node_modules
+# Node modules
+node_modules/
+# Ignore the distribution folder
+dist/
+
+# Logs
+logs
+*.log
+
+# Environment variables
+.env
+
+# Compiled JavaScript files
+*.js
+*.js.map
+
+# TypeScript cache
+*.tsbuildinfo
+
+# OS generated files
+.DS_Store
+Thumbs.db
