@@ -39,7 +39,12 @@ router.use((req, res, next) => {
 });
 
 // Middleware for CORS and parsing
-router.use(cors());
+// Middleware
+router.use(cors({
+    origin: ['http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE','HEAD'],  
+    credentials: true,  // Allow cookies or credentials
+}));
 router.use(express.urlencoded({ extended: true }));
 router.use(express.json());
 
