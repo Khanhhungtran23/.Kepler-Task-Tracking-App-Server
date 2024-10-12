@@ -1,93 +1,46 @@
-import express from 'express';
-import http from 'http';
-import mongoose from 'mongoose';
-import config from './config/config';
-import Logging from './library/Logging';
-import { router as v1 } from './routes/v1/index';
-import MailService from './services/mailService';
-import HttpError from './utils/httpError';
-import { crateRole } from './controllers/role.controller';
-import cors from 'cors';
-import dotenv from 'dotenv';
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import dotenv from "dotenv";
+import express, { Request, Response } from "express";
+import morgan from "morgan";
+import router from "../src/routes/index"; 
+import { dbConnection } from "./utils/util"; 
 
-const router = express();
 dotenv.config();
+dbConnection();
 
-// Set strictQuery option
-mongoose.set('strictQuery', true);
+const PORT = process.env.PORT || 3000;
+const app = express();
 
-// CONNECTION TO MONGOOSE DATABASE
-mongoose
-    .connect(config.mongo.url, { retryWrites: true, w: 'majority' })
-    .then(() => {
-        Logging.info('Connected to mongoDB.');
-        crateRole(); // Assuming this is needed after connection
-        StartServer(); // Start the server only after MongoDB is connected
-    })
-    .catch((error) => {
-        Logging.error('Unable to connect to MongoDB.');
-        Logging.error(error);
-    });
+// Set up CORS with the correct options
+app.use(
+  cors({
+    origin: ["http://localhost:3000", "http://localhost:3001"],
+    methods: ["GET", "POST", "DELETE", "PUT","HEAD"],
+    credentials: true,
+  })
+);
+app.options('*', cors());  // Enable pre-flight requests for all routes
 
-// Middleware for logging requests
-router.use((req, res, next) => {
-    Logging.info(`Incoming -> Method: [${req.method}] - Url: [${req.url}] - IP: [${req.socket.remoteAddress}]`);
-    res.on('finish', () => {
-        Logging.info(`Outgoing -> Method: [${req.method}] - Url: [${req.url}] - Status: [${res.statusCode}]`);
-    });
-    next();
-});
+// Middleware to parse JSON and URL-encoded data
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Middleware for CORS and parsing
-// Middleware
-router.use(cors({
-    origin: ['http://localhost:3000'],
-    methods: ['GET', 'POST', 'PUT', 'DELETE','HEAD'],  
-    credentials: true,  // Allow cookies or credentials
-}));
-router.use(express.urlencoded({ extended: true }));
-router.use(express.json());
+// // Parse cookies
+app.use(cookieParser());
 
-// API routes with versioning
-router.use('/api', v1);
-
-// Health check endpoint
-router.get('/ping', (req, res) => res.status(200).json({ message: 'pong' }));
+// // Logging HTTP requests
+app.use(morgan("develop"));
 
 // Root endpoint
-router.get('/', (_, res) => {
+app.get('/', (req, res) => {
     res.status(200).json({
         success: true,
-        message: 'You are on node-typescript-boilderplate. You should not have further access from here.',
+        message: 'You are on Task Tracking Application!!!',
     });
 });
+// API routes
+// app.use("/api", router);
 
-// Error handling for 404
-router.use((req, res, next) => {
-    const error = new Error('not found');
-    Logging.error(error);
-    return res.status(404).json({ success: false, message: error.message });
-});
-
-// Handle errors thrown by controllers
-router.use((err: any, req: any, res: any, next: any) => {
-    Logging.error(err.stack);
-    if (err instanceof HttpError) {
-        return err.sendError(res);
-    } else {
-        return res.status(500).json({
-            error: {
-                title: 'general_error',
-                detail: 'An error occurred, Please retry again later',
-                code: 500,
-            },
-        });
-    }
-});
-
-// Start server
-const StartServer = () => {
-    http.createServer(router).listen(config.server.port, () =>
-        Logging.info(`Server is running on port ${config.server.port}.`)
-    );
-};
+// Start the server
+app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
