@@ -1,30 +1,32 @@
-// middlewares/auth.middleware.ts
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-// import User from "../models/user.model"; // Adjust this path based on your structure
+import User from "../models/user.model";
+import mongoose from "mongoose";
 
 export const protect = async (req: Request, res: Response, next: NextFunction) => {
   let token;
 
-  // Check for the token in the authorization header
   if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
     try {
       token = req.headers.authorization.split(" ")[1];
 
-      // Verify token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { _id: string };
 
-      // Find the user and attach it to the request object
-      req.user = (decoded as any).userId;
+      const user = await User.findById(decoded._id).select("-password");
+
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+
+      // Explicitly cast user._id to mongoose.Types.ObjectId or string
+      req.user = { _id: user._id as mongoose.Types.ObjectId, isAdmin: user.isAdmin };
 
       next();
     } catch (error) {
       console.error(error);
       res.status(401).json({ message: "Not authorized, token failed" });
     }
-  }
-
-  if (!token) {
+  } else {
     res.status(401).json({ message: "Not authorized, no token" });
   }
 };

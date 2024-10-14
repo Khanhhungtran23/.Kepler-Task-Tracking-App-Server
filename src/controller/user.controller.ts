@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
 
+
 // Register a new user
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
   const { name, title, role, email, password } = req.body;
@@ -73,7 +74,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Change user password
-export const changeUserPassword = async (req: Request, res: Response): Promise<void> => {
+export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
   const { oldPassword, newPassword } = req.body;
   const userId = req.user; // Assuming protect middleware is used and user ID is available in req.user
 
@@ -99,7 +100,7 @@ export const changeUserPassword = async (req: Request, res: Response): Promise<v
 export const logoutUser = (req: Request, res: Response) => {
     res.cookie("token", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production", // Use secure cookies in production
+      secure: process.env.NODE_ENV === "development", // later in production
       sameSite: "strict", // Prevent CSRF attacks
       expires: new Date(0), // Set expiration time to the past
     });
@@ -132,6 +133,35 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
       });
     } else {
       res.status(404).json({ message: "User not found" });
+    }
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+// Get all users
+export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Retrieve all users from the database
+    const users = await User.find({}).sort({ createdAt: -1 });
+    console.log('Fetched messages:', users);
+    res.status(200).json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Get a user by name
+export const getUserByName = async (req: Request, res: Response): Promise<void> => {
+  const { name } = req.params; // Assuming name is passed as a route parameter
+
+  try {
+    // Find users matching the provided name (case insensitive)
+    const users = await User.find({ name: { $regex: new RegExp(name, "i") } }); // Use regex for case-insensitive search
+
+    if (users.length > 0) {
+      res.status(200).json(users);
+    } else {
+      res.status(404).json({ message: "No users found with that name" });
     }
   } catch (err) {
     res.status(500).json({ message: "Server error" });

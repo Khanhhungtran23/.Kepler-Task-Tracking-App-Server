@@ -3,8 +3,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
-import router from "../src/routes/index"; 
+import routes from "../src/routes/index"; 
 import { dbConnection } from "./utils/util"; 
+import { protect } from "../src/middlewares/auth"; // Import the protect middleware
+import bodyParser from "body-parser";
+
 
 dotenv.config();
 dbConnection();
@@ -25,12 +28,13 @@ app.options('*', cors());  // Enable pre-flight requests for all routes
 // Middleware to parse JSON and URL-encoded data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 // // Parse cookies
 app.use(cookieParser());
 
 // // Logging HTTP requests
-app.use(morgan("develop"));
+// app.use(morgan("develop"));
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -40,7 +44,8 @@ app.get('/', (req, res) => {
     });
 });
 // API routes
-// app.use("/api", router);
+// app.use(protect);
+app.use("/api", routes);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));

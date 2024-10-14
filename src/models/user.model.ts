@@ -11,6 +11,7 @@ export interface IUser extends Document {
   isAdmin: boolean;
   tasks: mongoose.Types.ObjectId[];
   isActive: boolean;
+  createdDay: Date;  // New field to track account creation date
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -24,6 +25,7 @@ const userSchema: Schema<IUser> = new Schema(
     password: { type: String, required: true },
     isAdmin: { type: Boolean, required: true, default: false },
     tasks: [{ type: Schema.Types.ObjectId, ref: "task" }],
+    createdDay: { type: Date, default: Date.now },  // Track user account creation date
     isActive: { type: Boolean, required: true, default: true },
   },
   { timestamps: true }
