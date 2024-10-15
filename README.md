@@ -35,7 +35,7 @@ Make sure you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/your-username/task-tracking-app.git
+   git clone --depth 1 https://github.com/your-username/task-tracking-app.git
    cd task-tracking-app
    ```
 2. **Install dependencies:**
@@ -43,34 +43,87 @@ Make sure you have the following installed:
     npm install
     ```
 3. **Set up environment variables:**
-- Create a .env file at the root of the project with the following content:
   ```bash
-  MONGO_DB_USER=tvkhhung03
-  MONGO_DB_PASSWORD=3i3S12iiLQD3v6mH
+  cp .env.example .env
+
+  # open .env and modify the environment variables (if needed)
+  ```
+  ```bash
   NODE_ENV=development
   PORT=3000
-  MONGODB_URI =  mongodb+srv://tvkhhung03:3i3S12iiLQD3v6mH@task-management-web-app.nlqtw.mongodb.net/?retryWrites=true&w=majority&appName=Task-management-web-app 
+  MONGODB_URI = mongodb+srv://tvkhhung03:3i3S12iiLQD3v6mH@task-management-web-app.nlqtw.mongodb.net/?retryWrites=true&w=majority&appName=Task-management-web-app 
   JWT_SECRET = ckIE47slkH
-
-  
+  ```
 4. **Run the application:**
+- Run locally:
   ```bash
   npm run dev
+  ```
+- Run in production:
+  ```bash
+  npm run start
+  ```
+- Commit changes:
+  ```bash
+  git acpt "message"
+  ```
+- Testing:
+  ```bash
+  # Run all tests
+  npm run test
+  # run TypeScript tests
+  npm run test:ts
+  # run JS tests
+  npm run test:js
+  # run all tests in watch mode
+  npm run test:watch
+  # run test coverage
+  npm run coverage
+  ```
+- Docker:
+  ```bash
+  # run docker container in development mode
+  npm run docker:dev
+
+  # run docker container in production mode
+  npm run docker:prod
+
+  # run all tests in a docker container
+  npm run docker:test
+  ```
+- Linting:
+  ```bash
+  # run ESLint
+  npm run lint
+
+  # fix ESLint errors
+  npm run lint:fix
+
+  # run prettier
+  npm run prettier
+
+  # fix prettier errors
+  npm run prettier:fix
   ```
   - The application will start running on http://localhost:3000.
 
 5. **API Endpoints:**
 
-### Public Routes
+#### Public Routes
 
-- **POST** `/user/register`: Register a new user
-- **POST** `/user/login`: Login an existing user
-- **POST** `/user/logout`: Logout the user
+- **POST** `api/user/register`: Register a new user
+- **POST** `api/user/login`: Login an existing user
+- **POST** `api/user/logout`: Logout the user
 
-### Protected Routes (Requires Authentication)
+#### Protected Routes (Requires Authentication)
 
-- **PUT** `/user/profile`: Update user profile (Authenticated users only)
-- **PUT** `/user/change-password`: Change user password (Authenticated users only)
+- **PUT** `api/user/profile`: Update user profile (Authenticated users only)
+- **PUT** `api/user/change-password`: Change user password (Authenticated users only)
+
+- **GET** `/api/user/get-all-info` :
+- **GET** `/api/user/search/:name` : 
+
+### Error Handling
 
 
 
