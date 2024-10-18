@@ -20,7 +20,7 @@ export const dbConnection = async (): Promise<void> => {
   };
 
   // JWT creation with TypeScript
-export const createJWT = (res: Response, userId: string): void => {
+export const createJWT = (res: Response, userId: string): string => {
     // Ensure the JWT secret exists in the environment variables
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
@@ -29,6 +29,7 @@ export const createJWT = (res: Response, userId: string): void => {
   
     const token = jwt.sign({ userId }, jwtSecret, {
       expiresIn: "1d", // Token expiry set to 1 day
+      algorithm: "HS256"
     }) 
     // Set the cookie with the JWT token
   res.cookie("token", token, {
@@ -37,4 +38,8 @@ export const createJWT = (res: Response, userId: string): void => {
     sameSite: "strict", // Prevent CSRF attack
     maxAge: 1 * 24 * 60 * 60 * 1000, // Set expiration time to 1 day (in milliseconds)
   });
+
+  // Return the token so it can also be logged or used elsewhere
+  return token;
+
 };

@@ -52,7 +52,7 @@ Make sure you have the following installed:
   NODE_ENV=development
   PORT=3000
   MONGODB_URI = mongodb+srv://tvkhhung03:3i3S12iiLQD3v6mH@task-management-web-app.nlqtw.mongodb.net/?retryWrites=true&w=majority&appName=Task-management-web-app 
-  JWT_SECRET = ckIE47slkH
+  JWT_SECRET = "in .env file"
   ```
 4. **Run the application:**
 - Run locally:

@@ -7,7 +7,9 @@ import routes from "../src/routes/index";
 import { dbConnection } from "./utils/util"; 
 import { protect } from "../src/middlewares/auth"; // Import the protect middleware
 import bodyParser from "body-parser";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
+import swaggerOptions from "./swagger/swagger.config";
 
 dotenv.config();
 dbConnection();
@@ -46,6 +48,7 @@ app.get('/', (req, res) => {
 // API routes
 // app.use(protect);
 app.use("/api", routes);
-
+const swaggerDocs = swaggerJsDoc(swaggerOptions);
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Start the server
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
