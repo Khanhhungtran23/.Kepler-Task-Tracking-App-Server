@@ -7,6 +7,8 @@ import {
   updateUserProfile,
   getAllUsers,
   getUserByName,
+  disableUserAccount,
+  enableUserAccount
 } from "../controller/user.controller";
 import { protect } from "../middlewares/auth";
 const router = express.Router();
@@ -205,6 +207,148 @@ router.get("/get-all-info", protect, getAllUsers);
  *       404:
  *         description: No users found with that name
  */
-router.get("/search/:user_name",  protect, getUserByName);
+router.get("/search/:user_name", protect, getUserByName);
+
+router.put("/disable-account", disableUserAccount);
+/**
+ * @swagger
+ * /users/disable-account:
+ *   post:
+ *     summary: Disable a user account
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The email of the user to be disabled
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: The account has been disabled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account of user@example.com has been disabled successfully.
+ *       400:
+ *         description: The account is already disabled
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: This account is already disabled
+ *       404:
+ *         description: No user found with that email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Disabled user not found
+ *       403:
+ *         description: Access denied. Only admins can disable accounts.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Access denied. Only admins can disable accounts.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
+
+router.put("/enable-account", enableUserAccount);
+/**
+ * @swagger
+ * /users/enable-account:
+ *   post:
+ *     summary: Enable a user account
+ *     tags: [Users]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: The email of the user to be enabled
+ *                 example: user@example.com
+ *     responses:
+ *       200:
+ *         description: The account has been enabled successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Account of user@example.com has been enabled successfully.
+ *       400:
+ *         description: The account is already enabled
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: This account is already enabled
+ *       404:
+ *         description: No user found with that email
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Enabled user not found
+ *       403:
+ *         description: Access denied. Only admins can enable accounts.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Access denied. Only admins can enable accounts.
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Server error
+ */
 
 export default router;

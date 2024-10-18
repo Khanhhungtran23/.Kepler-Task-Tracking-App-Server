@@ -180,3 +180,97 @@ export const getUserByName = async (req: Request, res: Response): Promise<void> 
     res.status(500).json({ message: "Server error" });
   }
 };
+
+//Disable user account
+export const disableUserAccount = async (req: Request|any, res: Response): Promise<void> => {
+  const { email } = req.body;
+  const userId = req.user;
+  try {
+    /*
+    const user = await User.findById(userId);
+    //Verify if the requester exists
+    if (!user) {
+      res.status(404).json({ message: "Requester not found" });
+      return;
+    }
+    // Verify if requester is admin
+    if (!req.user.isAdmin) {
+      res.status(403).json({ message: "Access denied. Only admins can disable accounts." });
+    }
+    */
+    const disableUser = await User.findOne({ email });
+
+    //Verify if the disable user is not exists
+    if (!disableUser) {
+      res.status(404).json({ message: "Disabled user not found" });
+      return;
+    }
+
+    // Verify if this account is already disabled
+    if (!disableUser.isActive) {
+      res.status(400).json({ message: "This account is already disabled" });
+      return;
+    }
+    
+    //disableUser.isActive = false;
+    
+    await User.findOneAndUpdate(
+      { email },
+      { isActive: false },
+      { new: true, runValidators: true }
+    );
+
+    console.log("isActive :", disableUser.isActive);
+    res.status(200).json({ message: `Account of ${disableUser.email} has been disabled successfully.` });
+  }catch (err) {
+    console.error("Error disabling account:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+//Enable user account
+export const enableUserAccount = async (req: Request|any, res: Response): Promise<void> => {
+  const { email } = req.body;
+  const userId = req.user;
+  try {
+    /*
+    const user = await User.findById(userId);
+    //Verify if the requester exists
+    if (!user) {
+      res.status(404).json({ message: "Requester not found" });
+      return;
+    }
+    // Verify if requester is admin
+    if (!req.user.isAdmin) {
+      res.status(403).json({ message: "Access denied. Only admins can disable accounts." });
+    }
+    */
+    const enableUser = await User.findOne({ email });
+
+    //Verify if the enabled user is not exists
+    if (!enableUser) {
+      res.status(404).json({ message: "Enabled user not found" });
+      return;
+    }
+
+    // Verify if this account is already enabled
+    if (enableUser.isActive) {
+      res.status(400).json({ message: "This account is already enabled" });
+      return;
+    }
+    
+    enableUser.isActive = false;
+    
+    await User.findOneAndUpdate(
+      { email },
+      { isActive: true },
+      { new: true, runValidators: true }
+    );
+
+    console.log("isActive :", enableUser.isActive);
+    res.status(200).json({ message: `Account of ${enableUser.email} has been enabled successfully.` });
+  }catch (err) {
+    console.error("Error enabling account:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
