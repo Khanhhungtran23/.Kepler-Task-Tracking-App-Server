@@ -10,6 +10,8 @@ import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerOptions from "./swagger/swagger.config";
+import { routeNotFound, errorHandler } from './middlewares/error';
+import { isAdmin } from './middlewares/auth';
 
 dotenv.config();
 dbConnection();
@@ -45,7 +47,12 @@ app.get('/', (req, res) => {
         message: 'You are on Task Tracking Application!!!',
     });
 });
-// API routes
+// API routes handling
+// Route not found handler
+app.use(routeNotFound);
+
+// General error handler
+app.use(errorHandler);
 // app.use(protect);
 app.use("/api", routes);
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

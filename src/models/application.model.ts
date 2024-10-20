@@ -8,6 +8,7 @@ const applicationSchema = new Schema(
       status: {
         type: String,
         enum: ['To Do', 'Implementing', 'Testing', 'Go Live'],
+        default: "To Do",
         required: true,
       },
       isTrashed: { type: Boolean, default: false },

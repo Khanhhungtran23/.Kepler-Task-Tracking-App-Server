@@ -4,7 +4,7 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 // Interface for user document
 export interface IUser extends Document {
   user_name: string;
-  full_name: string
+  // full_name: string
   role: string;
   email: string;
   password: string;
@@ -19,11 +19,11 @@ export interface IUser extends Document {
 const userSchema: Schema<IUser> = new Schema(
   {
     user_name: { type: String, required: true },
-    full_name: { type: String, required: true },
+    // full_name: { type: String, required: true },
     role: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    isAdmin: { type: Boolean, required: true, default: true },
+    isAdmin: { type: Boolean, required: true, default: false },
     tasks: [{ type: Schema.Types.ObjectId, ref: "task" }],
     isActive: { type: Boolean, required: true, default: true },
   },

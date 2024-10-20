@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 
 // Register a new user
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  const { user_name, full_name, role, email, password } = req.body;
+  const { user_name, role, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -20,7 +20,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     // Create a new user
     const user = await User.create({
       user_name,
-      full_name,
+      // full_name,
       role,
       email,
       password, // Password will be hashed automatically by mongoose pre-save hook
@@ -32,7 +32,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       res.status(201).json({
         _id: user._id,
         user_name: user.user_name,
-        full_name: user.full_name,
+        // full_name: user.full_name,
         role: user.role,
         email: user.email,
         isAdmin: user.isAdmin,
@@ -57,9 +57,17 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     // Find the user by email with a case-insensitive query
     const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
 
-
+    // Check if the user exists
+    if (!user || !(await user.matchPassword(password))) {
+      res.status(401).json({ message: "Invalid email or password" });
+      return;
+    }
+    // Check if the user is active
+    else if (user.isActive === false) {
+      res.status(403).json({ message: "Your account is disabled. Please contact your manager." });
+    }
     // Check if the user exists and the password matches
-    if (user && (await user.matchPassword(password))) {
+    else if (user && (await user.matchPassword(password))) {
       // Use the createJWT function from util.ts to generate a JWT and set it in a cookie
       const token = createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
       console.log("Successfully Login");
@@ -68,14 +76,16 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       res.json({
         _id: user._id,
         user_name: user.user_name,
-        full_name: user.full_name,
+        // full_name: user.full_name,
         role: user.role,
         email: user.email,
         isAdmin: user.isAdmin,
+        isActive: user.isActive
         // The token will be stored in the cookie, not returned directly in the response
       });
       
-    } else {
+    } 
+    else {
       // Return a 401 Unauthorized response if the email or password is incorrect
       res.status(401).json({ message: "Invalid email or password" });
     }
@@ -89,7 +99,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 // Change user password
 export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
   const { oldPassword, newPassword } = req.body;
-  const userId = req.user; // Assuming protect middleware is used and user ID is available in req.user
+  const userId = req.user?._id; // Assuming protect middleware is used and user ID is available in req.user
 
   try {
     // Find the user by ID
@@ -122,7 +132,7 @@ export const logoutUser = (req: Request, res: Response) => {
 // Update user profile
 export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user; // Assuming protect middleware is used and user ID is available in req.user
-  const { user_name,full_name, role } = req.body;
+  const { user_name, role } = req.body;
 
   try {
     // Find the user by ID
@@ -131,7 +141,7 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
     if (user) {
       // Update user profile details
       user.user_name = user_name || user.user_name;
-      user.full_name = full_name || user.full_name;
+      // user.full_name = full_name || user.full_name;
       user.role = role || user.role;
 
       const updatedUser = await user.save();
@@ -139,7 +149,7 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
       res.status(200).json({
         _id: updatedUser._id,
         user_name: updatedUser.user_name,
-        full_name: updatedUser.full_name,
+        // full_name: updatedUser.full_name,
         role: updatedUser.role,
         email: updatedUser.email,
         isAdmin: updatedUser.isAdmin,

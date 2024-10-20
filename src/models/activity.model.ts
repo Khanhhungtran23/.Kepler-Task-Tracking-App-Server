@@ -12,6 +12,7 @@ const activitySchema = new Schema(
           "QC2",
           "Deployment"
         ],
+        default: "Requirement Clarification",
         required: true,
       },
       comment: { type: String, required: true },
