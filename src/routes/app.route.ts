@@ -4,15 +4,26 @@ import { createApplication,
         editApplication, 
         trashApplication, 
         deleteApplication, 
-        getApplications 
+        getApplications,
+        searchApp,
+        searchTodoApp,
+        searchImplementApp,
+        searchTestingApp,
+        searchProductionApp 
     } from "../controller/application.controller";
 
 const router = express.Router();
 
-router.post("/add-new", protect, createApplication);
-router.put("/edit/:id", protect, editApplication);
-router.delete("/trash/:id", protect, trashApplication);
-router.delete("/delete/:id", protect, deleteApplication);
-router.get("/get-all", protect, getApplications);
+router.post("/add-new", createApplication);
+router.put("/edit/:id", editApplication);
+router.delete("/trash/:id", trashApplication);
+router.delete("/delete/:id",  deleteApplication);
+router.get("/get-all", getApplications);
+router.get("/search-app/:application_title", searchApp);
+router.get("/search-todo-app/:application_title", searchTodoApp);
+router.get("/search-implement-app/:application_title", searchImplementApp);
+router.get("/search-testing-app/:application_title", searchTestingApp);
+router.get("/search-production-app/:application_title", searchProductionApp);
+
 
 export default router;

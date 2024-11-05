@@ -49,10 +49,10 @@ app.get('/', (req, res) => {
 });
 // API routes handling
 // Route not found handler
-app.use(routeNotFound);
+//app.use(routeNotFound);
 
 // General error handler
-app.use(errorHandler);
+//app.use(errorHandler);
 // app.use(protect);
 app.use("/api", routes);
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

@@ -7,7 +7,7 @@ const applicationSchema = new Schema(
       assets: [String],
       status: {
         type: String,
-        enum: ['To Do', 'Implementing', 'Testing', 'Go Live'],
+        enum: ['To Do', 'Implement', 'Testing', 'Production'],
         default: "To Do",
         required: true,
       },

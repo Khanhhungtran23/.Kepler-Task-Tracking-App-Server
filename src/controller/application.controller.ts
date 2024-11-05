@@ -126,3 +126,112 @@ export const getApplications = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error while fetching applications' });
   }
 };
+
+export const searchApp = async (req: Request, res: Response): Promise<void> => {
+  const { application_title } = req.params; // Assuming application title is passed as a route parameter
+
+  try {
+    // Find application matching the provided application_title (case insensitive)
+    const apps = await Application.find({ 
+      title: { $regex: new RegExp(application_title, "i")},
+      isTrashed: "false"  
+    }); // Use regex for case-insensitive search
+
+    if (apps.length > 0) {
+      res.status(200).json(apps);
+    } else {
+      res.status(404).json({ message: "No application found with that title" });
+    }
+  } catch (err) {
+    console.log("Error: " + err)
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchTodoApp = async (req: Request, res: Response): Promise<void> => {
+  const { application_title } = req.params; // Assuming application title is passed as a route parameter
+
+  try {
+    // Find applications matching the application_title and status = "To Do" (case insensitive)
+    const apps = await Application.find({ 
+      title: { $regex: new RegExp(application_title, "i") },
+      status: "To Do",
+      isTrashed: "false"
+   });
+
+    if (apps.length > 0) {
+      res.status(200).json(apps);
+    } else {
+      res.status(404).json({ message: "No application found with that title" });
+    }
+  } catch (err) {
+    console.log("Error: " + err)
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchImplementApp = async (req: Request, res: Response): Promise<void> => {
+  const { application_title } = req.params; // Assuming application title is passed as a route parameter
+
+  try {
+    // Find applications matching the application_title and status = "Implementing" (case insensitive)
+    const apps = await Application.find({ 
+      title: { $regex: new RegExp(application_title, "i") },
+      status: "Implement",
+      isTrashed: "false"
+   });
+
+    if (apps.length > 0) {
+      res.status(200).json(apps);
+    } else {
+      res.status(404).json({ message: "No application found with that title" });
+    }
+  } catch (err) {
+    console.log("Error: " + err)
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchTestingApp = async (req: Request, res: Response): Promise<void> => {
+  const { application_title } = req.params; // Assuming application title is passed as a route parameter
+
+  try {
+    // Find applications matching the application_title and status = "Testing" (case insensitive)
+    const apps = await Application.find({ 
+      title: { $regex: new RegExp(application_title, "i") },
+      status: "Testing",
+      isTrashed: "false"
+   });
+
+    if (apps.length > 0) {
+      res.status(200).json(apps);
+    } else {
+      res.status(404).json({ message: "No application found with that title" });
+    }
+  } catch (err) {
+    console.log("Error: " + err)
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+export const searchProductionApp = async (req: Request, res: Response): Promise<void> => {
+  const { application_title } = req.params; // Assuming application title is passed as a route parameter
+
+  try {
+    // Find applications matching the application_title and status = "Implementing" (case insensitive)
+    const apps = await Application.find({ 
+      title: { $regex: new RegExp(application_title, "i") },
+      status: "Production",
+      isTrashed: "false"
+   });
+
+    if (apps.length > 0) {
+      res.status(200).json(apps);
+    } else {
+      res.status(404).json({ message: "No application found with that title" });
+    }
+  } catch (err) {
+    console.log("Error: " + err)
+    res.status(500).json({ message: "Server error" });
+  }
+};

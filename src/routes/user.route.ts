@@ -182,7 +182,7 @@ router.put("/profile", protect, updateUserProfile);
  *               items:
  *                 $ref: '#/components/schemas/User'
  */
-router.get("/get-all-info", protect, getAllUsers);
+router.get("/get-all-info",protect, getAllUsers);
 
 /**
  * @swagger
@@ -207,7 +207,7 @@ router.get("/get-all-info", protect, getAllUsers);
  *       404:
  *         description: No users found with that name
  */
-router.get("/search/:user_name", protect, getUserByName);
+router.get("/search/:user_name", getUserByName);
 
 router.put("/disable-account", disableUserAccount);
 /**
