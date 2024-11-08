@@ -17,7 +17,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /applications/add-new:
+ * /app/add-new:
  *   post:
  *     summary: Create a new application
  *     description: Creates a new application with provided details. Only admin users can create an application.
@@ -67,7 +67,7 @@ router.post("/add-new", protect, isAdmin, createApplication);
 
 /**
  * @swagger
- * /applications/edit/{id}:
+ * /app/edit/{id}:
  *   put:
  *     summary: Edit an existing application
  *     description: Allows an admin to edit the details of an application.
@@ -123,7 +123,7 @@ router.post("/add-new", protect, isAdmin, createApplication);
 router.put("/edit/:title", protect, isAdmin, editApplication);
 /**
  * @swagger
- * /applications/trash/{title}:
+ * /app/trash/{title}:
  *   put:
  *     summary: Move an application to trash
  *     description: Marks an application as trashed. Only admins can perform this action.
@@ -150,7 +150,7 @@ router.put("/trash/:id", protect, isAdmin, trashApplication);
 
 /**
  * @swagger
- * /applications/delete/{id}:
+ * /app/delete/{id}:
  *   delete:
  *     summary: Permanently delete an application
  *     description: Permanently deletes an application. Only trashed applications can be permanently deleted. Only admins can perform this action.
@@ -177,7 +177,7 @@ router.delete("/delete/:id", protect, isAdmin, deleteApplication);
 
 /**
  * @swagger
- * /applications/get-all:
+ * /app/get-all:
  *   get:
  *     summary: Get all applications
  *     tags: [Applications]
@@ -191,7 +191,7 @@ router.get("/get-all", protect, getApplications);
 
 /**
  * @swagger
- * /applications/search-app/{application_title}:
+ * /app/search-app/{application_title}:
  *   get:
  *     summary: Search an application by title
  *     tags: [Applications]
@@ -214,7 +214,7 @@ router.get("/search-app/:application_title", protect, searchApp);
 
 /**
  * @swagger
- * /applications/search-todo-app/{application_title}:
+ * /app/search-todo-app/{application_title}:
  *   get:
  *     summary: Search a To Do application by title
  *     tags: [Applications]
@@ -237,7 +237,7 @@ router.get("/search-todo-app/:application_title", protect, searchTodoApp);
 
 /**
  * @swagger
- * /applications/search-implement-app/{application_title}:
+ * /app/search-implement-app/{application_title}:
  *   get:
  *     summary: Search an Implementing application by title
  *     tags: [Applications]
@@ -260,7 +260,7 @@ router.get("/search-implement-app/:application_title", protect, searchImplementA
 
 /**
  * @swagger
- * /applications/search-testing-app/{application_title}:
+ * /app/search-testing-app/{application_title}:
  *   get:
  *     summary: Search a Testing application by title
  *     tags: [Applications]
@@ -283,7 +283,7 @@ router.get("/search-testing-app/:application_title", protect, searchTestingApp);
 
 /**
  * @swagger
- * /applications/search-production-app/{application_title}:
+ * /app/search-production-app/{application_title}:
  *   get:
  *     summary: Search a Production application by title
  *     tags: [Applications]
