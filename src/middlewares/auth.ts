@@ -62,7 +62,7 @@ export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): vo
   } else {
     res.status(401).json({
       status: false,
-      message: "Not authorized as admin. Try login as admin.",
+      message: "Not authorized as admin. Try login as admin. Only admins can perform this action",
     });
   }
 };

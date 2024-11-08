@@ -120,10 +120,10 @@ router.post("/add-new", protect, isAdmin, createApplication);
  *         description: Only admins can edit applications
  */
 
-router.put("/edit/:id", protect, isAdmin, editApplication);
+router.put("/edit/:title", protect, isAdmin, editApplication);
 /**
  * @swagger
- * /applications/trash/{id}:
+ * /applications/trash/{title}:
  *   put:
  *     summary: Move an application to trash
  *     description: Marks an application as trashed. Only admins can perform this action.
@@ -132,7 +132,7 @@ router.put("/edit/:id", protect, isAdmin, editApplication);
  *       - bearerAuth: []
  *     parameters:
  *       - in: path
- *         name: id
+ *         name: title
  *         required: true
  *         schema:
  *           type: string

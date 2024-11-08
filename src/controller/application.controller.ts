@@ -37,11 +37,6 @@ export const editApplication = async (req: Request, res: Response): Promise<void
     const { id } = req.params;
     const { title, description, assets, status, priority, tasks, teamMembers } = req.body;
 
-    // Only admins can edit applications
-    if (!req.user?.isAdmin) {
-      res.status(403).json({ message: 'Only admins can edit applications' });
-    }
-
     // Find and update the application
     const updatedApplication = await Application.findByIdAndUpdate(
       id,
@@ -63,15 +58,10 @@ export const editApplication = async (req: Request, res: Response): Promise<void
 // Soft delete (move to trash)
 export const trashApplication = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { id } = req.params;
-
-    // Only admins can trash applications
-    if (!req.user?.isAdmin) {
-      res.status(403).json({ message: 'Only admins can trash applications' });
-    }
+    const { title } = req.params;
 
     const trashedApplication = await Application.findByIdAndUpdate(
-      id,
+      { title: title },
       { isTrashed: true },
       { new: true }
     );
@@ -91,11 +81,6 @@ export const trashApplication = async (req: Request, res: Response): Promise<voi
 export const deleteApplication = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-
-    // Only admins can delete applications permanently
-    if (!req.user?.isAdmin) {
-      res.status(403).json({ message: 'Only admins can delete applications permanently' });
-    }
 
     const application = await Application.findById(id);
 
