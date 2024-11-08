@@ -1,57 +1,66 @@
 import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/user.model";
-import mongoose from "mongoose";
 
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
-  let token = req.cookies?.token;
+// Định nghĩa một giao diện để mở rộng Request với thuộc tính user
+interface AuthRequest extends Request {
+  user?: {
+    _id: string;
+    isAdmin: boolean;
+  };
+}
 
-  // Check if the authorization header exists and starts with "Bearer"
-  if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
-    try {
-      // Extract the token from the authorization header
-      token = req.headers.authorization.split(" ")[1];
+// Chuyển `protect` thành kiểu `RequestHandler`
+export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  let token: string | undefined;
 
-      // Verify the token using JWT_SECRET
-      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { _id: string };
+  if (req.cookies && req.cookies.token) {
+    token = req.cookies.token;
+    console.log("Token from cookie:", token); // Debug
+  } else if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+    token = req.headers.authorization.split(" ")[1];
+    console.log("Token from header:", token); // Debug
+  }
 
-      // Find the user by the decoded token ID and exclude the password field
-      const user = await User.findById(decoded._id).select("-password");
+  if (!token) {
+    console.log("No token provided");
+    res.status(401).json({ message: "Not authorized, no token" });
+    return;
+  }
 
-      // If user is not found, return a 404 error
-      if (!user) {
-        res.status(404).json({ message: "User not found" });
-        return; // Stop further execution
-      }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+    console.log("Decoded token:", decoded); // Debug
 
-      // Attach the user ID and admin status to the request object
-      req.user = { _id: user._id as mongoose.Types.ObjectId, isAdmin: user.isAdmin };
+    const user = await User.findById(decoded._id).select("-password");
+    if (!user) {
+      console.log("User not found");
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
 
-      // Continue to the next middleware or route handler
-      next();
-    } catch (error) {
-      // Log the error for debugging
+    req.user = { _id: user._id as string, isAdmin: user.isAdmin };
+    next();
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      res.status(401).json({ message: "Token expired, please login again" });
+    } else {
       console.error("Token verification failed:", error);
-
-      // Pass the error to the next middleware or route handler
       res.status(401).json({ message: "Not authorized, token failed" });
     }
-  } else {
-    // If no token is provided, log the error and return a 401 error
-    console.error("No token provided");
-    res.status(401).json({ message: "Not authorized, no token" });
   }
 };
-// Extend the Express Request interface to include `user`
+
+
+
 
 // Middleware to check if the user is an admin
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
+
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
   if (req.user && req.user.isAdmin) {
-    // Proceed to the next middleware if the user is an admin
-    next();
+    next(); // Tiếp tục nếu là admin
   } else {
-    // If not admin, return 401 Unauthorized with a custom message
-    return res.status(401).json({
+    res.status(401).json({
       status: false,
       message: "Not authorized as admin. Try login as admin.",
     });

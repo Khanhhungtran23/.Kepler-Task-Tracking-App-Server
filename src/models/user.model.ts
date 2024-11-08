@@ -23,8 +23,8 @@ const userSchema: Schema<IUser> = new Schema(
     role: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    isAdmin: { type: Boolean, required: true, default: false },
-    tasks: [{ type: Schema.Types.ObjectId, ref: "task" }],
+    isAdmin: { type: Boolean, required: false, default: false },
+    tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
     isActive: { type: Boolean, required: true, default: true },
   },
   { timestamps: true }

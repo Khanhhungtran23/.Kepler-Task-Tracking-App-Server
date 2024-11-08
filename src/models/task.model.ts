@@ -9,7 +9,7 @@ const taskSchema = new Schema(
     status: {
       type: String,
         enum: ['To Do', 'In progress', 'Done'],
-        deafult: "To Do",
+        default: "To Do",
         required: true,
     }
     // team: [{ type: Schema.Types.ObjectId, ref: "User" }], // assign to member

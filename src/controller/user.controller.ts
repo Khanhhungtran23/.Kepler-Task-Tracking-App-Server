@@ -20,7 +20,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     // Create a new user
     const user = await User.create({
       user_name,
-      // full_name,
       role,
       email,
       password, // Password will be hashed automatically by mongoose pre-save hook
@@ -32,7 +31,6 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       res.status(201).json({
         _id: user._id,
         user_name: user.user_name,
-        // full_name: user.full_name,
         role: user.role,
         email: user.email,
         isAdmin: user.isAdmin,

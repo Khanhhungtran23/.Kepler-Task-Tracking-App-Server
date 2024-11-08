@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
-// import mongoose from "mongoose";
 
 // Create an application
 export const createApplication = async (req: Request, res: Response): Promise<void> => {
@@ -116,7 +115,7 @@ export const deleteApplication = async (req: Request, res: Response): Promise<vo
 export const getApplications = async (req: Request, res: Response) => {
   try {
     const applications = await Application.find({ isTrashed: false })
-      .populate('tasks')
+      // .populate('tasks')
       .populate('teamMembers')
       .exec();
 
@@ -134,7 +133,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     // Find application matching the provided application_title (case insensitive)
     const apps = await Application.find({ 
       title: { $regex: new RegExp(application_title, "i")},
-      isTrashed: "false"  
+      isTrashed: false  
     }); // Use regex for case-insensitive search
 
     if (apps.length > 0) {
@@ -156,7 +155,7 @@ export const searchTodoApp = async (req: Request, res: Response): Promise<void> 
     const apps = await Application.find({ 
       title: { $regex: new RegExp(application_title, "i") },
       status: "To Do",
-      isTrashed: "false"
+      isTrashed: false
    });
 
     if (apps.length > 0) {
@@ -178,7 +177,7 @@ export const searchImplementApp = async (req: Request, res: Response): Promise<v
     const apps = await Application.find({ 
       title: { $regex: new RegExp(application_title, "i") },
       status: "Implement",
-      isTrashed: "false"
+      isTrashed: false
    });
 
     if (apps.length > 0) {
@@ -200,7 +199,7 @@ export const searchTestingApp = async (req: Request, res: Response): Promise<voi
     const apps = await Application.find({ 
       title: { $regex: new RegExp(application_title, "i") },
       status: "Testing",
-      isTrashed: "false"
+      isTrashed: false
    });
 
     if (apps.length > 0) {
@@ -222,7 +221,7 @@ export const searchProductionApp = async (req: Request, res: Response): Promise<
     const apps = await Application.find({ 
       title: { $regex: new RegExp(application_title, "i") },
       status: "Production",
-      isTrashed: "false"
+      isTrashed: false
    });
 
     if (apps.length > 0) {
