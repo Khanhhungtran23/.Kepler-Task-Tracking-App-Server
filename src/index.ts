@@ -3,7 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express, { Request, Response } from "express";
 import morgan from "morgan";
-import routes from "../src/routes/index"; 
+import routes from "./routes/index"; 
 import { dbConnection } from "./utils/util"; 
 import bodyParser from "body-parser";
 import swaggerUi from "swagger-ui-express";
