@@ -1,12 +1,15 @@
-// types/express.d.ts
-import * as express from "express";
-import { Types } from "mongoose";
+import { Request } from "express";
+import mongoose from "mongoose";
+import { IUser } from "./models/user.model";
 
-// Extend the Express Request interface to include the `user` property
+// Extend Express Request interface globally
 declare global {
   namespace Express {
-    interface Request {
-      user?: string; // User can be of type ObjectId or string
+    export interface Request {
+      user?: {
+        _id: mongoose.Types.ObjectId | any;
+        isAdmin: boolean;
+      };  // user is now an object with _id and isAdmin
     }
   }
 }
