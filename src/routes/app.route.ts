@@ -120,7 +120,7 @@ router.post("/add-new", protect, isAdmin, createApplication);
  *         description: Only admins can edit applications
  */
 
-router.put("/edit/:title", protect, isAdmin, editApplication);
+router.put("/edit/:id", protect, isAdmin, editApplication);
 /**
  * @swagger
  * /app/trash/{title}:
@@ -146,7 +146,7 @@ router.put("/edit/:title", protect, isAdmin, editApplication);
  *         description: Only admins can trash applications
  */
 
-router.put("/trash/:id", protect, isAdmin, trashApplication);
+router.put("/trash/:title", protect, isAdmin, trashApplication);
 
 /**
  * @swagger
