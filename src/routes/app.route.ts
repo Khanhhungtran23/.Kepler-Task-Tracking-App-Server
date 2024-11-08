@@ -10,7 +10,9 @@ import { createApplication,
         searchTodoApp,
         searchImplementApp,
         searchTestingApp,
-        searchProductionApp 
+        searchProductionApp,
+        restoreApplication,
+        getTrashedApplications 
     } from "../controller/application.controller";
 
 const router = express.Router();
@@ -304,6 +306,8 @@ router.get("/search-testing-app/:application_title", protect, searchTestingApp);
  */
 router.get("/search-production-app/:application_title", protect, searchProductionApp);
 
+router.put("/restore/:title", protect, isAdmin, restoreApplication);
 
+router.get("/get-trashed-app", protect, isAdmin, getTrashedApplications);
 
 export default router;
