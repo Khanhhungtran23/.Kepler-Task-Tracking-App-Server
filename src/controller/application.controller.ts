@@ -60,7 +60,7 @@ export const trashApplication = async (req: Request, res: Response): Promise<voi
   try {
     const { title } = req.params;
 
-    const trashedApplication = await Application.findByIdAndUpdate(
+    const trashedApplication = await Application.findOneAndUpdate(
       { title: title },
       { isTrashed: true },
       { new: true }
@@ -73,8 +73,11 @@ export const trashApplication = async (req: Request, res: Response): Promise<voi
     res.status(200).json({ message: 'Application moved to trash', application: trashedApplication });
   } catch (error) {
     console.error('Error trashing application:', error);
-    res.status(500).json({ message: 'Server error while trashing application' });
-  }
+    // Return 500 status if there's a server error
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Server error while trashing application' });
+    }
+    }
 };
 
 // Permanent delete (only if trashed)
