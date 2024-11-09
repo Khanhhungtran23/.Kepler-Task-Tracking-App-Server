@@ -1,8 +1,8 @@
-# Task Tracking Management App
+# .Kepler App
 
 ## Overview
 
-This Task Tracking Management App is designed to help users register, log in, manage their profiles, and track tasks efficiently. It is built using Node.js, Express.js, MongoDB, and JWT for authentication. The application provides a RESTful API to handle users and task-related actions.
+.Kepler - Task Tracking Management App is designed to help users register, log in, manage their profiles, and track tasks efficiently in each app in your organization. It is built using Node.js, Express.js, MongoDB, and JWT for authentication. The application provides a RESTful API to handle users and task-related actions.
 
 ## Features
 
@@ -12,6 +12,10 @@ This Task Tracking Management App is designed to help users register, log in, ma
   - Logout users and invalidate sessions.
   - Change password for authenticated users.
   - Update profile for authenticated users.
+
+- **Manage projects:**
+
+- **Manage human resources:**
 
 ## Technologies Used
 
@@ -35,12 +39,12 @@ Make sure you have the following installed:
 
 1. **Clone the repository:**
    ```bash
-   git clone --depth 1 https://github.com/your-username/task-tracking-app.git
-   cd task-tracking-app
+   git clone --depth 1 https://github.com/Khanhhungtran23/.Kepler-Task-Tracking-App-Server.git
+   cd .Kepler-Task-Tracking-App-Server
    ```
 2. **Install dependencies:**
     ```bash
-    npm install
+    npm install or npm i
     ```
 3. **Set up environment variables:**
   ```bash
@@ -61,6 +65,7 @@ Make sure you have the following installed:
   ```
 - Run in production:
   ```bash
+  npm run build
   npm run start
   ```
 - Commit changes:
