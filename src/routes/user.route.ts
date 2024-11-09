@@ -15,7 +15,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /users/register:
+ * /user/register:
  *   post:
  *     summary: Register a new user
  *     description: Registers a new user to the system.
@@ -54,7 +54,7 @@ const router = express.Router();
 router.post("/register", registerUser);
 /**
  * @swagger
- * /users/login:
+ * /user/login:
  *   post:
  *     summary: Login a user
  *     description: Logs in an existing user. Returns a JWT token.
@@ -83,7 +83,7 @@ router.post("/login", loginUser);
 
 /**
  * @swagger
- * /users/change-password:
+ * /user/change-password:
  *   put:
  *     summary: Change user password
  *     description: Allows a user to change their password. Requires the old password.
@@ -117,7 +117,7 @@ router.put("/change-password", protect, changeUserPassword);
 
 /**
  * @swagger
- * /users/logout:
+ * /user/logout:
  *   post:
  *     summary: Logout a user
  *     tags: [Users]
@@ -131,7 +131,7 @@ router.post("/logout", protect, logoutUser);
 
 /**
  * @swagger
- * /users/profile:
+ * /user/profile:
  *   put:
  *     summary: Update user profile
  *     description: Allows a user to update their profile information.
@@ -162,7 +162,7 @@ router.put("/profile", protect, updateUserProfile);
 
 /**
  * @swagger
- * /users/get-all-info:
+ * /user/get-all-info:
  *   get:
  *     summary: Get all users
  *     tags: [Users]
@@ -182,7 +182,7 @@ router.get("/get-all-info", protect, isAdmin, getAllUsers);
 
 /**
  * @swagger
- * /users/search/{user_name}:
+ * /user/search/{user_name}:
  *   get:
  *     summary: Get a user by username
  *     tags: [Users]
@@ -209,7 +209,7 @@ router.get("/search/:user_name", protect, isAdmin, getUserByName);
 
 /**
  * @swagger
- * /users/disable-account:
+ * /user/disable-account:
  *   put:
  *     summary: Disable a user account
  *     description: Disables a user's account by setting isActive to false. Only admins can perform this action.
@@ -239,7 +239,7 @@ router.put("/disable-account/:email", protect, isAdmin, disableUserAccount);
 
 /**
  * @swagger
- * /users/enable-account:
+ * /user/enable-account:
  *   put:
  *     summary: Enable a user account
  *     description: Enables a user's account by setting isActive to true. Only admins can perform this action.
