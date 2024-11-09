@@ -235,7 +235,7 @@ router.get("/search/:user_name", protect, isAdmin, getUserByName);
  *         description: Access denied
  */
 
-router.put("/disable-account", protect, isAdmin, disableUserAccount);
+router.put("/disable-account/:email", protect, isAdmin, disableUserAccount);
 
 /**
  * @swagger
@@ -265,7 +265,7 @@ router.put("/disable-account", protect, isAdmin, disableUserAccount);
  *         description: Access denied
  */
 
-router.put("/enable-account", protect, isAdmin, enableUserAccount);
+router.put("/enable-account/:email", protect, isAdmin, enableUserAccount);
 
 export default router;
 

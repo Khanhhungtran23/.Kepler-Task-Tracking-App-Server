@@ -1,5 +1,5 @@
 {
-  "name": "task-tracking-server",
+  "name": "kepler-server",
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {

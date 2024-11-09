@@ -60,7 +60,7 @@ export const trashApplication = async (req: Request, res: Response): Promise<voi
   try {
     const { title } = req.params;
 
-    const trashedApplication = await Application.findByIdAndUpdate(
+    const trashedApplication = await Application.findOneAndUpdate(
       { title: title },
       { isTrashed: true },
       { new: true }
@@ -73,8 +73,11 @@ export const trashApplication = async (req: Request, res: Response): Promise<voi
     res.status(200).json({ message: 'Application moved to trash', application: trashedApplication });
   } catch (error) {
     console.error('Error trashing application:', error);
-    res.status(500).json({ message: 'Server error while trashing application' });
-  }
+    // Return 500 status if there's a server error
+    if (!res.headersSent) {
+      res.status(500).json({ message: 'Server error while trashing application' });
+    }
+    }
 };
 
 // Permanent delete (only if trashed)
@@ -96,7 +99,7 @@ export const deleteApplication = async (req: Request, res: Response): Promise<vo
   }
 };
 
-// Get all applications (excluding trashed)
+// Get all untrashed applications (excluding trashed)
 export const getApplications = async (req: Request, res: Response) => {
   try {
     const applications = await Application.find({ isTrashed: false })
@@ -217,5 +220,41 @@ export const searchProductionApp = async (req: Request, res: Response): Promise<
   } catch (err) {
     console.log("Error: " + err)
     res.status(500).json({ message: "Server error" });
+  }
+};
+
+// Restore the trashed application (turn back to application tab)
+export const restoreApplication = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { title } = req.params;
+
+    const restoredApplication = await Application.findOneAndUpdate(
+      { title: title },
+      { isTrashed: false },
+      { new: true }
+    );
+
+    if (!restoredApplication) {
+      res.status(404).json({ message: 'Application not found' });
+    }
+
+    res.status(200).json({ message: 'Application is restored', application: restoredApplication });
+  } catch (error) {
+    console.error('Error restoring application:', error);
+    res.status(500).json({ message: 'Server error while restoring application' });
+  }
+};
+
+// Get all trashed applications (including trashed)
+export const getTrashedApplications = async (req: Request, res: Response) => {
+  try {
+    const trashedApplications = await Application.find({ isTrashed: true })
+      .populate('teamMembers')
+      .exec();
+
+    res.status(200).json({ trashedApplications });
+  } catch (error) {
+    console.error('Error fetching applications:', error);
+    res.status(500).json({ message: 'Server error while fetching applications' });
   }
 };
