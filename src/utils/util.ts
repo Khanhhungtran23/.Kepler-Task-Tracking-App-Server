@@ -34,7 +34,7 @@ export const createJWT = (res: Response, userId: string): string => {
     // Set the cookie with the JWT token
   res.cookie("token", token, {
     httpOnly: true, // Secure the cookie
-    secure: process.env.NODE_ENV !== "development", // Use secure cookies in non-development environments
+    secure: process.env.NODE_ENV === "production", // Use secure cookies in non-development environments
     sameSite: "strict", // Prevent CSRF attack
     maxAge: 1 * 24 * 60 * 60 * 1000, // Set expiration time to 1 day (in milliseconds)
   });
