@@ -121,7 +121,7 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
 export const logoutUser = (req: Request, res: Response) => {
     res.cookie("token", "", {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "development", // later in production
+      secure: process.env.NODE_ENV === "production", 
       sameSite: "strict", // Prevent CSRF attacks
       expires: new Date(0), // Set expiration time to the past
     });
