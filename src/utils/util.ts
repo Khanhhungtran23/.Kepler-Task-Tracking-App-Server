@@ -35,7 +35,7 @@ export const createJWT = (res: Response, userId: string): string => {
   res.cookie("token", token, {
     httpOnly: true, // Secure the cookie
     secure: process.env.NODE_ENV === "production", // Use secure cookies in non-development environments
-    sameSite: "strict", // Prevent CSRF attack
+    sameSite: "none", // Prevent CSRF attack
     maxAge: 1 * 24 * 60 * 60 * 1000, // Set expiration time to 1 day (in milliseconds)
   });
   // Return the token so it can also be logged or used elsewhere
