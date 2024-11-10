@@ -22,11 +22,17 @@ const app = express();
 // Set up CORS with the correct options
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:3001","https://dotkepler.vercel.app/","https://task-tracking-application-diw35wak6-vo-minh-khangs-projects.vercel.app/"],
-    methods: ["GET", "POST", "DELETE", "PUT","HEAD"],
+    origin: [
+      "http://localhost:3000", 
+      "http://localhost:3001",
+      "https://dotkepler.vercel.app/login",
+      "https://task-tracking-application-diw35wak6-vo-minh-khangs-projects.vercel.app"
+    ],
+    methods: ["GET", "POST", "DELETE", "PUT", "HEAD"],
     credentials: true,
   })
 );
+
 app.options('*', cors());  // Enable pre-flight requests for all routes
 
 // Middleware to parse JSON and URL-encoded data
