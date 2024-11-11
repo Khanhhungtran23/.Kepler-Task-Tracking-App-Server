@@ -13,7 +13,6 @@ const taskSchema = new Schema(
         required: true,
     }
     // team: [{ type: Schema.Types.ObjectId, ref: "User" }], // assign to member
-    // isTrashed: { type: Boolean, default: false },
     // priority: { type: Number, required: true },
   },
   { timestamps: true }

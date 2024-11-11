@@ -12,7 +12,12 @@ const applicationSchema = new Schema(
         required: true,
       },
       isTrashed: { type: Boolean, default: false },
-      priority: { type: Number, required: true },
+      priority: { 
+        type: Number, 
+        enum: ['Low', 'Medium', 'High'],
+        default: "None",
+        required: true 
+      },
       tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
       activities: [{ type: Schema.Types.ObjectId, ref: "Activity" }],
       teamMembers: [{ type: Schema.Types.ObjectId, ref: "User" }], // Assuming you have a User schema
