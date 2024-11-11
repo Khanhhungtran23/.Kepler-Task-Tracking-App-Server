@@ -13,7 +13,7 @@ const applicationSchema = new Schema(
       },
       isTrashed: { type: Boolean, default: false },
       priority: { 
-        type: Number, 
+        type: String, 
         enum: ['Low', 'Medium', 'High'],
         default: "None",
         required: true 

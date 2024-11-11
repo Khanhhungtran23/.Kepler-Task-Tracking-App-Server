@@ -12,7 +12,9 @@ import { createApplication,
         searchTestingApp,
         searchProductionApp,
         restoreApplication,
-        getTrashedApplications 
+        getTrashedApplications,
+        countApplicationsByStatus,
+        countApplicationsByPriority
     } from "../controller/application.controller";
 
 const router = express.Router();
@@ -309,5 +311,9 @@ router.get("/search-production-app/:application_title", protect, searchProductio
 router.put("/restore/:title", protect, isAdmin, restoreApplication);
 
 router.get("/get-trashed-app", protect, isAdmin, getTrashedApplications);
+
+router.get("/get-status-statistic", protect, countApplicationsByStatus);
+
+router.get("/get-priority-statistic", protect, countApplicationsByPriority);
 
 export default router;
