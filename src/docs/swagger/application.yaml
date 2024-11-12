@@ -1,0 +1,640 @@
+openapi: 3.0.0
+info:
+  title: Application API
+  description: API for managing applications.
+  version: 1.0.0
+
+paths:
+  /app/add-new:
+    post:
+      summary: Create a new application
+      description: Creates a new application with provided details. Only admin role can create an application.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - description
+                - status
+                - priority
+              properties:
+                title:
+                  type: string
+                  description: Title of the application
+                description:
+                  type: string
+                  description: Detailed description of the application
+                assets:
+                  type: array
+                  items:
+                    type: string
+                  description: List of asset URLs related to the application
+                status:
+                  type: string
+                  description: Current status of the application
+                  enum:
+                    - To Do
+                    - Implement
+                    - Testing
+                    - Production
+                priority:
+                  type: integer
+                  description: Priority level of the application (e.g., 1 for highest priority)
+            example:
+              title: "New Application"
+              description: "Detailed application description"
+              assets: ["http://example.com/asset1", "http://example.com/asset2"]
+              status: "To Do"
+              priority: 1
+      responses:
+        '201':
+          description: Application created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application created successfully"
+                  application:
+                    $ref: '#/components/schemas/Application'
+        '400':
+          description: Missing required fields
+        '403':
+          description: Only admins can create applications
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/edit/{id}:
+    put:
+      summary: Edit an existing application
+      description: Allows an admin to edit the details of an application.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Application ID to edit
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                description:
+                  type: string
+                assets:
+                  type: array
+                  items:
+                    type: string
+                status:
+                  type: string
+                  enum:
+                    - To Do
+                    - Implement
+                    - Testing
+                    - Production
+                priority:
+                  type: integer
+                tasks:
+                  type: array
+                  items:
+                    type: string
+                  description: List of task IDs associated with the application
+                teamMembers:
+                  type: array
+                  items:
+                    type: string
+                  description: List of user IDs assigned to the application
+            example:
+              title: "Updated Application"
+              description: "Updated description"
+              assets: ["http://example.com/asset1"]
+              status: "Testing"
+              priority: 2
+              tasks: ["task1", "task2"]
+              teamMembers: ["user1", "user2"]
+      responses:
+        '200':
+          description: Application updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application updated successfully"
+                  application:
+                    $ref: '#/components/schemas/Application'
+        '404':
+          description: Application not found
+        '403':
+          description: Only admins can edit applications
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/trash/{title}:
+    put:
+      summary: Move an application to trash
+      description: Marks an application as trashed. Only admins can perform this action.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: title
+          required: true
+          schema:
+            type: string
+          description: Application title to trash
+      responses:
+        '200':
+          description: Application moved to trash
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application moved to trash"
+        '404':
+          description: Application not found
+        '403':
+          description: Only admins can trash applications
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/delete/{id}:
+    delete:
+      summary: Permanently delete an application
+      description: Permanently deletes an application. Only trashed applications can be permanently deleted. Only admins can perform this action.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: Application ID to delete
+      responses:
+        '200':
+          description: Application permanently deleted
+        '404':
+          description: Application not found or not in trash
+        '403':
+          description: Only admins can delete applications permanently
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/get-all:
+    get:
+      summary: Get all applications
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Returns a list of all applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Application'
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/search-app/{application_title}:
+    get:
+      summary: Search an application by title
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: application_title
+          required: true
+          schema:
+            type: string
+          description: The application title
+      responses:
+        '200':
+          description: Application search results
+        '404':
+          description: Application not found
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/search-todo-app/{application_title}:
+    get:
+      summary: Search a To Do application by title
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: application_title
+          required: true
+          schema:
+            type: string
+          description: The title of the To Do application
+      responses:
+        '200':
+          description: To Do application search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+              example:
+                - title: "Sample To Do Application"
+                  description: "A sample application in To Do status"
+                  status: "To Do"
+                  priority: 1
+        '404':
+          description: Application not found
+        '500':
+          description: Server error while searching for the application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/search-implement-app/{application_title}:
+    get:
+      summary: Search an Implementing application by title
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: application_title
+          required: true
+          schema:
+            type: string
+          description: The title of the Implementing application
+      responses:
+        '200':
+          description: Implementing application search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+              example:
+                - title: "Sample Implementing Application"
+                  description: "A sample application in Implement status"
+                  status: "Implement"
+                  priority: 2
+        '404':
+          description: Application not found
+        '500':
+          description: Server error while searching for the application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/search-testing-app/{application_title}:
+    get:
+      summary: Search a Testing application by title
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: application_title
+          required: true
+          schema:
+            type: string
+          description: The title of the Testing application
+      responses:
+        '200':
+          description: Testing application search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+              example:
+                - title: "Sample Testing Application"
+                  description: "A sample application in Testing status"
+                  status: "Testing"
+                  priority: 3
+        '404':
+          description: Application not found
+        '500':
+          description: Server error while searching for the application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/search-production-app/{application_title}:
+    get:
+      summary: Search a Production application by title
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: application_title
+          required: true
+          schema:
+            type: string
+          description: The title of the Production application
+      responses:
+        '200':
+          description: Production application search results
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Application'
+              example:
+                - title: "Sample Production Application"
+                  description: "A sample application in Production status"
+                  status: "Production"
+                  priority: 4
+        '404':
+          description: Application not found
+        '500':
+          description: Server error while searching for the application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/restore/{title}:
+    put:
+      summary: Restore an application from trash
+      description: Restores a trashed application back to active status. Only admins can perform this action.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: title
+          required: true
+          schema:
+            type: string
+          description: Title of the application to restore
+      responses:
+        '200':
+          description: Application is restored
+        '404':
+          description: Application not found
+        '500':
+          description: Server error while restoring application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/get-trashed-app:
+    get:
+      summary: Get all trashed applications
+      description: Retrieves a list of all applications currently in the trash. Only admins can access this list.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of trashed applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  trashedApplications:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Application'
+              example:
+                trashedApplications:
+                  - title: "Trashed Application 1"
+                    description: "An application moved to trash"
+                    status: "To Do"
+                    priority: 2
+                    teamMembers: ["user1", "user2"]
+                  - title: "Trashed Application 2"
+                    description: "Another trashed application"
+                    status: "Testing"
+                    priority: 1
+                    teamMembers: ["user3", "user4"]
+        '500':
+          description: Server error while fetching applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error while fetching applications"
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/get-status-statistic:
+    get:
+      summary: Get application count by status
+      description: Retrieves the count of applications grouped by their status.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Application counts by status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  Statistic:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total:
+                          type: integer
+                        detail:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              status:
+                                type: string
+                              count:
+                                type: integer
+        '500':
+          description: Server error while counting applications
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /app/get-priority-statistic:
+    get:
+      summary: Get application count by priority
+      description: Retrieves the count of applications grouped by priority level.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Application counts by priority
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  Statistic:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        priority:
+                          type: string
+                        count:
+                          type: integer
+        '500':
+          description: Server error while counting applications
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+components:
+  schemas:
+    Application:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated application ID
+        title:
+          type: string
+          description: Application title
+          example: Task Management System
+        description:
+          type: string
+          description: Application description
+          example: Tracks tasks and team activities
+        assets:
+          type: array
+          items:
+            type: string
+          description: Assets related to the application, URL of document files
+        status:
+          type: string
+          enum: ["To Do", "Implement", "Testing", "Production"]
+          description: Current status of the application
+          example: To Do
+        isTrashed:
+          type: boolean
+          description: Is the application in trash?
+          example: false
+        priority:
+          type: string
+          description: Application priority
+          example: High
+        tasks:
+          type: array
+          items:
+            type: string
+          description: List of task IDs associated with the application
+        activities:
+          type: array
+          items:
+            type: string
+          description: List of activity IDs associated with the application
+        teamMembers:
+          type: array
+          items:
+            type: string
+          description: List of team member IDs associated with the application

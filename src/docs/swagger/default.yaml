@@ -1,0 +1,21 @@
+paths:
+  /:
+    get:
+      summary: Default API endpoint
+      description: Returns a welcome message for the Task Tracking Application.
+      tags:
+        - Default
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: You are on Task Tracking Application!!!
