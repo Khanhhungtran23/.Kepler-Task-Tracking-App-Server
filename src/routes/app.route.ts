@@ -14,7 +14,9 @@ import { createApplication,
         restoreApplication,
         getTrashedApplications,
         countApplicationsByStatus,
-        countApplicationsByPriority
+        countApplicationsByPriority,
+        countApplicationsPerUser,
+        addMemberToApplication
     } from "../controller/application.controller";
 const router = express.Router();
 
@@ -45,5 +47,10 @@ router.get("/get-trashed-app", protect, isAdmin, getTrashedApplications);
 router.get("/get-status-statistic", protect, countApplicationsByStatus);
 
 router.get("/get-priority-statistic", protect, countApplicationsByPriority);
+
+router.get("/get-apps-user", protect, countApplicationsPerUser);
+
+router.post("/add-member-app", protect, isAdmin, addMemberToApplication);
+
 
 export default router;

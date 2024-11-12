@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
-import bcrypt from "bcryptjs";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
 

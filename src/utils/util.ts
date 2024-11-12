@@ -13,7 +13,7 @@ export const dbConnection = async (): Promise<void> => {
       }
   
       await mongoose.connect(mongoURI);
-      console.log("DB connection established succesfully!");
+      console.log("Mongo Database connection established succesfully!");
     } catch (error) {
       console.log("DB Error: " + error);
     }
