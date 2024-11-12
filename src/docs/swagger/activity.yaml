@@ -1,0 +1,19 @@
+
+
+components:
+  schemas:
+    Activity:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated activity ID
+        title:
+          type: string
+          enum: ["Requirement Clarification", "Implementation", "QC1", "UAT", "QC2", "Deployment"]
+          description: Activity title
+          example: Implementation
+        comment:
+          type: string
+          description: Comment for the activity
+          example: Code for the login functionality has been implemented.

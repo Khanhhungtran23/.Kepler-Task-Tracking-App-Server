@@ -105,8 +105,7 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
 
     if (user && (await user.matchPassword(oldPassword))) {
       // If old password matches, hash the new password and save it
-      const salt = await bcrypt.genSalt(10);
-      user.password = await bcrypt.hash(newPassword, salt);
+      user.password = newPassword;
       await user.save();
 
       res.status(200).json({ message: "Password updated successfully" });

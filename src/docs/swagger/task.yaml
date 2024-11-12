@@ -1,0 +1,33 @@
+
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated task ID
+        title:
+          type: string
+          description: Task title
+          example: Implement login functionality
+        deadline:
+          type: string
+          format: date-time
+          description: Task deadline
+          example: 2024-10-30T12:00:00Z
+        assets:
+          type: array
+          items:
+            type: string
+          description: Assets for the task, URL of document files
+        tag:
+          type: string
+          description: Tag or category for the task
+          example: Backend
+        status:
+          type: string
+          enum: ["To Do", "In progress", "Done"]
+          description: Status of the task
+          example: To Do

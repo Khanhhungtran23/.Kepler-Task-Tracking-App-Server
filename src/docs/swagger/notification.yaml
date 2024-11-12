@@ -1,0 +1,53 @@
+
+
+components:
+  schemas:
+    Notification:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated notification ID
+        team:
+          type: array
+          items:
+            type: string
+            description: User ID
+          description: List of team members who will receive the notification
+        text:
+          type: string
+          description: Notification content
+          example: "You have been assigned to a new task."
+        application:
+          type: string
+          description: Application ID related to the notification
+          example: "603d2149e6c5c019d4fbdbd4"
+        task:
+          type: string
+          description: Task ID related to the notification, if applicable
+          example: "603d2149e6c5c019d4fbdbd5"
+        sender:
+          type: string
+          description: User ID of the sender, if the notification is a message
+          example: "603d2149e6c5c019d4fbdbd6"
+        notiType:
+          type: string
+          enum: ["alert", "message", "assignment"]
+          description: "Type of notification: alert, message, or assignment"
+          example: "alert"
+        isRead:
+          type: array
+          items:
+            type: string
+            description: User ID of those who have read the notification
+          description: List of users who have read the notification
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the notification was created
+          example: "2023-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the notification was last updated
+          example: "2023-01-01T00:00:00Z"

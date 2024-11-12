@@ -1,0 +1,857 @@
+paths:
+  /user/register:
+    post:
+      summary: Register a new user
+      description: Registers a new user to the system.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - user_name
+                - role
+                - email
+                - password
+              properties:
+                user_name:
+                  type: string
+                  description: Username for the new user
+                  example: johndoe
+                role:
+                  type: string
+                  description: Role of the user in the project (e.g., Developer, Manager)
+                  example: Developer
+                email:
+                  type: string
+                  description: Email address of the user
+                  example: johndoe@example.com
+                password:
+                  type: string
+                  description: Password for the user account
+                  example: password123
+            examples:
+              example-1:
+                summary: Register a new user example
+                value:
+                  user_name: johndoe
+                  role: Developer
+                  email: johndoe@example.com
+                  password: password123
+      responses:
+        '201':
+          description: User successfully registered and token generated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Auto-generated user ID
+                    example: "617c1f77f0d4c800170d0f67"
+                  user_name:
+                    type: string
+                    description: Username for the new user
+                    example: johndoe
+                  role:
+                    type: string
+                    description: Role of the user
+                    example: Developer
+                  email:
+                    type: string
+                    description: Email address of the user
+                    example: johndoe@example.com
+                  isAdmin:
+                    type: boolean
+                    description: Indicates if the user has admin rights
+                    example: false
+                  token:
+                    type: string
+                    description: JWT token for authentication
+                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: User already exists or invalid user data
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "User already exists"
+              examples:
+                user_exists:
+                  summary: User already exists example
+                  value:
+                    success: false
+                    message: "User already exists"
+                invalid_data:
+                  summary: Invalid user data example
+                  value:
+                    success: false
+                    message: "Invalid user data"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+
+  /user/login:
+    post:
+      summary: Login a user
+      description: Logs in an existing user and returns a JWT token in a cookie.
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  description: User email address
+                  example: johndoe@example.com
+                password:
+                  type: string
+                  description: User password
+                  example: password123
+            examples:
+              example-1:
+                summary: Login example
+                value:
+                  email: johndoe@example.com
+                  password: password123
+      responses:
+        '200':
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Auto-generated user ID
+                    example: "617c1f77f0d4c800170d0f67"
+                  user_name:
+                    type: string
+                    description: Username for the user
+                    example: johndoe
+                  role:
+                    type: string
+                    description: Role of the user
+                    example: Developer
+                  email:
+                    type: string
+                    description: Email address of the user
+                    example: johndoe@example.com
+                  isAdmin:
+                    type: boolean
+                    description: Indicates if the user has admin rights
+                    example: false
+                  isActive:
+                    type: boolean
+                    description: Account activation status
+                    example: true
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Invalid email or password"
+        '403':
+          description: Account disabled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Your account is disabled. Please contact your manager."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /user/change-password:
+    put:
+      summary: Change user password
+      description: Allows a user to change their password. Requires the old password for verification.
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - oldPassword
+                - newPassword
+              properties:
+                oldPassword:
+                  type: string
+                  description: Current password
+                  example: oldpassword123
+                newPassword:
+                  type: string
+                  description: New password
+                  example: newpassword456
+            examples:
+              example-1:
+                summary: Change password example
+                value:
+                  oldPassword: oldpassword123
+                  newPassword: newpassword456
+      responses:
+        '200':
+          description: Password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password updated successfully"
+        '400':
+          description: Old password is incorrect
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Old password is incorrect"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /user/logout:
+    post:
+      summary: Logout a user
+      description: Logs out an authenticated user by clearing the JWT token from the cookie.
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "User logged out successfully."
+        '401':
+          description: Unauthorized - User is not authenticated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthorized - Please log in to continue."
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /user/profile:
+    put:
+      summary: Update user profile
+      description: Allows a user to update their profile information.
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_name:
+                  type: string
+                  description: New username
+                  example: johndoe
+                role:
+                  type: string
+                  description: New role
+                  example: Developer
+            examples:
+              example-1:
+                summary: Update profile example
+                value:
+                  user_name: johndoe
+                  role: Developer
+      responses:
+        '200':
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Auto-generated user ID
+                    example: "617c1f77f0d4c800170d0f67"
+                  user_name:
+                    type: string
+                    description: Username for the user
+                    example: johndoe
+                  role:
+                    type: string
+                    description: Role of the user
+                    example: Developer
+                  email:
+                    type: string
+                    description: Email address of the user
+                    example: johndoe@example.com
+                  isAdmin:
+                    type: boolean
+                    description: Indicates if the user has admin rights
+                    example: false
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "User not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /user/get-all-info:
+    get:
+      summary: Get all users
+      tags:
+        - Users
+      description: Retrieve all user information, sorted by creation date in descending order.
+      operationId: getAllUsers
+      security:
+        - bearerAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: Successfully retrieved a list of all users.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                success:
+                  summary: Example response when users are found
+                  value:
+                    - id: "62a8c55bff564f0016a3e99e"
+                      name: "John Doe"
+                      email: "johndoe@example.com"
+                      createdAt: "2023-01-01T10:00:00Z"
+                      updatedAt: "2023-01-10T12:00:00Z"
+                    - id: "62a8c55bff564f0016a3e99f"
+                      name: "Jane Smith"
+                      email: "janesmith@example.com"
+                      createdAt: "2023-01-05T14:30:00Z"
+                      updatedAt: "2023-01-12T15:45:00Z"
+        '500':
+          description: Server error occurred while retrieving user data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+              examples:
+                serverError:
+                  summary: Example response when there is a server error
+                  value:
+                    message: "Server error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
+  /user/search/{user_name}:
+    get:
+      summary: Get a user by username
+      tags:
+        - Users
+      description: Retrieve users by their username with case-insensitive matching.
+      operationId: getUserByName
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: user_name
+          required: true
+          schema:
+            type: string
+          description: The user's username
+          x-required: true  # Đánh dấu required với sao đỏ
+      responses:
+        '200':
+          description: Successfully retrieved users with matching usernames.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+              examples:
+                success:
+                  summary: Example response when users are found
+                  value:
+                    - id: "62a8c55bff564f0016a3e99e"
+                      name: "John Doe"
+                      email: "johndoe@example.com"
+                      createdAt: "2023-01-01T10:00:00Z"
+                      updatedAt: "2023-01-10T12:00:00Z"
+                    - id: "62a8c55bff564f0016a3e99f"
+                      name: "Johnny Smith"
+                      email: "johnnysmith@example.com"
+                      createdAt: "2023-02-03T08:25:00Z"
+                      updatedAt: "2023-02-05T09:15:00Z"
+        '404':
+          description: No users found with that name.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "No users found with that name"
+              examples:
+                notFound:
+                  summary: Example response when no user is found
+                  value:
+                    message: "No users found with that name"
+        '500':
+          description: Server error occurred while retrieving user data.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+              examples:
+                serverError:
+                  summary: Example response when there is a server error
+                  value:
+                    message: "Server error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
+  /user/disable-account:
+    put:
+      summary: Disable a user account
+      description: Disables a user's account by setting `isActive` to false. Only admins can perform this action.
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email of the account to disable
+              required:
+                - email
+            example:
+              email: "user@example.com"
+      responses:
+        '200':
+          description: Account disabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account of user@example.com has been disabled successfully."
+                  User:
+                    $ref: '#/components/schemas/User'
+              examples:
+                success:
+                  summary: Example response when account is successfully disabled
+                  value:
+                    message: "Account of user@example.com has been disabled successfully."
+                    User:
+                      id: "62a8c55bff564f0016a3e99e"
+                      name: "User Name"
+                      email: "user@example.com"
+                      isActive: false
+                      createdAt: "2023-01-01T10:00:00Z"
+                      updatedAt: "2023-01-10T12:00:00Z"
+        '400':
+          description: The account is already disabled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "This account is already disabled"
+              examples:
+                alreadyDisabled:
+                  summary: Example response when account is already disabled
+                  value:
+                    message: "This account is already disabled"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Disabled user not found"
+              examples:
+                notFound:
+                  summary: Example response when user is not found
+                  value:
+                    message: "Disabled user not found"
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access denied"
+              examples:
+                accessDenied:
+                  summary: Example response when access is denied
+                  value:
+                    message: "Access denied"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+              examples:
+                serverError:
+                  summary: Example response when there is a server error
+                  value:
+                    message: "Server error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
+  /user/enable-account:
+    put:
+      summary: Enable a user account
+      description: Enables a user's account by setting `isActive` to true. Only admins can perform this action.
+      tags:
+        - Users
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  description: Email of the account to enable
+              required:
+                - email
+            example:
+              email: "user@example.com"
+      responses:
+        '200':
+          description: Account enabled successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Account of user@example.com has been enabled successfully."
+                  User:
+                    $ref: '#/components/schemas/User'
+              examples:
+                success:
+                  summary: Example response when account is successfully enabled
+                  value:
+                    message: "Account of user@example.com has been enabled successfully."
+                    User:
+                      id: "62a8c55bff564f0016a3e99e"
+                      name: "User Name"
+                      email: "user@example.com"
+                      isActive: true
+                      createdAt: "2023-01-01T10:00:00Z"
+                      updatedAt: "2023-01-10T12:00:00Z"
+        '400':
+          description: The account is already enabled.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "This account is already enabled"
+              examples:
+                alreadyEnabled:
+                  summary: Example response when account is already enabled
+                  value:
+                    message: "This account is already enabled"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Enabled user not found"
+              examples:
+                notFound:
+                  summary: Example response when user is not found
+                  value:
+                    message: "Enabled user not found"
+        '403':
+          description: Access denied
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access denied"
+              examples:
+                accessDenied:
+                  summary: Example response when access is denied
+                  value:
+                    message: "Access denied"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+              examples:
+                serverError:
+                  summary: Example response when there is a server error
+                  value:
+                    message: "Server error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated user ID
+        user_name:
+          type: string
+          description: The username
+          example: johndoe
+        role:
+          type: string
+          description: Role of the user in the project
+          example: Developer
+        email:
+          type: string
+          description: User email address
+          example: johndoe@example.com
+        password:
+          type: string
+          description: User password (hashed)
+          example: password123
+        isAdmin:
+          type: boolean
+          description: Determines if the user is an admin
+          example: false
+        isActive:
+          type: boolean
+          description: Is the account active?
+          example: true
+        tasks:
+          type: array
+          items:
+            type: string
+            description: Task IDs assigned to the user
+        createdDay:
+          type: string
+          format: date-time
+          description: Date when the account was created

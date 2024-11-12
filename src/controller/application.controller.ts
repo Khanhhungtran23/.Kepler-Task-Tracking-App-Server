@@ -258,6 +258,7 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error while fetching applications' });
   }
 };
+
 //Get number of application by status
 export const countApplicationsByStatus = async (req: Request, res: Response): Promise<void> => {
   try {
