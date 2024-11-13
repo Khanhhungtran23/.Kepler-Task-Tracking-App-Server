@@ -78,8 +78,10 @@ app.use(bodyParser.json());
 // // Parse cookies
 app.use(cookieParser());
 
-// // Logging HTTP requests
-// app.use(morgan("development"));
+// Logging HTTP requests
+// Configure Morgan for logging
+const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
+app.use(morgan(logFormat));
 
 // Root endpoint
 app.get('/', (req, res) => {
@@ -89,17 +91,17 @@ app.get('/', (req, res) => {
     });
 });
 
-// API routes handling
-// Route not found handler
-//app.use(routeNotFound);
-
-// General error handler
-//app.use(errorHandler);
 
 app.use("/api", routes);
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+// Route not found handler
+app.use(routeNotFound);
+
+// General error handler
+app.use(errorHandler);
 
 // Start the server
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));

@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import User from "../models/user.model";
-import bcrypt from "bcryptjs";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
 
@@ -98,22 +97,39 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
   const { oldPassword, newPassword } = req.body;
   const userId = req.user?._id; // Assuming protect middleware is used and user ID is available in req.user
+  
+  console.log("Request body:", req.body);
+  console.log("User ID:", userId);
+
+  if (!oldPassword || !newPassword) {
+    console.log("Password fields are missing");
+    res.status(400).json({ message: "Old and new passwords are required" });
+  }
 
   try {
     // Find the user by ID
     const user = await User.findById(userId);
+    if (!user) {
+      console.log("User not found");
+      res.status(404).json({ message: "User not found" });
+    } else { 
+    console.log("User found:", user);
+    }
 
     if (user && (await user.matchPassword(oldPassword))) {
       // If old password matches, hash the new password and save it
+      console.log("Old password is correct, updating password...");
       user.password = newPassword;
       await user.save();
-
       res.status(200).json({ message: "Password updated successfully" });
+
     } else {
+      console.log("Old password is incorrect");
       res.status(400).json({ message: "Old password is incorrect" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error in changeUserPassword:", err);
+    res.status(500).json({ message: "Server error"});
   }
 };
 // Logout user

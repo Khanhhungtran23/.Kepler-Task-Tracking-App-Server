@@ -589,6 +589,106 @@ paths:
           onClick: "resetForm()" # Reset button (front-end should define resetForm())
       x-execute-query: true # Show Execute Query button to test API
 
+  /get-apps-user:
+    get:
+      summary: Get application count per user
+      description: Returns the number of applications each user is a member of.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved application counts per user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Applications count for each member"
+                  Statistic:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total user:
+                          type: integer
+                          description: Total number of users
+                        detail:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: User ID
+                              count:
+                                type: integer
+                                description: Number of applications the user is a member of
+        '500':
+          description: Server error while counting applications per user
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+  /add-member-app:
+    post:
+      summary: Add a member to an application
+      description: Adds a user to the specified application's team members. Requires admin role.
+      tags:
+        - Applications
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - appId
+                - userId
+              properties:
+                appId:
+                  type: string
+                  description: ID of the application to which the user will be added
+                userId:
+                  type: string
+                  description: ID of the user to be added to the application
+            example:
+              appId: "603d0b00f41f5b4c1c2c0f1a"
+              userId: "603d0b00f41f5b4c1c2c0f1b"
+      responses:
+        '200':
+          description: User added to application successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User added to application successfully"
+                  application:
+                    $ref: '#/components/schemas/Application'
+        '400':
+          description: Invalid application ID, user ID, or user is already a member
+        '404':
+          description: Application or user not found
+        '500':
+          description: Server error while adding member to application
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
 components:
   schemas:
     Application:

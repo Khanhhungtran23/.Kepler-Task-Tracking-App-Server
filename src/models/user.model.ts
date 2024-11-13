@@ -11,7 +11,7 @@ export interface IUser extends Document {
   isAdmin: boolean;
   tasks: mongoose.Types.ObjectId[];
   isActive: boolean;
-  createdDay: Date;  // New field to track account creation date
+  createdDay: Date;  
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -26,6 +26,7 @@ const userSchema: Schema<IUser> = new Schema(
     isAdmin: { type: Boolean, required: false, default: false },
     tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
     isActive: { type: Boolean, required: true, default: true },
+    createdDay: { type: Date, default: Date.now },
   },
   { timestamps: true }
 );
@@ -33,7 +34,7 @@ const userSchema: Schema<IUser> = new Schema(
 // Middleware to hash password before saving
 userSchema.pre<IUser>("save", async function (next) {
   if (!this.isModified("password")) {
-    next();
+    return next();
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -43,7 +44,12 @@ userSchema.pre<IUser>("save", async function (next) {
 
 // Method to compare passwords
 userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
-  return await bcrypt.compare(enteredPassword, this.password);
+  try {
+    return await bcrypt.compare(enteredPassword, this.password);
+  } catch(err) {
+    console.error("Error comparing passwords:", err);
+    return false;
+  }
 };
 
 // Create and export the User model with the IUser interface

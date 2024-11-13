@@ -1,5 +1,8 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
+import User from "../models/user.model";
+import mongoose from "mongoose";
+
 
 // Create an application
 export const createApplication = async (req: Request, res: Response): Promise<void> => {
@@ -295,5 +298,82 @@ export const countApplicationsByPriority = async (req: Request, res: Response): 
   } catch (error) {
     console.error('Error counting applications by priority:', error);
     res.status(500).json({ message: 'Server error while counting applications' });
+  }
+};
+
+// Get number of applications for each user
+export const countApplicationsPerUser = async (req: Request, res: Response): Promise<void> => {
+  try {
+    // Aggregate to count applications for each user
+    const counts = await Application.aggregate([
+      { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
+      { $unwind: "$teamMembers" }, // Unwind teamMembers array
+      { $group: { _id: "$teamMembers", count: { $sum: 1 } } }, // Count applications per user
+      {
+        $project: {
+          _id: 0,
+          id: "$_id", // Rename _id to id
+          count: 1,
+        },
+      },
+    ]);
+
+    // Prepare response format
+    const response = {
+      message: "Applications count for each member",
+      Statistic: [
+        {
+          "total user": counts.length,
+          detail: counts,
+        },
+      ],
+    };
+
+    res.status(200).json(response);
+  } catch (error) {
+    console.error("Error counting applications per user:", error);
+    res.status(500).json({ message: "Server error while counting applications per user" });
+  }
+};
+
+// Function to add member to Application
+export const addMemberToApplication = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { appId, userId } = req.body; 
+
+    if (!mongoose.Types.ObjectId.isValid(appId) || !mongoose.Types.ObjectId.isValid(userId)) {
+      res.status(400).json({ message: "Invalid application ID or user ID format" });
+      return; 
+    }
+
+    const application = await Application.findById(appId);
+    if (!application) {
+      res.status(404).json({ message: "Application not found" });
+      return;
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (application.teamMembers.includes(userId)) {
+      res.status(400).json({ message: "User is already a member of this application" });
+      return;
+    }
+
+    // add user into array teamMembers of application
+    application.teamMembers.push(userId);
+    await application.save();
+
+
+    res.status(200).json({ 
+      message: "User added to application successfully", 
+      application
+    });
+  } catch (error) {
+    console.error("Error adding member to application:", error);
+    res.status(500).json({ message: "Server error while adding member to application" });
   }
 };

@@ -11,6 +11,10 @@ dist
 *.js
 *.js.map
 
+# Husky
+.husky/
+
+
 # TypeScript cache
 *.tsbuildinfo
 # OS generated files
