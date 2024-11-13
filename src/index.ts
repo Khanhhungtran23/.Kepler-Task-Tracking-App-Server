@@ -18,7 +18,7 @@ dotenv.config();
 dbConnection();
 
 // initialize app
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT;
 const app = express();
 
 // // Create HTTP server and integrate it with Express
