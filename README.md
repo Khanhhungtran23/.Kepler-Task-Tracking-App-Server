@@ -131,5 +131,15 @@ Make sure you have the following installed:
 ### Error Handling
 
 
+### Guide to use husky
+1. Config Husky: npx husky install
+2. Tạo Git Hook với Husky : npx husky add .husky/pre-commit "npm test"
+3. pre-push: Hook này chạy trước khi bạn push code lên remote repository. Để thêm hook này: npx husky add .husky/pre-push "npm run test"
+4. Run command :
+```
+git add .
+git commit -m "Test commit"
+```
+
 
 

@@ -30,7 +30,7 @@ const errorHandler = (
     message = "Resource not found";
   }
 
-  // Phản hồi với message và stack trace (chỉ hiện stack trong dev environment)
+  // Response with message and stack trace (chỉ hiện stack trong dev environment)
   res.status(statusCode).json({
     message: message,
     stack: process.env.NODE_ENV === "production" ? undefined : err.stack,
