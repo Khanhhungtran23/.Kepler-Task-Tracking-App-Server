@@ -95,15 +95,16 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 // Change user password
 export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
-  const { oldPassword, newPassword } = req.body;
+  const { oldPassword, newPassword } = req.body.body;
   const userId = req.user?._id; // Assuming protect middleware is used and user ID is available in req.user
   
-  console.log("Request body:", req.body);
+  console.log("Request body:", req.body.body);
   console.log("User ID:", userId);
 
   if (!oldPassword || !newPassword) {
     console.log("Password fields are missing");
     res.status(400).json({ message: "Old and new passwords are required" });
+    return;
   }
 
   try {
@@ -112,6 +113,7 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
     if (!user) {
       console.log("User not found");
       res.status(404).json({ message: "User not found" });
+      return;
     } else { 
     console.log("User found:", user);
     }
@@ -122,14 +124,17 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
       user.password = newPassword;
       await user.save();
       res.status(200).json({ message: "Password updated successfully" });
+      return;
 
     } else {
       console.log("Old password is incorrect");
       res.status(400).json({ message: "Old password is incorrect" });
+      return;
     }
   } catch (err) {
     console.error("Error in changeUserPassword:", err);
     res.status(500).json({ message: "Server error"});
+    return;
   }
 };
 // Logout user
