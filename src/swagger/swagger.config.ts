@@ -25,7 +25,7 @@ const swaggerOptions = {
         description: "Deployment server at Render.com",
       },
       {
-        url: "http://localhost:3000/api",
+        url: "http://localhost:8080/api",
         description: "Development server",
       },
     ],
