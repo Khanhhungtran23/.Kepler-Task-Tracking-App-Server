@@ -7,7 +7,7 @@ import mongoose from "mongoose";
 // Create an application
 export const createApplication = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { title, description, assets, status, priority } = req.body;
+    const { title, description, assets, status, priority } = req.body.body || req.body;
 
     // Ensure required fields are present
     if (!title || !description || !status || !priority) {
@@ -38,7 +38,7 @@ export const createApplication = async (req: Request, res: Response): Promise<vo
 export const editApplication = async (req: Request, res: Response): Promise<void> => {
   try {
     const { id } = req.params;
-    const { title, description, assets, status, priority, tasks, teamMembers } = req.body;
+    const { title, description, assets, status, priority, tasks, teamMembers } = req.body.body || req.body;
 
     // Find and update the application
     const updatedApplication = await Application.findByIdAndUpdate(
@@ -339,7 +339,7 @@ export const countApplicationsPerUser = async (req: Request, res: Response): Pro
 // Function to add member to Application
 export const addMemberToApplication = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { appId, userId } = req.body; 
+    const { appId, userId } = req.body.body || req.body; 
 
     if (!mongoose.Types.ObjectId.isValid(appId) || !mongoose.Types.ObjectId.isValid(userId)) {
       res.status(400).json({ message: "Invalid application ID or user ID format" });

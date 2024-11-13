@@ -6,7 +6,7 @@ import mongoose from "mongoose";
 
 // Register a new user
 export const registerUser = async (req: Request, res: Response): Promise<void> => {
-  const { user_name, role, email, password } = req.body;
+  const { user_name, role, email, password } = req.body.body || req.body;
 
   try {
     // Check if user already exists
@@ -44,7 +44,7 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
 
 // Login user
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
-  const { email, password } = req.body;
+  const { email, password } = req.body.body || req.body;
 
   try {
 
@@ -95,10 +95,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
 // Change user password
 export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
-  const { oldPassword, newPassword } = req.body.body;
+  const { oldPassword, newPassword } = req.body.body || req.body;
   const userId = req.user?._id; // Assuming protect middleware is used and user ID is available in req.user
   
-  console.log("Request body:", req.body.body);
+  console.log("Request body:", req.body.body || req.body);
   console.log("User ID:", userId);
 
   if (!oldPassword || !newPassword) {
@@ -150,7 +150,7 @@ export const logoutUser = (req: Request, res: Response) => {
 // Update user profile
 export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
   const userId = req.user; // Assuming protect middleware is used and user ID is available in req.user
-  const { user_name, role } = req.body;
+  const { user_name, role } = req.body.body || req.body;
 
   try {
     // Find the user by ID
