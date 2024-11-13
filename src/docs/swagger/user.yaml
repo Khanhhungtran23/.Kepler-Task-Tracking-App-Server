@@ -241,23 +241,29 @@ paths:
             schema:
               type: object
               required:
-                - oldPassword
-                - newPassword
+                - body
               properties:
-                oldPassword:
-                  type: string
-                  description: Current password
-                  example: oldpassword123
-                newPassword:
-                  type: string
-                  description: New password
-                  example: newpassword456
+                body:
+                  type: object
+                  required:
+                    - oldPassword
+                    - newPassword
+                  properties:
+                    oldPassword:
+                      type: string
+                      description: Current password
+                      example: oldpassword123
+                    newPassword:
+                      type: string
+                      description: New password
+                      example: newpassword456
             examples:
               example-1:
                 summary: Change password example
                 value:
-                  oldPassword: oldpassword123
-                  newPassword: newpassword456
+                  body:
+                    oldPassword: oldpassword123
+                    newPassword: newpassword456
       responses:
         '200':
           description: Password updated successfully
@@ -298,7 +304,6 @@ paths:
                   message:
                     type: string
                     example: "Server error"
-
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
