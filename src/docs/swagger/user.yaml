@@ -241,29 +241,23 @@ paths:
             schema:
               type: object
               required:
-                - body
+                - oldPassword
+                - newPassword
               properties:
-                body:
-                  type: object
-                  required:
-                    - oldPassword
-                    - newPassword
-                  properties:
-                    oldPassword:
-                      type: string
-                      description: Current password
-                      example: oldpassword123
-                    newPassword:
-                      type: string
-                      description: New password
-                      example: newpassword456
+                oldPassword:
+                  type: string
+                  description: Current password
+                  example: oldpassword123
+                newPassword:
+                  type: string
+                  description: New password
+                  example: newpassword456
             examples:
               example-1:
                 summary: Change password example
                 value:
-                  body:
-                    oldPassword: oldpassword123
-                    newPassword: newpassword456
+                  oldPassword: oldpassword123
+                  newPassword: newpassword456
       responses:
         '200':
           description: Password updated successfully
