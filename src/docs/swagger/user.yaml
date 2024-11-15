@@ -69,10 +69,6 @@ paths:
                     type: boolean
                     description: Indicates if the user has admin rights
                     example: false
-                  token:
-                    type: string
-                    description: JWT token for authentication
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         '400':
           description: User already exists or invalid user data
           content:
@@ -461,16 +457,28 @@ paths:
                 success:
                   summary: Example response when users are found
                   value:
-                    - id: "62a8c55bff564f0016a3e99e"
-                      name: "John Doe"
+                    - _id: "62a8c55bff564f0016a3e99e"
+                      user_name: "minhk34434hang"
+                      role: "UIIIII"
+                      email: "khangk333a1111ng@gmail.com"
+                      password: "$2a$10$9WWdnzVe1Hc2IGhjQIKvX.N9IDpkKCQvwcbLXA2WdrIk5EbH7FU5W"
+                      isAdmin: false
+                      tasks: []
+                      isActive: true
+                      createdDay: "2024-11-15T13:06:26.885Z"
+                      createdAt: "2024-11-15T13:06:26.882Z"
+                      updatedAt: "2024-11-15T13:06:26.882Z"
+                    - _id: "62a8c55bff564f0016a3e99f"
+                      user_name: "John Doe"
+                      role: "Manager"
                       email: "johndoe@example.com"
+                      password: "$2a$10$abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd"
+                      isAdmin: true
+                      tasks: ["62a8c55bff564f0016a3e99g", "62a8c55bff564f0016a3e99h"]
+                      isActive: true
+                      createdDay: "2023-01-01T10:00:00Z"
                       createdAt: "2023-01-01T10:00:00Z"
                       updatedAt: "2023-01-10T12:00:00Z"
-                    - id: "62a8c55bff564f0016a3e99f"
-                      name: "Jane Smith"
-                      email: "janesmith@example.com"
-                      createdAt: "2023-01-05T14:30:00Z"
-                      updatedAt: "2023-01-12T15:45:00Z"
         '500':
           description: Server error occurred while retrieving user data.
           content:
