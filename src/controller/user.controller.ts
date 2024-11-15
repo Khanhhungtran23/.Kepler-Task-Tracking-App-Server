@@ -38,9 +38,18 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
-  }
+    console.error("Error during user registration:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+    }
 };
+    
 
 // Login user
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
