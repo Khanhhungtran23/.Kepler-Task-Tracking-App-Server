@@ -69,10 +69,6 @@ paths:
                     type: boolean
                     description: Indicates if the user has admin rights
                     example: false
-                  token:
-                    type: string
-                    description: JWT token for authentication
-                    example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
         '400':
           description: User already exists or invalid user data
           content:
