@@ -9,7 +9,7 @@ declare global {
       user?: {
         _id: mongoose.Types.ObjectId | any;
         isAdmin: boolean;
-      };  // user is now an object with _id and isAdmin
+      }; // user is now an object with _id and isAdmin
     }
   }
 }

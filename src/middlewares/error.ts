@@ -3,11 +3,11 @@ import { Request, Response, NextFunction } from "express";
 // Route Not Found Middleware
 const routeNotFound = (req: Request, res: Response, next: NextFunction) => {
   const error = new Error(`Route not found: ${req.originalUrl}`);
-  res.status(404); 
+  res.status(404);
   next(error); // -> errorHandler
 };
 
-// CustomError Interface 
+// CustomError Interface
 interface CustomError extends Error {
   name: string;
   kind?: string; // `kind` used for Mongoose CastError
@@ -19,7 +19,7 @@ const errorHandler = (
   err: CustomError, // Custom error type
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
   let message = err.message;

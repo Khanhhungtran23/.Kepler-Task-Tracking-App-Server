@@ -20,7 +20,7 @@ paths:
                 user_name:
                   type: string
                   description: Username for the new user
-                  example: johndoe
+                  example: johndocon
                 role:
                   type: string
                   description: Role of the user in the project (e.g., Developer, Manager)
@@ -32,15 +32,15 @@ paths:
                 password:
                   type: string
                   description: Password for the user account
-                  example: password123
+                  example: password333
             examples:
               example-1:
                 summary: Register a new user example
                 value:
-                  user_name: johndoe
+                  user_name: johndocon
                   role: Developer
                   email: johndoe@example.com
-                  password: password123
+                  password: password333
       responses:
         '201':
           description: User successfully registered and token generated
@@ -56,7 +56,7 @@ paths:
                   user_name:
                     type: string
                     description: Username for the new user
-                    example: johndoe
+                    example: johndocon
                   role:
                     type: string
                     description: Role of the user
@@ -94,7 +94,7 @@ paths:
                     success: false
                     message: "Invalid user data"
         '500':
-          description: Server error
+          description: Server error with error message 
           content:
             application/json:
               schema:
@@ -106,6 +106,17 @@ paths:
                   message:
                     type: string
                     example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -203,7 +214,7 @@ paths:
                     type: string
                     example: "Your account is disabled. Please contact your manager."
         '500':
-          description: Server error
+          description: Server error with error message 
           content:
             application/json:
               schema:
@@ -215,6 +226,17 @@ paths:
                   message:
                     type: string
                     example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -282,7 +304,7 @@ paths:
                     type: string
                     example: "Old password is incorrect"
         '500':
-          description: Server error
+          description: Server error with error message 
           content:
             application/json:
               schema:
@@ -294,6 +316,17 @@ paths:
                   message:
                     type: string
                     example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -414,7 +447,7 @@ paths:
                     type: string
                     example: "User not found"
         '500':
-          description: Server error
+          description: Server error with error message 
           content:
             application/json:
               schema:
@@ -426,6 +459,17 @@ paths:
                   message:
                     type: string
                     example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
 
       x-buttons:
         - text: Cancel
@@ -480,20 +524,29 @@ paths:
                       createdAt: "2023-01-01T10:00:00Z"
                       updatedAt: "2023-01-10T12:00:00Z"
         '500':
-          description: Server error occurred while retrieving user data.
+          description: Server error with error message 
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
                   message:
                     type: string
                     example: "Server error"
-              examples:
-                serverError:
-                  summary: Example response when there is a server error
-                  value:
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
                     message: "Server error"
+                    error: "Database connection failed"
       x-execute:
         - description: "Execute query to test the API"
           button: "Execute Query"
@@ -561,20 +614,29 @@ paths:
                   value:
                     message: "No users found with that name"
         '500':
-          description: Server error occurred while retrieving user data.
+          description: Server error with error message 
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
                   message:
                     type: string
                     example: "Server error"
-              examples:
-                serverError:
-                  summary: Example response when there is a server error
-                  value:
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
                     message: "Server error"
+                    error: "Database connection failed"
       x-execute:
         - description: "Execute query to test the API"
           button: "Execute Query"
@@ -586,7 +648,7 @@ paths:
           button: "Cancel"
 
 
-  /user/disable-account:
+  /user/disable-account/{email}:
     put:
       summary: Disable a user account
       description: Disables a user's account by setting `isActive` to false. Only admins can perform this action.
@@ -594,20 +656,13 @@ paths:
         - Users
       security:
         - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: Email of the account to disable
-              required:
-                - email
-            example:
-              email: "user@example.com"
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+          description: Email of the account to disable
       responses:
         '200':
           description: Account disabled successfully
@@ -679,20 +734,29 @@ paths:
                   value:
                     message: "Access denied"
         '500':
-          description: Server error
+          description: Server error with error message
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
                   message:
                     type: string
                     example: "Server error"
-              examples:
-                serverError:
-                  summary: Example response when there is a server error
-                  value:
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
                     message: "Server error"
+                    error: "Database connection failed"
       x-execute:
         - description: "Execute query to test the API"
           button: "Execute Query"
@@ -704,7 +768,8 @@ paths:
           button: "Cancel"
 
 
-  /user/enable-account:
+
+  /user/enable-account/{email}:
     put:
       summary: Enable a user account
       description: Enables a user's account by setting `isActive` to true. Only admins can perform this action.
@@ -712,20 +777,13 @@ paths:
         - Users
       security:
         - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                  description: Email of the account to enable
-              required:
-                - email
-            example:
-              email: "user@example.com"
+      parameters:
+        - in: path
+          name: email
+          required: true
+          schema:
+            type: string
+          description: Email of the account to enable
       responses:
         '200':
           description: Account enabled successfully
@@ -797,20 +855,29 @@ paths:
                   value:
                     message: "Access denied"
         '500':
-          description: Server error
+          description: Server error with error message
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
                   message:
                     type: string
                     example: "Server error"
-              examples:
-                serverError:
-                  summary: Example response when there is a server error
-                  value:
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
                     message: "Server error"
+                    error: "Database connection failed"
       x-execute:
         - description: "Execute query to test the API"
           button: "Execute Query"
@@ -820,6 +887,7 @@ paths:
       x-cancel:
         - description: "Cancel the request and go back"
           button: "Cancel"
+
 
 components:
   schemas:

@@ -11,7 +11,7 @@ export interface IUser extends Document {
   isAdmin: boolean;
   tasks: mongoose.Types.ObjectId[];
   isActive: boolean;
-  createdDay: Date;  
+  createdDay: Date;
   matchPassword(enteredPassword: string): Promise<boolean>;
 }
 
@@ -28,7 +28,7 @@ const userSchema: Schema<IUser> = new Schema(
     isActive: { type: Boolean, required: true, default: true },
     createdDay: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 // Middleware to hash password before saving
@@ -43,10 +43,12 @@ userSchema.pre<IUser>("save", async function (next) {
 });
 
 // Method to compare passwords
-userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
+userSchema.methods.matchPassword = async function (
+  enteredPassword: string,
+): Promise<boolean> {
   try {
     return await bcrypt.compare(enteredPassword, this.password);
-  } catch(err) {
+  } catch (err) {
     console.error("Error comparing passwords:", err);
     return false;
   }

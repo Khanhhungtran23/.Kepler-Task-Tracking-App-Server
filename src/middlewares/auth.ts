@@ -11,13 +11,20 @@ interface AuthRequest extends Request {
 }
 
 // Chuyển `protect` thành kiểu `RequestHandler`
-export const protect = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+export const protect = async (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   let token: string | undefined;
 
   if (req.cookies && req.cookies.token) {
     token = req.cookies.token;
     console.log("Token from cookie:", token); // Debug
-  } else if (req.headers.authorization && req.headers.authorization.startsWith("Bearer")) {
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer")
+  ) {
     token = req.headers.authorization.split(" ")[1];
     console.log("Token from header:", token); // Debug
   }
@@ -51,18 +58,20 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
   }
 };
 
-
-
-
 // Middleware to check if the user is an admin
 
-export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction): void => {
+export const isAdmin = (
+  req: AuthRequest,
+  res: Response,
+  next: NextFunction,
+): void => {
   if (req.user && req.user.isAdmin) {
     next(); // Tiếp tục nếu là admin
   } else {
     res.status(401).json({
       status: false,
-      message: "Not authorized as admin. Try login as admin. Only admins can perform this action",
+      message:
+        "Not authorized as admin. Try login as admin. Only admins can perform this action",
     });
   }
 };

@@ -70,6 +70,30 @@ paths:
           description: Missing required fields
         '403':
           description: Only admins can create applications
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -151,12 +175,37 @@ paths:
           description: Application not found
         '403':
           description: Only admins can edit applications
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
         - text: Reset
           onClick: "resetForm()" # Reset button (front-end should define resetForm())
       x-execute-query: true # Show Execute Query button to test API
+
 
   /app/trash/{title}:
     put:
@@ -188,6 +237,30 @@ paths:
           description: Application not found
         '403':
           description: Only admins can trash applications
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -217,6 +290,30 @@ paths:
           description: Application not found or not in trash
         '403':
           description: Only admins can delete applications permanently
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -243,6 +340,30 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Application'
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -269,6 +390,30 @@ paths:
           description: Application search results
         '404':
           description: Application not found
+        '500':
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -307,7 +452,29 @@ paths:
         '404':
           description: Application not found
         '500':
-          description: Server error while searching for the application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -346,7 +513,29 @@ paths:
         '404':
           description: Application not found
         '500':
-          description: Server error while searching for the application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -385,7 +574,29 @@ paths:
         '404':
           description: Application not found
         '500':
-          description: Server error while searching for the application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -424,7 +635,29 @@ paths:
         '404':
           description: Application not found
         '500':
-          description: Server error while searching for the application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -453,7 +686,29 @@ paths:
         '404':
           description: Application not found
         '500':
-          description: Server error while restoring application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -494,15 +749,29 @@ paths:
                     priority: 1
                     teamMembers: ["user3", "user4"]
         '500':
-          description: Server error while fetching applications
+          description: Server error with error message 
           content:
             application/json:
               schema:
                 type: object
                 properties:
+                  success:
+                    type: boolean
+                    example: false
                   message:
                     type: string
-                    example: "Server error while fetching applications"
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -545,7 +814,29 @@ paths:
                               count:
                                 type: integer
         '500':
-          description: Server error while counting applications
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -581,7 +872,29 @@ paths:
                         count:
                           type: integer
         '500':
-          description: Server error while counting applications
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -628,7 +941,29 @@ paths:
                                 type: integer
                                 description: Number of applications the user is a member of
         '500':
-          description: Server error while counting applications per user
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -681,7 +1016,29 @@ paths:
         '404':
           description: Application or user not found
         '500':
-          description: Server error while adding member to application
+          description: Server error with error message 
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action

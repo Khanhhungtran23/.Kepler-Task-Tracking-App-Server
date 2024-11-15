@@ -3,9 +3,11 @@ import User from "../models/user.model";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
 
-
 // Register a new user
-export const registerUser = async (req: Request, res: Response): Promise<void> => {
+export const registerUser = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { user_name, role, email, password } = req.body.body || req.body;
 
   try {
@@ -47,21 +49,21 @@ export const registerUser = async (req: Request, res: Response): Promise<void> =
     } else {
       res.status(500).json({ message: "Server error", error: "Unknown error" });
     }
-    }
+  }
 };
-    
 
 // Login user
 export const loginUser = async (req: Request, res: Response): Promise<void> => {
   const { email, password } = req.body.body || req.body;
 
   try {
-
     // Log the email for debugging purposes
     console.log("Email received:", email);
 
     // Find the user by email with a case-insensitive query
-    const user = await User.findOne({ email: { $regex: new RegExp(`^${email}$`, 'i') } });
+    const user = await User.findOne({
+      email: { $regex: new RegExp(`^${email}$`, "i") },
+    });
 
     // Check if the user exists
     if (!user || !(await user.matchPassword(password))) {
@@ -70,12 +72,19 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
     // Check if the user is active
     else if (user.isActive === false) {
-      res.status(403).json({ message: "Your account is disabled. Please contact your manager." });
+      res
+        .status(403)
+        .json({
+          message: "Your account is disabled. Please contact your manager.",
+        });
     }
     // Check if the user exists and the password matches
     else if (user && (await user.matchPassword(password))) {
       // Use the createJWT function from util.ts to generate a JWT and set it in a cookie
-      const token = createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
+      const token = createJWT(
+        res,
+        (user._id as mongoose.Types.ObjectId).toString(),
+      );
       console.log("Successfully Login");
       console.log("Token provided:", token);
       // Respond with user data, no need to manually return the token as it's in the cookie
@@ -86,27 +95,34 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         role: user.role,
         email: user.email,
         isAdmin: user.isAdmin,
-        isActive: user.isActive
-        // The token will be stored in the cookie, not returned directly in the response
+        isActive: user.isActive,
       });
-      
-    } 
-    else {
+    } else {
       // Return a 401 Unauthorized response if the email or password is incorrect
       res.status(401).json({ message: "Invalid email or password" });
     }
   } catch (err) {
     // Return a 500 error if something goes wrong on the server
     console.error("Error during login:", err);
-    res.status(500).json({ message: "Server error" });
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 
 // Change user password
-export const changeUserPassword = async (req: Request|any, res: Response): Promise<void> => {
+export const changeUserPassword = async (
+  req: Request | any,
+  res: Response,
+): Promise<void> => {
   const { oldPassword, newPassword } = req.body.body || req.body;
-  const userId = req.user?._id; // Assuming protect middleware is used and user ID is available in req.user
-  
+  const userId = req.user?._id; // protect middleware is used and user ID is available in req.user
+
   console.log("Request body:", req.body.body || req.body);
   console.log("User ID:", userId);
 
@@ -123,8 +139,8 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
       console.log("User not found");
       res.status(404).json({ message: "User not found" });
       return;
-    } else { 
-    console.log("User found:", user);
+    } else {
+      console.log("User found:", user);
     }
 
     if (user && (await user.matchPassword(oldPassword))) {
@@ -134,7 +150,6 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
       await user.save();
       res.status(200).json({ message: "Password updated successfully" });
       return;
-
     } else {
       console.log("Old password is incorrect");
       res.status(400).json({ message: "Old password is incorrect" });
@@ -142,22 +157,31 @@ export const changeUserPassword = async (req: Request|any, res: Response): Promi
     }
   } catch (err) {
     console.error("Error in changeUserPassword:", err);
-    res.status(500).json({ message: "Server error"});
-    return;
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 // Logout user
 export const logoutUser = (req: Request, res: Response) => {
-    res.cookie("token", "", {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "strict", // Prevent CSRF attacks
-      expires: new Date(0), // Set expiration time to the past
-    });
-    res.status(200).json({ message: "User logged out successfully." });
-  };
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+    expires: new Date(0), // Set expiration time to the past
+  });
+  res.status(200).json({ message: "User logged out successfully." });
+};
 // Update user profile
-export const updateUserProfile = async (req: Request, res: Response): Promise<void> => {
+export const updateUserProfile = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const userId = req.user; // Assuming protect middleware is used and user ID is available in req.user
   const { user_name, role } = req.body.body || req.body;
 
@@ -185,28 +209,52 @@ export const updateUserProfile = async (req: Request, res: Response): Promise<vo
       res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error in update user profile:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 // Get all users
-export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   try {
     // Retrieve all users from the database
     const users = await User.find({}).sort({ createdAt: -1 });
-    console.log('Fetched messages:', users);
+    console.log("All members information:", users);
     res.status(200).json(users);
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error during get all information of user:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 
 // Get a user by name
-export const getUserByName = async (req: Request, res: Response): Promise<void> => {
+export const getUserByName = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { user_name } = req.params; // Assuming name is passed as a route parameter
 
   try {
     // Find users matching the provided name (case insensitive)
-    const users = await User.find({ name: { $regex: new RegExp(user_name, "i") } }); // Use regex for case-insensitive search
+    const users = await User.find({
+      name: { $regex: new RegExp(user_name, "i") },
+    }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
       res.status(200).json(users);
@@ -214,12 +262,23 @@ export const getUserByName = async (req: Request, res: Response): Promise<void> 
       res.status(404).json({ message: "No users found with that name" });
     }
   } catch (err) {
-    res.status(500).json({ message: "Server error" });
+    console.error("Error during find/get people info by name:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 
 //Disable user account
-export const disableUserAccount = async (req: Request|any, res: Response): Promise<void> => {
+export const disableUserAccount = async (
+  req: Request | any,
+  res: Response,
+): Promise<void> => {
   const { email } = req.params;
 
   try {
@@ -236,25 +295,40 @@ export const disableUserAccount = async (req: Request|any, res: Response): Promi
       res.status(400).json({ message: "This account is already disabled" });
       return;
     }
-    
+
     disableUser.isActive = false;
-    
+
     await User.findOneAndUpdate(
       { email },
       { isActive: false },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     console.log("isActive :", disableUser.isActive);
-    res.status(200).json({ message: `Account of ${disableUser.email} has been disabled successfully.`, User : disableUser });
-  }catch (err) {
-    console.error("Error disabling account:", err);
-    res.status(500).json({ message: "Server error" });
+    res
+      .status(200)
+      .json({
+        message: `Account of ${disableUser.email} has been disabled successfully.`,
+        User: disableUser,
+      });
+  } catch (err) {
+    console.error("Error during disabling account:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };
 
 //Enable user account
-export const enableUserAccount = async (req: Request|any, res: Response): Promise<void> => {
+export const enableUserAccount = async (
+  req: Request | any,
+  res: Response,
+): Promise<void> => {
   const { email } = req.params;
 
   try {
@@ -271,19 +345,31 @@ export const enableUserAccount = async (req: Request|any, res: Response): Promis
       res.status(400).json({ message: "This account is already enabled" });
       return;
     }
-    
+
     enableUser.isActive = true;
-    
+
     await User.findOneAndUpdate(
       { email },
       { isActive: true },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     console.log("isActive :", enableUser.isActive);
-    res.status(200).json({ message: `Account of ${enableUser.email} has been enabled successfully.`, User : enableUser  });
-  }catch (err) {
+    res
+      .status(200)
+      .json({
+        message: `Account of ${enableUser.email} has been enabled successfully.`,
+        User: enableUser,
+      });
+  } catch (err) {
     console.error("Error enabling account:", err);
-    res.status(500).json({ message: "Server error" });
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
   }
 };

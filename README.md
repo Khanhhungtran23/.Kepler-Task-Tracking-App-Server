@@ -24,6 +24,7 @@
 - **Authentication**: JWT (JSON Web Tokens)
 - **Middleware**: Express Middleware (Authentication, CORS, Logging)
 - **Logging**: Morgan for HTTP request logging
+- **Validation**: Joi for request data validation
 - **Environment Variables**: Managed using Dotenv
 
 ## Installation and Setup
@@ -114,21 +115,7 @@ Make sure you have the following installed:
 
 5. **API Endpoints:**
 
-#### Public Routes
-
-- **POST** `api/user/register`: Register a new user
-- **POST** `api/user/login`: Login an existing user
-- **POST** `api/user/logout`: Logout the user
-
-#### Protected Routes (Requires Authentication)
-
-- **PUT** `api/user/profile`: Update user profile (Authenticated users only)
-- **PUT** `api/user/change-password`: Change user password (Authenticated users only)
-
-- **GET** `/api/user/get-all-info` :
-- **GET** `/api/user/search/:name` : 
-
-### Error Handling
+Link swagger: https://kepler.up.railway.app/api-docs/
 
 
 ### Guide to use husky
