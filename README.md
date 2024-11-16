@@ -66,7 +66,6 @@ Make sure you have the following installed:
   ```
 - Run in production:
   ```bash
-  npm run build
   npm run start
   ```
 - Commit changes:
@@ -117,6 +116,22 @@ Make sure you have the following installed:
 
 Link swagger: https://kepler.up.railway.app/api-docs/
 
+6. **Permanent Tokens Account:**
+- Description: This provides details about two fixed test accounts (Admin and User) with permanent tokens. Tokens are generated using a script and do not expire.
+#### AdminAccount:
+```
+email: dev@gmail.com
+password: 123456
+role: admin
+permanentToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzJmNTQ4N2Q0ZWExMTczZTg5ZWQxNDAiLCJpc0FkbWluIjp0cnVlLCJpYXQiOjE3MzE3Njc2OTN9.7ZoSP8-vJgvf7bX3PmZaohNfv2JwoSksHdxkMtgOxMc
+```
+#### UserAccount:
+```
+email: tester@gmail.com
+password: 123456
+role: user
+permanentToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2NzM4YTdlOGNlNjAzOTIyN2Q5Y2FiYmMiLCJpc0FkbWluIjpmYWxzZSwiaWF0IjoxNzMxNzY3NjkzfQ.EqYf8Mw--t-2Lx5Kyrle1a0FQvtf_-NWFrT1FBW7qvA
+```
 
 ### Guide to use husky
 1. Config Husky: npx husky install

@@ -14,11 +14,9 @@ export const createApplication = async (
 
     // Ensure required fields are present
     if (!title || !description || !status || !priority) {
-      res
-        .status(400)
-        .json({
-          message: "Title, description, status, and priority are required",
-        });
+      res.status(400).json({
+        message: "Title, description, status, and priority are required",
+      });
     }
 
     // Create a new Application without tasks or team members initially
@@ -34,12 +32,10 @@ export const createApplication = async (
 
     // Save the new application to the database
     const savedApplication = await newApplication.save();
-    res
-      .status(201)
-      .json({
-        message: "Application created successfully",
-        application: savedApplication,
-      });
+    res.status(201).json({
+      message: "Application created successfully",
+      application: savedApplication,
+    });
   } catch (error) {
     console.error("Error creating application:", error);
     if (error instanceof Error) {
@@ -74,12 +70,10 @@ export const editApplication = async (
       res.status(404).json({ message: "Application not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Application updated successfully",
-        application: updatedApplication,
-      });
+    res.status(200).json({
+      message: "Application updated successfully",
+      application: updatedApplication,
+    });
   } catch (error) {
     console.error("Error during editing application:", error);
     if (error instanceof Error) {
@@ -112,12 +106,10 @@ export const trashApplication = async (
       return;
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Application moved to trash",
-        application: trashedApplication,
-      });
+    res.status(200).json({
+      message: "Application moved to trash",
+      application: trashedApplication,
+    });
   } catch (error) {
     console.error("Error during trashing application:", error);
     if (error instanceof Error) {
@@ -361,12 +353,10 @@ export const restoreApplication = async (
       res.status(404).json({ message: "Application not found" });
     }
 
-    res
-      .status(200)
-      .json({
-        message: "Application is restored",
-        application: restoredApplication,
-      });
+    res.status(200).json({
+      message: "Application is restored",
+      application: restoredApplication,
+    });
   } catch (error) {
     console.error("Error restoring application from trash:", error);
     if (error instanceof Error) {

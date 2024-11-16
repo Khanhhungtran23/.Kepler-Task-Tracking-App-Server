@@ -38,7 +38,10 @@ export const protect = async (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     console.log("Decoded token:", decoded); // Debug
 
-    req.user = { _id: decoded._id as string, isAdmin: decoded.isAdmin?? false };
+    req.user = {
+      _id: decoded._id as string,
+      isAdmin: decoded.isAdmin ?? false,
+    };
     console.log("Middleware protect - User:", req.user);
     next();
   } catch (error) {
@@ -51,7 +54,6 @@ export const protect = async (
   }
 };
 
-
 // Middleware to check if the user is an admin
 
 export const isAdmin = (
@@ -61,7 +63,7 @@ export const isAdmin = (
 ): void => {
   console.log("Middleware isAdmin:", req.user);
   if (req.user && req.user.isAdmin) {
-    next(); 
+    next();
   } else {
     res.status(401).json({
       status: false,
