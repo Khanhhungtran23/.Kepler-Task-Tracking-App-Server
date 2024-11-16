@@ -37,7 +37,6 @@ const swaggerOptions = {
       {
         name: "Users",
         description: "Endpoints for user management",
-        
       },
       {
         name: "Applications",

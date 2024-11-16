@@ -1,0 +1,19 @@
+{
+    "extends": "./tsconfig.json",
+    "compilerOptions": {
+      "module": "commonjs",
+      "baseUrl": "./",
+      "paths": {
+      "@/*": ["src/*"],
+      "@controllers/*": ["src/controllers/*"],
+      "@middlewares/*": ["src/middlewares/*"],
+      "@models/*": ["src/models/*"],
+      "@routes/*": ["src/routes/*"],
+      "@swagger/*": ["src/swagger/*"],
+      "@validators/*": ["src/validators/*"],
+      "@utils/*": ["src/utils/*"]
+    }
+    },
+    "include": ["src", "src/tests/**/*.ts"],
+    "exclude": ["node_modules", "dist"]
+  }

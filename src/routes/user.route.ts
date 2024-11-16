@@ -8,18 +8,28 @@ import {
   getAllUsers,
   getUserByName,
   disableUserAccount,
-  enableUserAccount
+  enableUserAccount,
 } from "../controller/user.controller";
-
+import { validate } from "../middlewares/validate";
+import {
+  registerUserSchema,
+  loginUserSchema,
+  changePasswordSchema,
+} from "../validators/user.validator";
 import { protect, isAdmin } from "../middlewares/auth";
+
 const router = express.Router();
 
+router.post("/register", validate(registerUserSchema), registerUser);
 
-router.post("/register", registerUser);
+router.post("/login", validate(loginUserSchema), loginUser);
 
-router.post("/login", loginUser);
-
-router.put("/change-password", protect, changeUserPassword);
+router.put(
+  "/change-password",
+  protect,
+  validate(changePasswordSchema),
+  changeUserPassword,
+);
 
 router.post("/logout", protect, logoutUser);
 
@@ -34,4 +44,3 @@ router.put("/disable-account/:email", protect, isAdmin, disableUserAccount);
 router.put("/enable-account/:email", protect, isAdmin, enableUserAccount);
 
 export default router;
-

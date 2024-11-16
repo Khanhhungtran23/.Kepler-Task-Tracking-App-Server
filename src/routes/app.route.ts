@@ -1,28 +1,47 @@
 import express from "express";
+import {
+  createApplication,
+  editApplication,
+  trashApplication,
+  deleteApplication,
+  getApplications,
+  searchApp,
+  searchTodoApp,
+  searchImplementApp,
+  searchTestingApp,
+  searchProductionApp,
+  restoreApplication,
+  getTrashedApplications,
+  countApplicationsByStatus,
+  countApplicationsByPriority,
+  countApplicationsPerUser,
+  addMemberToApplication,
+} from "../controller/application.controller";
+import { validate } from "../middlewares/validate";
+import {
+  createApplicationSchema,
+  editApplicationSchema,
+  addMemberToApplicationSchema,
+} from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
-import { createApplication, 
-        editApplication, 
-        trashApplication, 
-        deleteApplication, 
-        getApplications,
-        searchApp,
-        searchTodoApp,
-        searchImplementApp,
-        searchTestingApp,
-        searchProductionApp,
-        restoreApplication,
-        getTrashedApplications,
-        countApplicationsByStatus,
-        countApplicationsByPriority,
-        countApplicationsPerUser,
-        addMemberToApplication
-    } from "../controller/application.controller";
 const router = express.Router();
 
-router.post("/add-new", protect, isAdmin, createApplication);
+router.post(
+  "/add-new",
+  protect,
+  isAdmin,
+  validate(createApplicationSchema),
+  createApplication,
+);
 
-router.put("/edit/:id", protect, isAdmin, editApplication);
+router.put(
+  "/edit/:id",
+  protect,
+  isAdmin,
+  validate(editApplicationSchema),
+  editApplication,
+);
 
 router.put("/trash/:title", protect, isAdmin, trashApplication);
 
@@ -34,11 +53,19 @@ router.get("/search-app/:application_title", protect, searchApp);
 
 router.get("/search-todo-app/:application_title", protect, searchTodoApp);
 
-router.get("/search-implement-app/:application_title", protect, searchImplementApp);
+router.get(
+  "/search-implement-app/:application_title",
+  protect,
+  searchImplementApp,
+);
 
 router.get("/search-testing-app/:application_title", protect, searchTestingApp);
 
-router.get("/search-production-app/:application_title", protect, searchProductionApp);
+router.get(
+  "/search-production-app/:application_title",
+  protect,
+  searchProductionApp,
+);
 
 router.put("/restore/:title", protect, isAdmin, restoreApplication);
 
@@ -50,7 +77,12 @@ router.get("/get-priority-statistic", protect, countApplicationsByPriority);
 
 router.get("/get-apps-user", protect, countApplicationsPerUser);
 
-router.post("/add-member-app", protect, isAdmin, addMemberToApplication);
-
+router.post(
+  "/add-member-app",
+  protect,
+  isAdmin,
+  validate(addMemberToApplicationSchema),
+  addMemberToApplication,
+);
 
 export default router;
