@@ -10,7 +10,6 @@ interface AuthRequest extends Request {
   };
 }
 
-// Chuyển `protect` thành kiểu `RequestHandler`
 export const protect = async (
   req: AuthRequest,
   res: Response,
@@ -39,14 +38,8 @@ export const protect = async (
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
     console.log("Decoded token:", decoded); // Debug
 
-    const user = await User.findById(decoded._id).select("-password");
-    if (!user) {
-      console.log("User not found");
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-
-    req.user = { _id: user._id as string, isAdmin: user.isAdmin };
+    req.user = { _id: decoded._id as string, isAdmin: decoded.isAdmin?? false };
+    console.log("Middleware protect - User:", req.user);
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
@@ -58,6 +51,7 @@ export const protect = async (
   }
 };
 
+
 // Middleware to check if the user is an admin
 
 export const isAdmin = (
@@ -65,8 +59,9 @@ export const isAdmin = (
   res: Response,
   next: NextFunction,
 ): void => {
+  console.log("Middleware isAdmin:", req.user);
   if (req.user && req.user.isAdmin) {
-    next(); // Tiếp tục nếu là admin
+    next(); 
   } else {
     res.status(401).json({
       status: false,

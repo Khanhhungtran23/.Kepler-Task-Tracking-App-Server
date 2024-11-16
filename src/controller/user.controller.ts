@@ -28,7 +28,7 @@ export const registerUser = async (
 
     if (user) {
       // Create a JWT token
-      createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
+      // createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
       res.status(201).json({
         _id: user._id,
         user_name: user.user_name,
@@ -71,20 +71,22 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       return;
     }
     // Check if the user is active
-    else if (user.isActive === false) {
+    if (user.isActive === false) {
       res
         .status(403)
         .json({
           message: "Your account is disabled. Please contact your manager.",
         });
     }
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "none",
+    });
     // Check if the user exists and the password matches
-    else if (user && (await user.matchPassword(password))) {
+    if (user && (await user.matchPassword(password))) {
       // Use the createJWT function from util.ts to generate a JWT and set it in a cookie
-      const token = createJWT(
-        res,
-        (user._id as mongoose.Types.ObjectId).toString(),
-      );
+      const token = createJWT(res, (user._id as mongoose.Types.ObjectId).toString(), user.isAdmin);
       console.log("Successfully Login");
       console.log("Token provided:", token);
       // Respond with user data, no need to manually return the token as it's in the cookie
@@ -169,12 +171,21 @@ export const changeUserPassword = async (
 };
 // Logout user
 export const logoutUser = (req: Request, res: Response) => {
+  // Log cookie trước khi thực hiện xóa
+  console.log("Cookies before logout:", req.cookies);
+
   res.cookie("token", "", {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "strict",
-    expires: new Date(0), // Set expiration time to the past
+    secure: process.env.NODE_ENV === "production" ? true : false,
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    expires: new Date(0), 
+    path: "/", 
   });
+
+  // Log cookie sau khi thực hiện xóa
+  console.log("Cookies after logout cleared.");
+
+  // Phản hồi lại cho client
   res.status(200).json({ message: "User logged out successfully." });
 };
 // Update user profile
