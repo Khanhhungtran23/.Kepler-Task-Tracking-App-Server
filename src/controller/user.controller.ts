@@ -72,11 +72,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
     // Check if the user is active
     if (user.isActive === false) {
-      res
-        .status(403)
-        .json({
-          message: "Your account is disabled. Please contact your manager.",
-        });
+      res.status(403).json({
+        message: "Your account is disabled. Please contact your manager.",
+      });
     }
     res.clearCookie("token", {
       httpOnly: true,
@@ -86,7 +84,11 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     // Check if the user exists and the password matches
     if (user && (await user.matchPassword(password))) {
       // Use the createJWT function from util.ts to generate a JWT and set it in a cookie
-      const token = createJWT(res, (user._id as mongoose.Types.ObjectId).toString(), user.isAdmin);
+      const token = createJWT(
+        res,
+        (user._id as mongoose.Types.ObjectId).toString(),
+        user.isAdmin,
+      );
       console.log("Successfully Login");
       console.log("Token provided:", token);
       // Respond with user data, no need to manually return the token as it's in the cookie
@@ -178,8 +180,8 @@ export const logoutUser = (req: Request, res: Response) => {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production" ? true : false,
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
-    expires: new Date(0), 
-    path: "/", 
+    expires: new Date(0),
+    path: "/",
   });
 
   // Log cookie sau khi thực hiện xóa
@@ -316,12 +318,10 @@ export const disableUserAccount = async (
     );
 
     console.log("isActive :", disableUser.isActive);
-    res
-      .status(200)
-      .json({
-        message: `Account of ${disableUser.email} has been disabled successfully.`,
-        User: disableUser,
-      });
+    res.status(200).json({
+      message: `Account of ${disableUser.email} has been disabled successfully.`,
+      User: disableUser,
+    });
   } catch (err) {
     console.error("Error during disabling account:", err);
     if (err instanceof Error) {
@@ -366,12 +366,10 @@ export const enableUserAccount = async (
     );
 
     console.log("isActive :", enableUser.isActive);
-    res
-      .status(200)
-      .json({
-        message: `Account of ${enableUser.email} has been enabled successfully.`,
-        User: enableUser,
-      });
+    res.status(200).json({
+      message: `Account of ${enableUser.email} has been enabled successfully.`,
+      User: enableUser,
+    });
   } catch (err) {
     console.error("Error enabling account:", err);
     if (err instanceof Error) {

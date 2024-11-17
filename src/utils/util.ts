@@ -19,7 +19,11 @@ export const dbConnection = async (): Promise<void> => {
 };
 
 // JWT creation with TypeScript
-export const createJWT = (res: Response, userId: string, isAdmin: boolean): string => {
+export const createJWT = (
+  res: Response,
+  userId: string,
+  isAdmin: boolean,
+): string => {
   // Ensure the JWT secret exists in the environment variables
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
@@ -46,3 +50,4 @@ export const createJWT = (res: Response, userId: string, isAdmin: boolean): stri
     throw new Error("Cannot create JWT!");
   }
 };
+
