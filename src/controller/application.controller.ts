@@ -400,9 +400,10 @@ export const countApplicationsByStatus = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const counts = await Application.aggregate([
+    const untrashedCounts = await Application.aggregate([
       { $match: { isTrashed: { $ne: true } } }, // exclude trashed applications
       { $group: { _id: "$status", count: { $sum: 1 } } }, // group by status and count
+
       {
         $group: {
           _id: null,
@@ -410,12 +411,25 @@ export const countApplicationsByStatus = async (
           detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
         },
       },
-      { $project: { _id: 0, total: 1, detail: 1 } },
+      { $project: { _id: 0, total: 1, detail: 1} },
+    ]);
+
+    const trashedCounts = await Application.aggregate([
+      { $match: { isTrashed: { $ne: false } } }, // Include trashed applications
+      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by priority and count
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$count" }, // Calculate the total count of all applications
+          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+        },
+      },
+      { $project: { _id: 0, total: 1, detail: 1} },
     ]);
 
     res
       .status(200)
-      .json({ message: "Applications count by status", Statistic: counts });
+      .json({ message: "Applications count by status", unstrashedStatistic: untrashedCounts , trashedStatistic: trashedCounts});
   } catch (error) {
     console.error("Error counting applications by status:", error);
     if (error instanceof Error) {
