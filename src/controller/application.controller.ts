@@ -179,6 +179,91 @@ export const getApplications = async (req: Request, res: Response) => {
   }
 };
 
+// Get all untrashed applications (excluding trashed)
+export const getTodoApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "To Do" });
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all to do applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getImplementApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Implement" })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getTestingApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Testing" })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getProductionApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Production" })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
 export const searchApp = async (req: Request, res: Response): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
