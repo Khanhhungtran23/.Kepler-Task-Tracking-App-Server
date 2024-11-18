@@ -1,3 +1,4 @@
+import { addActivity } from './../controller/application.controller';
 import express from "express";
 import {
   createApplication,
@@ -26,6 +27,7 @@ import {
   createApplicationSchema,
   editApplicationSchema,
   addMemberToApplicationSchema,
+  addNewActivityToApplicationSchema
 } from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
@@ -95,6 +97,13 @@ router.post(
   isAdmin,
   validate(addMemberToApplicationSchema),
   addMemberToApplication,
+);
+
+router.post(
+  "/add-activity-app",
+  protect,
+  validate(addNewActivityToApplicationSchema),
+  addActivity
 );
 
 export default router;

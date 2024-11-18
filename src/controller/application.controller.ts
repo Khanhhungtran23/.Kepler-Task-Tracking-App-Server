@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
 import User from "../models/user.model";
+import Activity from "../models/activity.model";
 import mongoose from "mongoose";
 
 // Create an application
@@ -644,6 +645,57 @@ export const addMemberToApplication = async (
 
     res.status(200).json({
       message: "User added to application successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Error adding/assigning member to application:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Function to add member to Application
+export const addActivity = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { title, comment, appId } = req.body.body || req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(appId)) {
+      res
+        .status(400)
+        .json({ message: "Invalid appId format" });
+      return;
+    }
+
+    const application = await Application.findById(appId);
+    if (!application) {
+      res.status(404).json({ message: "Application not found" });
+      return;
+    }
+
+    const newActivity = new Activity({
+      title,
+      comment,
+    });
+    await newActivity.save();
+
+    application.activities.push({
+      _id: newActivity._id,
+      title: newActivity.title,
+      comment: newActivity.comment,
+    });
+    await application.save();
+
+    res.status(200).json({
+      message: "Acitivity are added to application successfully",
       application,
     });
   } catch (error) {
