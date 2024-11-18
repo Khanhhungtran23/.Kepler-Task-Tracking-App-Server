@@ -5,6 +5,10 @@ import {
   trashApplication,
   deleteApplication,
   getApplications,
+  getTodoApplications,
+  getImplementApplications,
+  getTestingApplications,
+  getProductionApplications,
   searchApp,
   searchTodoApp,
   searchImplementApp,
@@ -48,6 +52,14 @@ router.put("/trash/:title", protect, isAdmin, trashApplication);
 router.delete("/delete/:id", protect, isAdmin, deleteApplication);
 
 router.get("/get-all", protect, getApplications);
+
+router.get("/get-all-todo", protect, getTodoApplications);
+
+router.get("/get-all-implement", protect, getImplementApplications);
+
+router.get("/get-all-testing", protect, getTestingApplications);
+
+router.get("/get-all-production", protect, getProductionApplications);
 
 router.get("/search-app/:application_title", protect, searchApp);
 
