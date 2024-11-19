@@ -29,3 +29,19 @@ export const addMemberToApplicationSchema = Joi.object({
   appId: Joi.string().required(),
   userId: Joi.string().required(),
 });
+
+// Schema for adding new activity to application
+export const addNewActivityToApplicationSchema = Joi.object({
+  appId: Joi.string().required(), 
+  title: Joi.string()
+    .valid(
+      "Requirement Clarification",
+      "Implementation",
+      "QC1",
+      "UAT",
+      "QC2",
+      "Deployment"
+    )
+    .required(), 
+  comment: Joi.string().required(), 
+});

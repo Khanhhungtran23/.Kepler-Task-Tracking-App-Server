@@ -266,7 +266,7 @@ export const getUserByName = async (
   try {
     // Find users matching the provided name (case insensitive)
     const users = await User.find({
-      name: { $regex: new RegExp(user_name, "i") },
+      user_name: { $regex: new RegExp(user_name, "i") },
     }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
@@ -376,6 +376,37 @@ export const enableUserAccount = async (
       res.status(500).json({
         message: "Server error",
         error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Permanent delete user account
+export const deleteAccount = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { email } = req.params;
+    const userAccount = await User.findOne({ email });
+
+    if (!userAccount) {
+      res
+        .status(404)
+        .json({ message: "User account not found !" });
+        return;
+    }
+
+    await User.deleteOne({ email });
+    res.status(200).json({ message: "User account permanently deleted", userAccount });
+  } catch (error) {
+    console.error("Error during deleting user account permanently:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
       });
     } else {
       res.status(500).json({ message: "Server error", error: "Unknown error" });
