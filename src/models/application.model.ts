@@ -24,6 +24,7 @@ const applicationSchema = new Schema(
         _id: { type: Schema.Types.ObjectId, ref: "Activity" },
         title: { type: Schema.Types.String},
         comment: { type: Schema.Types.String},
+        user_name: { type: Schema.Types.String}
       },
     ],
     teamMembers: [{ type: Schema.Types.ObjectId, ref: "User" }],

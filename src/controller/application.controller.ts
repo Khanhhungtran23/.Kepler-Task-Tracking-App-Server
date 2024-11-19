@@ -3,6 +3,7 @@ import Application from "../models/application.model";
 import User from "../models/user.model";
 import Activity from "../models/activity.model";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 // Create an application
 export const createApplication = async (
@@ -667,6 +668,14 @@ export const addActivity = async (
 ): Promise<void> => {
   try {
     const { title, comment, appId } = req.body.body || req.body;
+    const userId = req.user?._id;
+
+    const user = await User.findById(userId);
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+    const user_name = user.user_name;
 
     if (!mongoose.Types.ObjectId.isValid(appId)) {
       res
@@ -684,6 +693,7 @@ export const addActivity = async (
     const newActivity = new Activity({
       title,
       comment,
+      user_name
     });
     await newActivity.save();
 
@@ -691,6 +701,7 @@ export const addActivity = async (
       _id: newActivity._id,
       title: newActivity.title,
       comment: newActivity.comment,
+      user_name: newActivity.user_name,
     });
     await application.save();
 
