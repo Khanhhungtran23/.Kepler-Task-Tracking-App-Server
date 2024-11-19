@@ -19,7 +19,13 @@ const applicationSchema = new Schema(
       required: true,
     },
     tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
-    activities: [{ type: Schema.Types.ObjectId, ref: "Activity" }],
+    activities: [
+      {
+        _id: { type: Schema.Types.ObjectId, ref: "Activity" },
+        title: { type: Schema.Types.String},
+        comment: { type: Schema.Types.String},
+      },
+    ],
     teamMembers: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   { timestamps: true },

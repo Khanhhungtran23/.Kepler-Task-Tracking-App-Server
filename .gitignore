@@ -14,6 +14,7 @@ dist
 # Husky
 .husky/
 
+.coverage/
 
 # TypeScript cache
 *.tsbuildinfo

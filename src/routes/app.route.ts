@@ -1,3 +1,4 @@
+import { addActivity } from './../controller/application.controller';
 import express from "express";
 import {
   createApplication,
@@ -5,6 +6,10 @@ import {
   trashApplication,
   deleteApplication,
   getApplications,
+  getTodoApplications,
+  getImplementApplications,
+  getTestingApplications,
+  getProductionApplications,
   searchApp,
   searchTodoApp,
   searchImplementApp,
@@ -22,6 +27,7 @@ import {
   createApplicationSchema,
   editApplicationSchema,
   addMemberToApplicationSchema,
+  addNewActivityToApplicationSchema
 } from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
@@ -48,6 +54,14 @@ router.put("/trash/:title", protect, isAdmin, trashApplication);
 router.delete("/delete/:id", protect, isAdmin, deleteApplication);
 
 router.get("/get-all", protect, getApplications);
+
+router.get("/get-all-todo", protect, getTodoApplications);
+
+router.get("/get-all-implement", protect, getImplementApplications);
+
+router.get("/get-all-testing", protect, getTestingApplications);
+
+router.get("/get-all-production", protect, getProductionApplications);
 
 router.get("/search-app/:application_title", protect, searchApp);
 
@@ -83,6 +97,13 @@ router.post(
   isAdmin,
   validate(addMemberToApplicationSchema),
   addMemberToApplication,
+);
+
+router.post(
+  "/add-activity-app",
+  protect,
+  validate(addNewActivityToApplicationSchema),
+  addActivity
 );
 
 export default router;

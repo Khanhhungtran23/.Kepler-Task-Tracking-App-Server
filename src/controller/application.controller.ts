@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
 import User from "../models/user.model";
+import Activity from "../models/activity.model";
 import mongoose from "mongoose";
 
 // Create an application
@@ -161,6 +162,91 @@ export const deleteApplication = async (
 export const getApplications = async (req: Request, res: Response) => {
   try {
     const applications = await Application.find({ isTrashed: false })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getTodoApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "To Do" });
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all to do applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getImplementApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Implement" })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getTestingApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Testing" })
+      // .populate('tasks')
+      .populate("teamMembers")
+      .exec();
+
+    res.status(200).json({ applications });
+  } catch (error) {
+    console.error("Error during fetching info of all applications:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Get all untrashed applications (excluding trashed)
+export const getProductionApplications = async (req: Request, res: Response) => {
+  try {
+    const applications = await Application.find({ isTrashed: false, status: "Production" })
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
@@ -400,9 +486,10 @@ export const countApplicationsByStatus = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const counts = await Application.aggregate([
+    const untrashedCounts = await Application.aggregate([
       { $match: { isTrashed: { $ne: true } } }, // exclude trashed applications
       { $group: { _id: "$status", count: { $sum: 1 } } }, // group by status and count
+
       {
         $group: {
           _id: null,
@@ -410,12 +497,25 @@ export const countApplicationsByStatus = async (
           detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
         },
       },
-      { $project: { _id: 0, total: 1, detail: 1 } },
+      { $project: { _id: 0, total: 1, detail: 1} },
+    ]);
+
+    const trashedCounts = await Application.aggregate([
+      { $match: { isTrashed: { $ne: false } } }, // Include trashed applications
+      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by priority and count
+      {
+        $group: {
+          _id: null,
+          total: { $sum: "$count" }, // Calculate the total count of all applications
+          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+        },
+      },
+      { $project: { _id: 0, total: 1, detail: 1} },
     ]);
 
     res
       .status(200)
-      .json({ message: "Applications count by status", Statistic: counts });
+      .json({ message: "Applications count by status", unstrashedStatistic: untrashedCounts , trashedStatistic: trashedCounts});
   } catch (error) {
     console.error("Error counting applications by status:", error);
     if (error instanceof Error) {
@@ -545,6 +645,57 @@ export const addMemberToApplication = async (
 
     res.status(200).json({
       message: "User added to application successfully",
+      application,
+    });
+  } catch (error) {
+    console.error("Error adding/assigning member to application:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
+// Function to add member to Application
+export const addActivity = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  try {
+    const { title, comment, appId } = req.body.body || req.body;
+
+    if (!mongoose.Types.ObjectId.isValid(appId)) {
+      res
+        .status(400)
+        .json({ message: "Invalid appId format" });
+      return;
+    }
+
+    const application = await Application.findById(appId);
+    if (!application) {
+      res.status(404).json({ message: "Application not found" });
+      return;
+    }
+
+    const newActivity = new Activity({
+      title,
+      comment,
+    });
+    await newActivity.save();
+
+    application.activities.push({
+      _id: newActivity._id,
+      title: newActivity.title,
+      comment: newActivity.comment,
+    });
+    await application.save();
+
+    res.status(200).json({
+      message: "Acitivity are added to application successfully",
       application,
     });
   } catch (error) {
