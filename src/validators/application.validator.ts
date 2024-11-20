@@ -32,7 +32,7 @@ export const addMemberToApplicationSchema = Joi.object({
 
 // Schema for adding new activity to application
 export const addNewActivityToApplicationSchema = Joi.object({
-  appId: Joi.string().required(), 
+  appId: Joi.string().required(),
   title: Joi.string()
     .valid(
       "Requirement Clarification",
@@ -40,24 +40,24 @@ export const addNewActivityToApplicationSchema = Joi.object({
       "QC1",
       "UAT",
       "QC2",
-      "Deployment"
+      "Deployment",
     )
-    .required(), 
-  comment: Joi.string().required(), 
+    .required(),
+  comment: Joi.string().required(),
 });
 
 export const duplicateApplicationSchema = Joi.object({
-  includeRelations: Joi.boolean().optional().default(true),  
+  includeRelations: Joi.boolean().optional().default(true),
 });
 
 export const paramsIdSchema = Joi.object({
-  id: Joi.string().length(24).required(), 
+  id: Joi.string().length(24).required(),
 });
 
 export const titleSchema = Joi.object({
-  title: Joi.string().required(), 
+  title: Joi.string().required(),
 });
 
 export const apptitleSchema = Joi.object({
-  application_title: Joi.string().required(), 
+  application_title: Joi.string().required(),
 });

@@ -44,5 +44,3 @@ export const emailParamSchema = Joi.object({
     "string.email": "Field email must be a valid email",
   }),
 });
-
-

@@ -21,7 +21,7 @@ import {
   countApplicationsPerUser,
   addMemberToApplication,
   duplicateApplication,
-  addActivity
+  addActivity,
 } from "../controller/application.controller";
 import { validate } from "../middlewares/validate";
 import {
@@ -32,7 +32,7 @@ import {
   paramsIdSchema,
   titleSchema,
   apptitleSchema,
-  duplicateApplicationSchema
+  duplicateApplicationSchema,
 } from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
@@ -51,19 +51,31 @@ router.put(
   protect,
   isAdmin,
   validate({
-    params: paramsIdSchema, 
-    body: editApplicationSchema, 
+    params: paramsIdSchema,
+    body: editApplicationSchema,
   }),
   editApplication,
 );
 
-router.put("/trash/:title", protect, isAdmin, validate({
-  params: titleSchema, 
-}), trashApplication);
+router.put(
+  "/trash/:title",
+  protect,
+  isAdmin,
+  validate({
+    params: titleSchema,
+  }),
+  trashApplication,
+);
 
-router.delete("/delete/:id", protect, isAdmin, validate({
-  params: paramsIdSchema,
-}), deleteApplication);
+router.delete(
+  "/delete/:id",
+  protect,
+  isAdmin,
+  validate({
+    params: paramsIdSchema,
+  }),
+  deleteApplication,
+);
 
 router.get("/get-all", protect, getApplications);
 
@@ -75,19 +87,29 @@ router.get("/get-all-testing", protect, getTestingApplications);
 
 router.get("/get-all-production", protect, getProductionApplications);
 
-router.get("/search-app/:application_title", protect, validate({
-  params: apptitleSchema, 
-}), searchApp);
+router.get(
+  "/search-app/:application_title",
+  protect,
+  validate({
+    params: apptitleSchema,
+  }),
+  searchApp,
+);
 
-router.get("/search-todo-app/:application_title", protect, validate({
-  params: apptitleSchema, 
-}), searchTodoApp);
+router.get(
+  "/search-todo-app/:application_title",
+  protect,
+  validate({
+    params: apptitleSchema,
+  }),
+  searchTodoApp,
+);
 
 router.get(
   "/search-implement-app/:application_title",
   protect,
   validate({
-    params: apptitleSchema, 
+    params: apptitleSchema,
   }),
   searchImplementApp,
 );
@@ -100,9 +122,15 @@ router.get(
   searchProductionApp,
 );
 
-router.put("/restore/:title", protect, isAdmin, validate({
-  params: titleSchema, 
-}), restoreApplication);
+router.put(
+  "/restore/:title",
+  protect,
+  isAdmin,
+  validate({
+    params: titleSchema,
+  }),
+  restoreApplication,
+);
 
 router.get("/get-trashed-app", protect, isAdmin, getTrashedApplications);
 
@@ -124,16 +152,18 @@ router.post(
   "/add-activity-app",
   protect,
   validate({ body: addNewActivityToApplicationSchema }),
-  addActivity
+  addActivity,
 );
 
-router.post("/duplicate/:id", protect, isAdmin, 
+router.post(
+  "/duplicate/:id",
+  protect,
+  isAdmin,
   validate({
-    params: paramsIdSchema, 
-    body: duplicateApplicationSchema, 
-  }), 
-  duplicateApplication
+    params: paramsIdSchema,
+    body: duplicateApplicationSchema,
+  }),
+  duplicateApplication,
 );
-
 
 export default router;

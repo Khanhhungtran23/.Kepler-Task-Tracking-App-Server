@@ -67,7 +67,12 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Check if the user exists
     if (!user || !(await user.matchPassword(password))) {
-      res.status(401).json({ message: "Invalid email or password, email and password are required!" });
+      res
+        .status(401)
+        .json({
+          message:
+            "Invalid email or password, email and password are required!",
+        });
       return;
     }
     // Check if the user is active
@@ -237,13 +242,13 @@ export const updateUserProfile = async (
 // Function to update user profile by admin (edit member info in team)
 export const adminUpdateUser = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   const { user_name, role, email, isAdmin } = req.body.body || req.body;
   const userEmail = req.params.email;
 
   try {
-    const user = await User.findOne( {email: userEmail} );
+    const user = await User.findOne({ email: userEmail });
     if (!user) {
       res.status(404).json({ message: "User not found" });
       return;
@@ -314,7 +319,12 @@ export const getUserByName = async (
   try {
     // Find users matching the provided name (case insensitive)
     const users = await User.find({
-      user_name: { $regex: new RegExp(user_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      user_name: {
+        $regex: new RegExp(
+          user_name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
     }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
@@ -441,14 +451,14 @@ export const deleteAccount = async (
     const userAccount = await User.findOne({ email });
 
     if (!userAccount) {
-      res
-        .status(404)
-        .json({ message: "User account not found !" });
-        return;
+      res.status(404).json({ message: "User account not found !" });
+      return;
     }
 
     await User.deleteOne({ email });
-    res.status(200).json({ message: "User account permanently deleted", userAccount });
+    res
+      .status(200)
+      .json({ message: "User account permanently deleted", userAccount });
   } catch (error) {
     console.error("Error during deleting user account permanently:", error);
     if (error instanceof Error) {

@@ -1,13 +1,15 @@
 import { Request, Response, NextFunction } from "express";
 import Joi from "joi";
 
-export const validate = (
-  schema: { body?: Joi.ObjectSchema; params?: Joi.ObjectSchema; query?: Joi.ObjectSchema }
-): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
+export const validate = (schema: {
+  body?: Joi.ObjectSchema;
+  params?: Joi.ObjectSchema;
+  query?: Joi.ObjectSchema;
+}): ((req: Request, res: Response, next: NextFunction) => Promise<void>) => {
   return async (
     req: Request,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): Promise<void> => {
     try {
       const errors: string[] = [];
@@ -16,7 +18,7 @@ export const validate = (
         const { error } = schema.body.validate(req.body);
         if (error) {
           errors.push(
-            `Body: ${error.details.map((detail) => detail.message).join(", ")}`
+            `Body: ${error.details.map((detail) => detail.message).join(", ")}`,
           );
         }
       }
@@ -25,7 +27,7 @@ export const validate = (
         const { error } = schema.params.validate(req.params);
         if (error) {
           errors.push(
-            `Params: ${error.details.map((detail) => detail.message).join(", ")}`
+            `Params: ${error.details.map((detail) => detail.message).join(", ")}`,
           );
         }
       }
@@ -34,7 +36,7 @@ export const validate = (
         const { error } = schema.query.validate(req.query);
         if (error) {
           errors.push(
-            `Query: ${error.details.map((detail) => detail.message).join(", ")}`
+            `Query: ${error.details.map((detail) => detail.message).join(", ")}`,
           );
         }
       }
@@ -47,9 +49,9 @@ export const validate = (
         return;
       }
 
-      next(); 
+      next();
     } catch (err) {
-      next(err); 
+      next(err);
     }
   };
 };

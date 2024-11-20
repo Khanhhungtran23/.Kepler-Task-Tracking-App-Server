@@ -53,19 +53,19 @@ export const createApplication = async (
 // Function to duplicate application
 export const duplicateApplication = async (
   req: Request,
-  res: Response
+  res: Response,
 ): Promise<void> => {
   try {
     console.log(req.params);
     const { id } = req.params; // Application ID to be duplicated
-    const {includeRelations} = req.body.body || req.body; // boolean value : if user want to copy the relations or not ?
+    const { includeRelations } = req.body.body || req.body; // boolean value : if user want to copy the relations or not ?
 
     if (!mongoose.Types.ObjectId.isValid(id)) {
       res.status(400).json({ message: "Invalid application ID" });
       return;
     }
 
-    const existingApplication = await Application.findById(id).lean(); 
+    const existingApplication = await Application.findById(id).lean();
     if (!existingApplication) {
       res.status(404).json({ message: "Application not found" });
       return;
@@ -75,9 +75,9 @@ export const duplicateApplication = async (
 
     const duplicatedApplication = new Application({
       ...existingApplication, // copy app be duplicated into new app
-      _id: undefined, 
-      title: newTitle, 
-      createdAt: undefined, 
+      _id: undefined,
+      title: newTitle,
+      createdAt: undefined,
       updatedAt: undefined,
       tasks: includeRelations ? existingApplication.tasks : [],
       teamMembers: includeRelations ? existingApplication.teamMembers : [],
@@ -236,11 +236,17 @@ export const getApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getTodoApplications = async (req: Request, res: Response) => {
   try {
-    const applications = await Application.find({ isTrashed: false, status: "To Do" });
+    const applications = await Application.find({
+      isTrashed: false,
+      status: "To Do",
+    });
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error("Error during fetching info of all to do applications:", error);
+    console.error(
+      "Error during fetching info of all to do applications:",
+      error,
+    );
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -255,7 +261,10 @@ export const getTodoApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getImplementApplications = async (req: Request, res: Response) => {
   try {
-    const applications = await Application.find({ isTrashed: false, status: "Implement" })
+    const applications = await Application.find({
+      isTrashed: false,
+      status: "Implement",
+    })
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
@@ -277,7 +286,10 @@ export const getImplementApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getTestingApplications = async (req: Request, res: Response) => {
   try {
-    const applications = await Application.find({ isTrashed: false, status: "Testing" })
+    const applications = await Application.find({
+      isTrashed: false,
+      status: "Testing",
+    })
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
@@ -297,9 +309,15 @@ export const getTestingApplications = async (req: Request, res: Response) => {
 };
 
 // Get all untrashed applications (excluding trashed)
-export const getProductionApplications = async (req: Request, res: Response) => {
+export const getProductionApplications = async (
+  req: Request,
+  res: Response,
+) => {
   try {
-    const applications = await Application.find({ isTrashed: false, status: "Production" })
+    const applications = await Application.find({
+      isTrashed: false,
+      status: "Production",
+    })
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
@@ -324,7 +342,12 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   try {
     // Find application matching the provided application_title (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      title: {
+        $regex: new RegExp(
+          application_title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
       isTrashed: false,
     }); // Use regex for case-insensitive search
 
@@ -355,7 +378,12 @@ export const searchTodoApp = async (
   try {
     // Find applications matching the application_title and status = "To Do" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      title: {
+        $regex: new RegExp(
+          application_title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
       status: "To Do",
       isTrashed: false,
     });
@@ -387,7 +415,12 @@ export const searchImplementApp = async (
   try {
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      title: {
+        $regex: new RegExp(
+          application_title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
       status: "Implement",
       isTrashed: false,
     });
@@ -419,7 +452,12 @@ export const searchTestingApp = async (
   try {
     // Find applications matching the application_title and status = "Testing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      title: {
+        $regex: new RegExp(
+          application_title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
       status: "Testing",
       isTrashed: false,
     });
@@ -451,7 +489,12 @@ export const searchProductionApp = async (
   try {
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
+      title: {
+        $regex: new RegExp(
+          application_title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
+          "i",
+        ),
+      },
       status: "Production",
       isTrashed: false,
     });
@@ -550,7 +593,7 @@ export const countApplicationsByStatus = async (
           detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
         },
       },
-      { $project: { _id: 0, total: 1, detail: 1} },
+      { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
     const trashedCounts = await Application.aggregate([
@@ -563,12 +606,16 @@ export const countApplicationsByStatus = async (
           detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
         },
       },
-      { $project: { _id: 0, total: 1, detail: 1} },
+      { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
     res
       .status(200)
-      .json({ message: "Applications count by status", unstrashedStatistic: untrashedCounts , trashedStatistic: trashedCounts});
+      .json({
+        message: "Applications count by status",
+        unstrashedStatistic: untrashedCounts,
+        trashedStatistic: trashedCounts,
+      });
   } catch (error) {
     console.error("Error counting applications by status:", error);
     if (error instanceof Error) {
@@ -620,7 +667,7 @@ export const countApplicationsPerUser = async (
       { $match: { isTrashed: { $ne: true } } },
       {
         $lookup: {
-          from: "users", 
+          from: "users",
           localField: "teamMembers",
           foreignField: "_id",
           as: "userDetails",
@@ -630,20 +677,20 @@ export const countApplicationsPerUser = async (
       {
         $group: {
           _id: {
-            user_name: "$userDetails.name", 
-            status: "$status", 
+            user_name: "$userDetails.name",
+            status: "$status",
           },
-          count: { $sum: 1 }, 
+          count: { $sum: 1 },
         },
       },
       {
         $group: {
-          _id: "$_id.user_name", 
-          total_app: { $sum: "$count" }, 
+          _id: "$_id.user_name",
+          total_app: { $sum: "$count" },
           details: {
             $push: {
-              status: "$_id.status", 
-              count: "$count", 
+              status: "$_id.status",
+              count: "$count",
             },
           },
         },
@@ -672,14 +719,16 @@ export const countApplicationsPerUser = async (
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("Error counting number and details of applications per user:", error);
+    console.error(
+      "Error counting number and details of applications per user:",
+      error,
+    );
     res.status(500).json({
       message: "Server error",
       error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };
-
 
 // Function to add member to Application
 export const addMemberToApplication = async (
@@ -716,7 +765,7 @@ export const addMemberToApplication = async (
         .status(400)
         .json({ message: "User is already a member of this application" });
       return;
-    }    
+    }
 
     // add user into array teamMembers of application
     application.teamMembers.push(userId);
@@ -756,9 +805,7 @@ export const addActivity = async (
     const user_name = user.user_name;
 
     if (!mongoose.Types.ObjectId.isValid(appId)) {
-      res
-        .status(400)
-        .json({ message: "Invalid appId format" });
+      res.status(400).json({ message: "Invalid appId format" });
       return;
     }
 
@@ -771,7 +818,7 @@ export const addActivity = async (
     const newActivity = new Activity({
       title,
       comment,
-      user_name
+      user_name,
     });
     await newActivity.save();
 
