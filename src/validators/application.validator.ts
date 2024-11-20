@@ -45,3 +45,19 @@ export const addNewActivityToApplicationSchema = Joi.object({
     .required(), 
   comment: Joi.string().required(), 
 });
+
+export const duplicateApplicationSchema = Joi.object({
+  includeRelations: Joi.boolean().optional().default(true),  
+});
+
+export const paramsIdSchema = Joi.object({
+  id: Joi.string().length(24).required(), 
+});
+
+export const titleSchema = Joi.object({
+  title: Joi.string().required(), 
+});
+
+export const apptitleSchema = Joi.object({
+  application_title: Joi.string().required(), 
+});

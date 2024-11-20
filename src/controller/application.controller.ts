@@ -50,6 +50,59 @@ export const createApplication = async (
   }
 };
 
+// Function to duplicate application
+export const duplicateApplication = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  try {
+    console.log(req.params);
+    const { id } = req.params; // Application ID to be duplicated
+    const {includeRelations} = req.body.body || req.body; // boolean value : if user want to copy the relations or not ?
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      res.status(400).json({ message: "Invalid application ID" });
+      return;
+    }
+
+    const existingApplication = await Application.findById(id).lean(); 
+    if (!existingApplication) {
+      res.status(404).json({ message: "Application not found" });
+      return;
+    }
+
+    const newTitle = `${existingApplication.title} - Copy`;
+
+    const duplicatedApplication = new Application({
+      ...existingApplication, // copy app be duplicated into new app
+      _id: undefined, 
+      title: newTitle, 
+      createdAt: undefined, 
+      updatedAt: undefined,
+      tasks: includeRelations ? existingApplication.tasks : [],
+      teamMembers: includeRelations ? existingApplication.teamMembers : [],
+    });
+
+    // Save the duplicated application
+    const savedApplication = await duplicatedApplication.save();
+
+    res.status(201).json({
+      message: "Application duplicated successfully",
+      application: savedApplication,
+    });
+  } catch (error) {
+    console.error("Error duplicating application:", error);
+    if (error instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: error.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
 // Edit an application
 export const editApplication = async (
   req: Request,
@@ -271,7 +324,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   try {
     // Find application matching the provided application_title (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title, "i") },
+      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
       isTrashed: false,
     }); // Use regex for case-insensitive search
 
@@ -302,7 +355,7 @@ export const searchTodoApp = async (
   try {
     // Find applications matching the application_title and status = "To Do" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title, "i") },
+      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
       status: "To Do",
       isTrashed: false,
     });
@@ -334,7 +387,7 @@ export const searchImplementApp = async (
   try {
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title, "i") },
+      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
       status: "Implement",
       isTrashed: false,
     });
@@ -366,7 +419,7 @@ export const searchTestingApp = async (
   try {
     // Find applications matching the application_title and status = "Testing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title, "i") },
+      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
       status: "Testing",
       isTrashed: false,
     });
@@ -398,7 +451,7 @@ export const searchProductionApp = async (
   try {
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
-      title: { $regex: new RegExp(application_title, "i") },
+      title: { $regex: new RegExp(application_title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
       status: "Production",
       isTrashed: false,
     });

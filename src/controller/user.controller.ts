@@ -314,7 +314,7 @@ export const getUserByName = async (
   try {
     // Find users matching the provided name (case insensitive)
     const users = await User.find({
-      user_name: { $regex: new RegExp(user_name, "i") },
+      user_name: { $regex: new RegExp(user_name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), "i") },
     }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
