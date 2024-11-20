@@ -3,7 +3,6 @@ import Application from "../models/application.model";
 import User from "../models/user.model";
 import Activity from "../models/activity.model";
 import mongoose from "mongoose";
-import jwt from "jsonwebtoken";
 
 // Create an application
 export const createApplication = async (
@@ -564,26 +563,55 @@ export const countApplicationsPerUser = async (
   res: Response,
 ): Promise<void> => {
   try {
-    // Aggregate to count applications for each user
     const counts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
-      { $unwind: "$teamMembers" }, // Unwind teamMembers array
-      { $group: { _id: "$teamMembers", count: { $sum: 1 } } }, // Count applications per user
+      { $match: { isTrashed: { $ne: true } } },
+      {
+        $lookup: {
+          from: "users", 
+          localField: "teamMembers",
+          foreignField: "_id",
+          as: "userDetails",
+        },
+      },
+      { $unwind: "$userDetails" },
+      {
+        $group: {
+          _id: {
+            user_name: "$userDetails.name", 
+            status: "$status", 
+          },
+          count: { $sum: 1 }, 
+        },
+      },
+      {
+        $group: {
+          _id: "$_id.user_name", 
+          total_app: { $sum: "$count" }, 
+          details: {
+            $push: {
+              status: "$_id.status", 
+              count: "$count", 
+            },
+          },
+        },
+      },
       {
         $project: {
           _id: 0,
-          id: "$_id", // Rename _id to id
-          count: 1,
+          user_name: "$_id",
+          total_app: 1,
+          details: 1,
         },
       },
     ]);
 
-    // Prepare response format
+    const totalUsers = counts.length;
+
     const response = {
       message: "Applications count for each member",
       Statistic: [
         {
-          "total user": counts.length,
+          "total user": totalUsers,
           detail: counts,
         },
       ],
@@ -591,17 +619,14 @@ export const countApplicationsPerUser = async (
 
     res.status(200).json(response);
   } catch (error) {
-    console.error("Error counting no of applications per user:", error);
-    if (error instanceof Error) {
-      res.status(500).json({
-        message: "Server error",
-        error: error.message,
-      });
-    } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
-    }
+    console.error("Error counting number and details of applications per user:", error);
+    res.status(500).json({
+      message: "Server error",
+      error: error instanceof Error ? error.message : "Unknown error",
+    });
   }
 };
+
 
 // Function to add member to Application
 export const addMemberToApplication = async (
@@ -633,12 +658,12 @@ export const addMemberToApplication = async (
       return;
     }
 
-    if (application.teamMembers.includes(userId)) {
+    if (application.teamMembers.some((member) => member.equals(userId))) {
       res
         .status(400)
         .json({ message: "User is already a member of this application" });
       return;
-    }
+    }    
 
     // add user into array teamMembers of application
     application.teamMembers.push(userId);
@@ -661,7 +686,7 @@ export const addMemberToApplication = async (
   }
 };
 
-// Function to add member to Application
+// Function to add new comment to Application
 export const addActivity = async (
   req: Request,
   res: Response,
@@ -706,11 +731,11 @@ export const addActivity = async (
     await application.save();
 
     res.status(200).json({
-      message: "Acitivity are added to application successfully",
+      message: "Acitivity are added to application successfully:",
       application,
     });
   } catch (error) {
-    console.error("Error adding/assigning member to application:", error);
+    console.error("Error adding new comment/activity to application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",

@@ -9,7 +9,8 @@ import {
   getUserByName,
   disableUserAccount,
   enableUserAccount,
-  deleteAccount
+  deleteAccount,
+  adminUpdateUser
 } from "../controller/user.controller";
 import { validate } from "../middlewares/validate";
 import {
@@ -45,5 +46,7 @@ router.put("/disable-account/:email", protect, isAdmin, disableUserAccount);
 router.put("/enable-account/:email", protect, isAdmin, enableUserAccount);
 
 router.delete("/delete/:email", protect, isAdmin, deleteAccount);
+
+router.put("/admin/update-user/:email", protect, isAdmin, adminUpdateUser);
 
 export default router;

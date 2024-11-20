@@ -67,7 +67,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Check if the user exists
     if (!user || !(await user.matchPassword(password))) {
-      res.status(401).json({ message: "Invalid email or password" });
+      res.status(401).json({ message: "Invalid email or password, email and password are required!" });
       return;
     }
     // Check if the user is active
@@ -190,7 +190,7 @@ export const logoutUser = (req: Request, res: Response) => {
   // Phản hồi lại cho client
   res.status(200).json({ message: "User logged out successfully." });
 };
-// Update user profile
+// Update user profile for only user or admin
 export const updateUserProfile = async (
   req: Request,
   res: Response,
@@ -233,6 +233,54 @@ export const updateUserProfile = async (
     }
   }
 };
+
+// Function to update user profile by admin (edit member info in team)
+export const adminUpdateUser = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
+  const { user_name, role, email, isAdmin } = req.body.body || req.body;
+  const userEmail = req.params.email;
+
+  try {
+    const user = await User.findOne( {email: userEmail} );
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    if (user_name !== undefined) user.user_name = user_name;
+    if (role !== undefined) user.role = role;
+    if (email !== undefined) user.email = email;
+    if (isAdmin !== undefined) user.isAdmin = isAdmin;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      message: "User updated successfully!",
+      user: {
+        _id: updatedUser._id,
+        user_name: updatedUser.user_name,
+        role: updatedUser.role,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+        isActive: updatedUser.isActive,
+        createdDay: updatedUser.createdDay,
+      },
+    });
+  } catch (err) {
+    console.error("Error updating user by admin:", err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({ message: "Server error", error: "Unknown error" });
+    }
+  }
+};
+
 // Get all users
 export const getAllUsers = async (
   req: Request,
