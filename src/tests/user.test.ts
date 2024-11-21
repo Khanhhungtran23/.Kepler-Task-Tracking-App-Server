@@ -1,5 +1,6 @@
 import request from "supertest";
 import app from "../index";
+import server from "../app";
 import redisClient from "../utils/redis";
 
 jest.mock("../utils/redis", () => ({
@@ -16,7 +17,8 @@ describe("User API with Redis Cache", () => {
   
   afterAll(async () => {
     await redisClient.quit();
-    console.log("Redis connection closed");
+    server.close();
+    console.log("Server and Redis connection closed");
   });
 
   it("should fetch users and cache the result", async () => {

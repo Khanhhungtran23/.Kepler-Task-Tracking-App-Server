@@ -6,7 +6,7 @@
     "start": "npm run build && NODE_ENV=production node dist/app.js",
     "dev": "nodemon --files src/app.ts",
     "build": "tsc",
-    "test": "jest",
+    "test": "jest --forceExit --detectOpenHandles",
     "test:watch": "jest --watch",
     "prepare": "if [ \"$NODE_ENV\" != \"production\" ]; then husky install; fi",
     "clean": "echo \"Cleaning build and dependencies\" && rimraf ./dist ./node_modules && echo \"Done\"",

@@ -1,9 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1732199177233" clover="3.2.0">
-  <project timestamp="1732199177233" name="All files">
-    <metrics statements="2478" coveredstatements="872" conditionals="15" coveredconditionals="8" methods="45" coveredmethods="4" elements="2538" coveredelements="884" complexity="0" loc="2478" ncloc="2478" packages="9" files="19" classes="19"/>
+<coverage generated="1732199885164" clover="3.2.0">
+  <project timestamp="1732199885164" name="All files">
+    <metrics statements="2490" coveredstatements="884" conditionals="17" coveredconditionals="9" methods="45" coveredmethods="4" elements="2552" coveredelements="897" complexity="0" loc="2490" ncloc="2490" packages="9" files="20" classes="20"/>
     <package name="src">
-      <metrics statements="114" coveredstatements="108" conditionals="4" coveredconditionals="1" methods="1" coveredmethods="1"/>
+      <metrics statements="126" coveredstatements="120" conditionals="6" coveredconditionals="2" methods="1" coveredmethods="1"/>
+      <file name="app.ts" path="/Users/hungtran/Downloads/Project/dotKepler-Server/src/app.ts">
+        <metrics statements="12" coveredstatements="12" conditionals="2" coveredconditionals="1" methods="0" coveredmethods="0"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="2" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="4" count="1" type="stmt"/>
+        <line num="5" count="1" type="cond" truecount="0" falsecount="1"/>
+        <line num="6" count="1" type="stmt"/>
+        <line num="7" count="1" type="stmt"/>
+        <line num="8" count="1" type="cond" truecount="1" falsecount="0"/>
+        <line num="9" count="1" type="stmt"/>
+        <line num="10" count="1" type="stmt"/>
+        <line num="11" count="1" type="stmt"/>
+        <line num="12" count="1" type="stmt"/>
+      </file>
       <file name="index.ts" path="/Users/hungtran/Downloads/Project/dotKepler-Server/src/index.ts">
         <metrics statements="114" coveredstatements="108" conditionals="4" coveredconditionals="1" methods="1" coveredmethods="1"/>
         <line num="1" count="1" type="stmt"/>
