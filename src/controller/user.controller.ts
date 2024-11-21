@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import User from "../models/user.model";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
+import redisClient from "../utils/redis";
+import clearUserCache from "../helpers/clearUserCache";
 
 // Register a new user
 export const registerUser = async (
@@ -29,6 +31,7 @@ export const registerUser = async (
     if (user) {
       // Create a JWT token
       // createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
+      await clearUserCache();
       res.status(201).json({
         _id: user._id,
         user_name: user.user_name,
@@ -67,12 +70,9 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
     // Check if the user exists
     if (!user || !(await user.matchPassword(password))) {
-      res
-        .status(401)
-        .json({
-          message:
-            "Invalid email or password, email and password are required!",
-        });
+      res.status(401).json({
+        message: "Invalid email or password, email and password are required!",
+      });
       return;
     }
     // Check if the user is active
@@ -214,6 +214,7 @@ export const updateUserProfile = async (
       user.role = role || user.role;
 
       const updatedUser = await user.save();
+      await clearUserCache();
 
       res.status(200).json({
         _id: updatedUser._id,
@@ -244,7 +245,7 @@ export const adminUpdateUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const { user_name, role, email, isAdmin } = req.body.body || req.body;
+  const { user_name, role, isAdmin } = req.body.body || req.body;
   const userEmail = req.params.email;
 
   try {
@@ -256,10 +257,10 @@ export const adminUpdateUser = async (
 
     if (user_name !== undefined) user.user_name = user_name;
     if (role !== undefined) user.role = role;
-    if (email !== undefined) user.email = email;
     if (isAdmin !== undefined) user.isAdmin = isAdmin;
 
     const updatedUser = await user.save();
+    await clearUserCache();
 
     res.status(200).json({
       message: "User updated successfully!",
@@ -292,9 +293,20 @@ export const getAllUsers = async (
   res: Response,
 ): Promise<void> => {
   try {
+    const cacheKey = "users:all";
+    const cachedUsers = await redisClient.get(cacheKey);
+    if (cachedUsers) {
+      console.log("Cache hit for all users");
+      res.status(200).json(JSON.parse(cachedUsers));
+      return;
+    } else {
+      console.log("Cache miss for all users");
+    }
+
     // Retrieve all users from the database
     const users = await User.find({}).sort({ createdAt: -1 });
     console.log("All members information:", users);
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(users));
     res.status(200).json(users);
   } catch (err) {
     console.error("Error during get all information of user:", err);
@@ -317,6 +329,15 @@ export const getUserByName = async (
   const { user_name } = req.params; // Assuming name is passed as a route parameter
 
   try {
+    const cacheKey = `users:search:${user_name}`;
+    const cachedUsers = await redisClient.get(cacheKey);
+    if (cachedUsers) {
+      console.log("Cache hit for user search");
+      res.status(200).json(JSON.parse(cachedUsers));
+      return;
+    } else {
+      console.log("Cache miss for user search");
+    }
     // Find users matching the provided name (case insensitive)
     const users = await User.find({
       user_name: {
@@ -328,6 +349,7 @@ export const getUserByName = async (
     }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
+      await redisClient.setEx(cacheKey, 3600, JSON.stringify(users));
       res.status(200).json(users);
     } else {
       res.status(404).json({ message: "No users found with that name" });
@@ -376,6 +398,8 @@ export const disableUserAccount = async (
     );
 
     console.log("isActive :", disableUser.isActive);
+    await clearUserCache();
+
     res.status(200).json({
       message: `Account of ${disableUser.email} has been disabled successfully.`,
       User: disableUser,
@@ -424,6 +448,8 @@ export const enableUserAccount = async (
     );
 
     console.log("isActive :", enableUser.isActive);
+    await clearUserCache();
+
     res.status(200).json({
       message: `Account of ${enableUser.email} has been enabled successfully.`,
       User: enableUser,
@@ -456,6 +482,8 @@ export const deleteAccount = async (
     }
 
     await User.deleteOne({ email });
+    await clearUserCache();
+
     res
       .status(200)
       .json({ message: "User account permanently deleted", userAccount });

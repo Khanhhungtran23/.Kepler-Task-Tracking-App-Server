@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
-import User from "../models/user.model";
 
 // Định nghĩa một giao diện để mở rộng Request với thuộc tính user
 interface AuthRequest extends Request {

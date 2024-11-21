@@ -3,6 +3,8 @@ import Application from "../models/application.model";
 import User from "../models/user.model";
 import Activity from "../models/activity.model";
 import mongoose from "mongoose";
+import redisClient from "../utils/redis";
+import clearApplicationCache from "../helpers/clearAppCache";
 
 // Create an application
 export const createApplication = async (
@@ -33,6 +35,10 @@ export const createApplication = async (
 
     // Save the new application to the database
     const savedApplication = await newApplication.save();
+
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(201).json({
       message: "Application created successfully",
       application: savedApplication,
@@ -86,6 +92,9 @@ export const duplicateApplication = async (
     // Save the duplicated application
     const savedApplication = await duplicatedApplication.save();
 
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(201).json({
       message: "Application duplicated successfully",
       application: savedApplication,
@@ -124,6 +133,9 @@ export const editApplication = async (
       res.status(404).json({ message: "Application not found" });
     }
 
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(200).json({
       message: "Application updated successfully",
       application: updatedApplication,
@@ -159,6 +171,9 @@ export const trashApplication = async (
       res.status(404).json({ message: "Application not found" });
       return;
     }
+
+    // DELETE cache to reset cache
+    await clearApplicationCache();
 
     res.status(200).json({
       message: "Application moved to trash",
@@ -197,6 +212,10 @@ export const deleteApplication = async (
     }
 
     await Application.findByIdAndDelete(id);
+
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(200).json({ message: "Application permanently deleted" });
   } catch (error) {
     console.error("Error during deleting application permanently:", error);
@@ -214,10 +233,26 @@ export const deleteApplication = async (
 // Get all untrashed applications (excluding trashed)
 export const getApplications = async (req: Request, res: Response) => {
   try {
+    const cacheKey = "application:all";
+
+    // check cache first if yes or not
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for all applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    }
+
+    // If not in cache, get from database
+    else console.log("Cache miss for all applications");
+    // command to get from db server
     const applications = await Application.find({ isTrashed: false })
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
+
+    // store in cache, expire in 1h = 3600s
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
   } catch (error) {
@@ -236,10 +271,21 @@ export const getApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getTodoApplications = async (req: Request, res: Response) => {
   try {
+    const cacheKey = "applications:todo";
+
+    const cachedTodoApplications = await redisClient.get(cacheKey);
+    if (cachedTodoApplications) {
+      console.log("Cache hit for To Do applications");
+      res.status(200).json(JSON.parse(cachedTodoApplications));
+      return;
+    } else console.log("Cache miss for To Do applications");
+
     const applications = await Application.find({
       isTrashed: false,
       status: "To Do",
     });
+
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
   } catch (error) {
@@ -261,6 +307,14 @@ export const getTodoApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getImplementApplications = async (req: Request, res: Response) => {
   try {
+    const cacheKey = "applications:implement";
+    const cachedImplementApplications = await redisClient.get(cacheKey);
+    if (cachedImplementApplications) {
+      console.log("Cache hit for Implement applications");
+      res.status(200).json(JSON.parse(cachedImplementApplications));
+      return;
+    } else console.log("Cache miss for Implement applications");
+
     const applications = await Application.find({
       isTrashed: false,
       status: "Implement",
@@ -268,6 +322,8 @@ export const getImplementApplications = async (req: Request, res: Response) => {
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
+
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
   } catch (error) {
@@ -286,6 +342,14 @@ export const getImplementApplications = async (req: Request, res: Response) => {
 // Get all untrashed applications (excluding trashed)
 export const getTestingApplications = async (req: Request, res: Response) => {
   try {
+    const cacheKey = "applications:test";
+    const cachedTestApplications = await redisClient.get(cacheKey);
+    if (cachedTestApplications) {
+      console.log("Cache hit for Test applications");
+      res.status(200).json(JSON.parse(cachedTestApplications));
+      return;
+    } else console.log("Cache miss for Test applications");
+
     const applications = await Application.find({
       isTrashed: false,
       status: "Testing",
@@ -293,6 +357,8 @@ export const getTestingApplications = async (req: Request, res: Response) => {
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
+
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
   } catch (error) {
@@ -314,6 +380,14 @@ export const getProductionApplications = async (
   res: Response,
 ) => {
   try {
+    const cacheKey = "applications:prod";
+    const cachedProdApplications = await redisClient.get(cacheKey);
+    if (cachedProdApplications) {
+      console.log("Cache hit for Production applications");
+      res.status(200).json(JSON.parse(cachedProdApplications));
+      return;
+    } else console.log("Cache miss for Production applications");
+
     const applications = await Application.find({
       isTrashed: false,
       status: "Production",
@@ -322,6 +396,7 @@ export const getProductionApplications = async (
       .populate("teamMembers")
       .exec();
 
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
     res.status(200).json({ applications });
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
@@ -340,6 +415,14 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
+    const cacheKey = `applications:search:${application_title}`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for search applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for search applications");
+
     // Find application matching the provided application_title (case insensitive)
     const apps = await Application.find({
       title: {
@@ -352,6 +435,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     }); // Use regex for case-insensitive search
 
     if (apps.length > 0) {
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
       res.status(404).json({ message: "No application found with that title" });
@@ -376,6 +460,14 @@ export const searchTodoApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
+    const cacheKey = `TodoApplications:search:${application_title}`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for search Todo applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for search Todo applications");
+
     // Find applications matching the application_title and status = "To Do" (case insensitive)
     const apps = await Application.find({
       title: {
@@ -389,6 +481,7 @@ export const searchTodoApp = async (
     });
 
     if (apps.length > 0) {
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
       res.status(404).json({ message: "No application found with that title" });
@@ -413,6 +506,14 @@ export const searchImplementApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
+    const cacheKey = `ImApplications:search:${application_title}`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for search Implement applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for search Implement applications");
+
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
       title: {
@@ -426,6 +527,7 @@ export const searchImplementApp = async (
     });
 
     if (apps.length > 0) {
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
       res.status(404).json({ message: "No application found with that title" });
@@ -450,6 +552,13 @@ export const searchTestingApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
+    const cacheKey = `TestApplications:search:${application_title}`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for search Test applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for search Test applications");
     // Find applications matching the application_title and status = "Testing" (case insensitive)
     const apps = await Application.find({
       title: {
@@ -463,6 +572,7 @@ export const searchTestingApp = async (
     });
 
     if (apps.length > 0) {
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
       res.status(404).json({ message: "No application found with that title" });
@@ -487,6 +597,14 @@ export const searchProductionApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
+    const cacheKey = `ProdApplications:search:${application_title}`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for search Production applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for search Production applications");
+
     // Find applications matching the application_title and status = "Implementing" (case insensitive)
     const apps = await Application.find({
       title: {
@@ -500,6 +618,7 @@ export const searchProductionApp = async (
     });
 
     if (apps.length > 0) {
+      await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
       res.status(404).json({ message: "No application found with that title" });
@@ -535,6 +654,9 @@ export const restoreApplication = async (
       res.status(404).json({ message: "Application not found" });
     }
 
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(200).json({
       message: "Application is restored",
       application: restoredApplication,
@@ -555,10 +677,23 @@ export const restoreApplication = async (
 // Get all trashed applications (including trashed)
 export const getTrashedApplications = async (req: Request, res: Response) => {
   try {
+    const cacheKey = `TrashApplication:all`;
+    const cachedApplications = await redisClient.get(cacheKey);
+    if (cachedApplications) {
+      console.log("Cache hit for get all trash applications");
+      res.status(200).json(JSON.parse(cachedApplications));
+      return;
+    } else console.log("Cache miss for get all trash applications");
+
     const trashedApplications = await Application.find({ isTrashed: true })
       .populate("teamMembers")
       .exec();
 
+    await redisClient.setEx(
+      cacheKey,
+      1800,
+      JSON.stringify(trashedApplications),
+    );
     res.status(200).json({ trashedApplications });
   } catch (error) {
     console.error(
@@ -582,6 +717,14 @@ export const countApplicationsByStatus = async (
   res: Response,
 ): Promise<void> => {
   try {
+    const cacheKey = "applications:status-count";
+    const cachedCounts = await redisClient.get(cacheKey);
+    if (cachedCounts) {
+      console.log("Cache hit for status count");
+      res.status(200).json(JSON.parse(cachedCounts));
+      return;
+    } else console.log("Cache miss for status count");
+
     const untrashedCounts = await Application.aggregate([
       { $match: { isTrashed: { $ne: true } } }, // exclude trashed applications
       { $group: { _id: "$status", count: { $sum: 1 } } }, // group by status and count
@@ -609,13 +752,16 @@ export const countApplicationsByStatus = async (
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
-    res
-      .status(200)
-      .json({
-        message: "Applications count by status",
-        unstrashedStatistic: untrashedCounts,
-        trashedStatistic: trashedCounts,
-      });
+    await redisClient.setEx(
+      cacheKey,
+      3600,
+      JSON.stringify(untrashedCounts, trashedCounts),
+    );
+    res.status(200).json({
+      message: "Applications count by status",
+      unstrashedStatistic: untrashedCounts,
+      trashedStatistic: trashedCounts,
+    });
   } catch (error) {
     console.error("Error counting applications by status:", error);
     if (error instanceof Error) {
@@ -635,12 +781,21 @@ export const countApplicationsByPriority = async (
   res: Response,
 ): Promise<void> => {
   try {
+    const cacheKey = "applications:priority-count";
+    const cachedCounts = await redisClient.get(cacheKey);
+    if (cachedCounts) {
+      console.log("Cache hit for priority count");
+      res.status(200).json(JSON.parse(cachedCounts));
+      return;
+    } else console.log("Cache miss for priority count");
+
     const counts = await Application.aggregate([
       { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
       { $group: { _id: "$priority", count: { $sum: 1 } } }, // Group by priority and count
       { $project: { _id: 0, priority: "$_id", count: 1 } },
     ]);
 
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(counts));
     res
       .status(200)
       .json({ message: "Applications count by priority", Statistic: counts });
@@ -663,6 +818,14 @@ export const countApplicationsPerUser = async (
   res: Response,
 ): Promise<void> => {
   try {
+    const cacheKey = "users:applications-count";
+    const cachedCounts = await redisClient.get(cacheKey);
+    if (cachedCounts) {
+      console.log("Cache hit for app per user count");
+      res.status(200).json(JSON.parse(cachedCounts));
+      return;
+    } else console.log("Cache miss for app per user count");
+
     const counts = await Application.aggregate([
       { $match: { isTrashed: { $ne: true } } },
       {
@@ -717,6 +880,7 @@ export const countApplicationsPerUser = async (
       ],
     };
 
+    await redisClient.setEx(cacheKey, 3600, JSON.stringify(counts));
     res.status(200).json(response);
   } catch (error) {
     console.error(
