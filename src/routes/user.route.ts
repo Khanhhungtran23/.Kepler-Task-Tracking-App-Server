@@ -40,7 +40,7 @@ router.post("/logout", protect, logoutUser);
 
 router.put("/profile", protect, updateUserProfile);
 
-router.get("/get-all-info",  getAllUsers);
+router.get("/get-all-info", getAllUsers);
 
 router.get(
   "/search/:user_name",
