@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response } from "express";
 import User from "../models/user.model";
 import { createJWT } from "../utils/util";

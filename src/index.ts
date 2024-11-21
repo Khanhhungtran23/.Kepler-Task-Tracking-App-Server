@@ -1,7 +1,7 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
-import express, { Request, Response } from "express";
+import express from "express";
 import morgan from "morgan";
 import routes from "./routes/index"; 
 import { dbConnection } from "./utils/util"; 
@@ -10,8 +10,8 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerOptions from "./swagger/swagger.config";
 import { routeNotFound, errorHandler } from './middlewares/error';
-import { Server } from "socket.io"; // Import Socket.IO
-import { setupWebSocket } from "./utils/socket"; // Import hàm setupWebSocket
+// import { Server } from "socket.io"; // Import Socket.IO
+// import { setupWebSocket } from "./utils/socket"; // Import hàm setupWebSocket
 import sessionMiddleware from "./middlewares/session";
 
 // db connection
@@ -19,7 +19,6 @@ dotenv.config();
 dbConnection();
 
 // initialize app
-const PORT = process.env.PORT;
 const app = express();
 
 // // Create HTTP server and integrate it with Express
