@@ -17,3 +17,7 @@ components:
           type: string
           description: Comment for the activity
           example: Code for the login functionality has been implemented.
+        user_name:
+          type: string
+          description: User do this activity/comment
+          example: John Doe

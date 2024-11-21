@@ -9,26 +9,30 @@ import {
   getUserByName,
   disableUserAccount,
   enableUserAccount,
-  deleteAccount
+  deleteAccount,
+  adminUpdateUser,
 } from "../controller/user.controller";
 import { validate } from "../middlewares/validate";
 import {
   registerUserSchema,
   loginUserSchema,
   changePasswordSchema,
+  adminUpdateUserSchema,
+  searchUserByNameSchema,
+  emailParamSchema,
 } from "../validators/user.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
 const router = express.Router();
 
-router.post("/register", validate(registerUserSchema), registerUser);
+router.post("/register", validate({ body: registerUserSchema }), registerUser);
 
-router.post("/login", validate(loginUserSchema), loginUser);
+router.post("/login", validate({ body: loginUserSchema }), loginUser);
 
 router.put(
   "/change-password",
   protect,
-  validate(changePasswordSchema),
+  validate({ body: changePasswordSchema }),
   changeUserPassword,
 );
 
@@ -38,12 +42,47 @@ router.put("/profile", protect, updateUserProfile);
 
 router.get("/get-all-info", protect, isAdmin, getAllUsers);
 
-router.get("/search/:user_name", protect, isAdmin, getUserByName);
+router.get(
+  "/search/:user_name",
+  protect,
+  isAdmin,
+  validate({ params: searchUserByNameSchema }),
+  getUserByName,
+);
 
-router.put("/disable-account/:email", protect, isAdmin, disableUserAccount);
+router.put(
+  "/disable-account/:email",
+  protect,
+  isAdmin,
+  validate({ params: emailParamSchema }),
+  disableUserAccount,
+);
 
-router.put("/enable-account/:email", protect, isAdmin, enableUserAccount);
+router.put(
+  "/enable-account/:email",
+  protect,
+  isAdmin,
+  validate({ params: emailParamSchema }),
+  enableUserAccount,
+);
 
-router.delete("/delete/:email", protect, isAdmin, deleteAccount);
+router.delete(
+  "/delete/:email",
+  protect,
+  isAdmin,
+  validate({ params: emailParamSchema }),
+  deleteAccount,
+);
+
+router.put(
+  "/admin/update-user/:email",
+  protect,
+  isAdmin,
+  validate({
+    params: emailParamSchema,
+    body: adminUpdateUserSchema,
+  }),
+  adminUpdateUser,
+);
 
 export default router;

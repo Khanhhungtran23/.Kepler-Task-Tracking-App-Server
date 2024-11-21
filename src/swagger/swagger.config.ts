@@ -35,12 +35,20 @@ const swaggerOptions = {
         description: "Default API endpoint",
       },
       {
-        name: "Users",
+        name: "User",
         description: "Endpoints for user management",
       },
       {
-        name: "Applications",
+        name: "User (use by Admin)",
+        description: "Endpoints for user management by Admin",
+      },
+      {
+        name: "Application",
         description: "Endpoints for managing applications",
+      },
+      {
+        name: "Application (use by Admin)",
+        description: "Endpoints for managing applications by Admin",
       },
     ],
     components: {

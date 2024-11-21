@@ -4,7 +4,7 @@ paths:
       summary: Register a new user
       description: Registers a new user to the system.
       tags:
-        - Users
+        - User
       requestBody:
         required: true
         content:
@@ -130,7 +130,7 @@ paths:
       summary: Login a user
       description: Logs in an existing user and returns a JWT token in a cookie.
       tags:
-        - Users
+        - User
       requestBody:
         required: true
         content:
@@ -249,7 +249,7 @@ paths:
       summary: Change user password
       description: Allows a user to change their password. Requires the old password for verification.
       tags:
-        - Users
+        - User
       security:
         - bearerAuth: []
       requestBody:
@@ -339,7 +339,7 @@ paths:
       summary: Logout a user
       description: Logs out an authenticated user by clearing the JWT token from the cookie.
       tags:
-        - Users
+        - User
       security:
         - bearerAuth: []
       responses:
@@ -381,7 +381,7 @@ paths:
       summary: Update user profile
       description: Allows a user to update their profile information.
       tags:
-        - Users
+        - User
       security:
         - bearerAuth: []
       requestBody:
@@ -482,7 +482,7 @@ paths:
     get:
       summary: Get all users
       tags:
-        - Users
+        - User (use by Admin)
       description: Retrieve all user information, sorted by creation date in descending order.
       operationId: getAllUsers
       security:
@@ -562,7 +562,7 @@ paths:
     get:
       summary: Get a user by username
       tags:
-        - Users
+        - User (use by Admin)
       description: Retrieve users by their username with case-insensitive matching.
       operationId: getUserByName
       security:
@@ -653,7 +653,7 @@ paths:
       summary: Disable a user account
       description: Disables a user's account by setting `isActive` to false. Only admins can perform this action.
       tags:
-        - Users
+        - User (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -774,7 +774,7 @@ paths:
       summary: Enable a user account
       description: Enables a user's account by setting `isActive` to true. Only admins can perform this action.
       tags:
-        - Users
+        - User (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -888,6 +888,245 @@ paths:
         - description: "Cancel the request and go back"
           button: "Cancel"
 
+  /user/admin/update-user/{email}:
+    patch:
+      summary: Update a user's profile by admin
+      description: Allows an admin to update user details, such as username, role, and admin rights.
+      tags:
+        - User (use by Admin)
+      parameters:
+        - name: email
+          in: path
+          description: Email of the user to be updated
+          required: true
+          schema:
+            type: string
+            format: email
+            example: user@example.com
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user_name:
+                  type: string
+                  description: New username for the user
+                  example: johndocon
+                role:
+                  type: string
+                  description: New role of the user
+                  example: Manager
+                isAdmin:
+                  type: boolean
+                  description: Indicates if the user should have admin rights
+                  example: true
+            examples:
+              update-role:
+                summary: Update user role and admin status
+                value:
+                  user_name: johndocon
+                  role: Manager
+                  isAdmin: true
+      responses:
+        '200':
+          description: User successfully updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "User updated successfully!"
+                  user:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        description: User's unique ID
+                        example: "617c1f77f0d4c800170d0f67"
+                      user_name:
+                        type: string
+                        description: Updated username
+                        example: johndocon
+                      role:
+                        type: string
+                        description: Updated role
+                        example: Manager
+                      email:
+                        type: string
+                        description: Email of the user
+                        example: user@example.com
+                      isAdmin:
+                        type: boolean
+                        description: Indicates if the user has admin rights
+                        example: true
+                      isActive:
+                        type: boolean
+                        description: Indicates if the user account is active
+                        example: true
+                      createdDay:
+                        type: string
+                        description: The date when the user account was created
+                        format: date
+                        example: "2023-01-01"
+        '404':
+          description: User not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "User not found"
+              examples:
+                not-found:
+                  summary: User not found example
+                  value:
+                    message: "User not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Server error"
+                  error:
+                    type: string
+                    description: Detailed error message
+                    example: "Cannot connect to the database"
+              examples:
+                server-error:
+                  summary: Server error example
+                  value:
+                    message: "Server error"
+                    error: "Database connection failed"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /user/delete/{email}:
+    delete:
+      summary: Permanently delete a user account
+      description: Allows an admin to delete a user account permanently by their email.
+      tags:
+        - User (use by Admin)
+      parameters:
+        - name: email
+          in: path
+          description: Email of the user account to be deleted
+          required: true
+          schema:
+            type: string
+            format: email
+            example: user@example.com
+      responses:
+        '200':
+          description: User account successfully deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "User account permanently deleted"
+                  userAccount:
+                    type: object
+                    description: Details of the deleted user account
+                    properties:
+                      _id:
+                        type: string
+                        description: Unique user ID
+                        example: "617c1f77f0d4c800170d0f67"
+                      user_name:
+                        type: string
+                        description: User's name
+                        example: johndocon
+                      role:
+                        type: string
+                        description: Role of the user
+                        example: Manager
+                      email:
+                        type: string
+                        description: Email of the user
+                        example: user@example.com
+                      isAdmin:
+                        type: boolean
+                        description: Indicates if the user had admin rights
+                        example: false
+                      isActive:
+                        type: boolean
+                        description: Indicates if the account was active
+                        example: true
+                      createdDay:
+                        type: string
+                        description: The date when the account was created
+                        format: date
+                        example: "2023-01-01"
+        '404':
+          description: User account not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "User account not found !"
+              examples:
+                account-not-found:
+                  summary: Account not found example
+                  value:
+                    message: "User account not found !"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Server error"
+                  error:
+                    type: string
+                    description: Detailed error message
+                    example: "Cannot connect to the database"
+              examples:
+                server-error:
+                  summary: Server error example
+                  value:
+                    message: "Server error"
+                    error: "Database connection failed"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
 
 components:
   schemas:
@@ -930,3 +1169,4 @@ components:
           type: string
           format: date-time
           description: Date when the account was created
+

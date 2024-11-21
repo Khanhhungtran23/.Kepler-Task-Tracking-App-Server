@@ -50,4 +50,3 @@ export const createJWT = (
     throw new Error("Cannot create JWT!");
   }
 };
-

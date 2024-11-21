@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import User from "../models/user.model"; 
+import User from "../models/user.model";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 
@@ -27,21 +27,13 @@ const generatePermanentTokens = async () => {
       throw new Error("Not found user account with email: tester@gmail.com");
     }
 
-    const adminToken = jwt.sign(
-      { _id: admin._id, isAdmin: true },
-      jwtSecret,
-      {
-        algorithm: "HS256", 
-      }
-    );
+    const adminToken = jwt.sign({ _id: admin._id, isAdmin: true }, jwtSecret, {
+      algorithm: "HS256",
+    });
 
-    const userToken = jwt.sign(
-      { _id: user._id, isAdmin: false },
-      jwtSecret,
-      {
-        algorithm: "HS256", 
-      }
-    );
+    const userToken = jwt.sign({ _id: user._id, isAdmin: false }, jwtSecret, {
+      algorithm: "HS256",
+    });
 
     console.log("Pernament token for admin:", adminToken);
     console.log("Pernament token for user:", userToken);

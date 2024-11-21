@@ -10,7 +10,7 @@ paths:
       summary: Create a new application
       description: Creates a new application with provided details. Only admin role can create an application.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       requestBody:
@@ -106,7 +106,7 @@ paths:
       summary: Edit an existing application
       description: Allows an admin to edit the details of an application.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -212,7 +212,7 @@ paths:
       summary: Move an application to trash
       description: Marks an application as trashed. Only admins can perform this action.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -273,7 +273,7 @@ paths:
       summary: Permanently delete an application
       description: Permanently deletes an application. Only trashed applications can be permanently deleted. Only admins can perform this action.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -325,7 +325,7 @@ paths:
     get:
       summary: Get all applications
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       responses:
@@ -375,7 +375,7 @@ paths:
     get:
       summary: Search an application by title
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -425,7 +425,7 @@ paths:
     get:
       summary: Search a To Do application by title
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -486,7 +486,7 @@ paths:
     get:
       summary: Search an Implementing application by title
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -547,7 +547,7 @@ paths:
     get:
       summary: Search a Testing application by title
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -608,7 +608,7 @@ paths:
     get:
       summary: Search a Production application by title
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -670,7 +670,7 @@ paths:
       summary: Restore an application from trash
       description: Restores a trashed application back to active status. Only admins can perform this action.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       parameters:
@@ -721,7 +721,7 @@ paths:
       summary: Get all trashed applications
       description: Retrieves a list of all applications currently in the trash. Only admins can access this list.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       responses:
@@ -784,7 +784,7 @@ paths:
       summary: Get application count by status
       description: Retrieves the count of applications grouped by their status.
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       responses:
@@ -849,7 +849,7 @@ paths:
       summary: Get application count by priority
       description: Retrieves the count of applications grouped by priority level.
       tags:
-        - Applications
+        - Application
       security:
         - bearerAuth: []
       responses:
@@ -902,14 +902,12 @@ paths:
           onClick: "resetForm()" # Reset button (front-end should define resetForm())
       x-execute-query: true # Show Execute Query button to test API
 
-  /get-apps-user:
+  /app/get-apps-user:
     get:
-      summary: Get application count per user
-      description: Returns the number of applications each user is a member of.
+      summary: Get application counts per user
+      description: Retrieves the total number of applications per user, grouped by their status, for all non-trashed applications.
       tags:
-        - Applications
-      security:
-        - bearerAuth: []
+        - Application
       responses:
         '200':
           description: Successfully retrieved application counts per user
@@ -920,63 +918,108 @@ paths:
                 properties:
                   message:
                     type: string
+                    description: Description of the response
                     example: "Applications count for each member"
                   Statistic:
                     type: array
+                    description: Aggregated application statistics per user
                     items:
                       type: object
                       properties:
-                        total user:
+                        total_user:
                           type: integer
                           description: Total number of users
+                          example: 5
                         detail:
                           type: array
+                          description: Details of application counts per user
                           items:
                             type: object
                             properties:
-                              id:
+                              user_name:
                                 type: string
-                                description: User ID
-                              count:
+                                description: Name of the user
+                                example: "John Doe"
+                              total_app:
                                 type: integer
-                                description: Number of applications the user is a member of
+                                description: Total number of applications associated with the user
+                                example: 15
+                              details:
+                                type: array
+                                description: Breakdown of applications by status
+                                items:
+                                  type: object
+                                  properties:
+                                    status:
+                                      type: string
+                                      description: Application status
+                                      example: "To Do"
+                                    count:
+                                      type: integer
+                                      description: Number of applications with the specified status
+                                      example: 5
+              examples:
+                example-response:
+                  summary: Example response
+                  value:
+                    message: "Applications count for each member"
+                    Statistic:
+                      - total_user: 3
+                        detail:
+                          - user_name: "John Doe"
+                            total_app: 10
+                            details:
+                              - status: "To Do"
+                                count: 4
+                              - status: "Implement"
+                                count: 3
+                              - status: "Testing"
+                                count: 2
+                              - status: "Production"
+                                count: 1
+                          - user_name: "Jane Smith"
+                            total_app: 5
+                            details:
+                              - status: "To Do"
+                                count: 2
+                              - status: "Implement"
+                                count: 3
         '500':
-          description: Server error with error message 
+          description: Server error
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: false
                   message:
                     type: string
                     example: "Server error"
-                  error: 
+                  error:
                     type: string
-                    description: Detailed error message from the server
-                    example: "Error: Cannot connect to database"
-              examples: 
-                server_error:
-                  summary: Server error example
-                  value: 
-                    success: false
+                    description: Detailed error message
+                    example: "Unknown error"
+              examples:
+                server-error:
+                  summary: Example error response
+                  value:
                     message: "Server error"
                     error: "Database connection failed"
-      x-buttons:
-        - text: Cancel
-          onClick: "window.location.reload()" # Cancel button action
-        - text: Reset
-          onClick: "resetForm()" # Reset button (front-end should define resetForm())
-      x-execute-query: true # Show Execute Query button to test API
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
 
-  /add-member-app:
+  /app/add-member-app:
     post:
       summary: Add a member to an application
       description: Adds a user to the specified application's team members. Requires admin role.
       tags:
-        - Applications
+        - Application (use by Admin)
       security:
         - bearerAuth: []
       requestBody:
@@ -1045,6 +1088,477 @@ paths:
         - text: Reset
           onClick: "resetForm()" # Reset button (front-end should define resetForm())
       x-execute-query: true # Show Execute Query button to test API
+
+  /app/add-activity-app:
+    post:
+      summary: Add activity/comment to an application
+      description: Adds a new activity or comment to a specific application by a logged-in user.
+      tags:
+        - Application
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - comment
+                - appId
+              properties:
+                title:
+                  type: string
+                  description: Title of the activity
+                  example: "Added new feature"
+                comment:
+                  type: string
+                  description: Comment or description for the activity
+                  example: "Implemented user login feature"
+                appId:
+                  type: string
+                  description: ID of the application where the activity is being added
+                  example: "617c1f77f0d4c800170d0f67"
+            examples:
+              example-request:
+                summary: Example request
+                value:
+                  title: "Added new feature"
+                  comment: "Implemented user login feature"
+                  appId: "617c1f77f0d4c800170d0f67"
+      responses:
+        '200':
+          description: Activity added successfully to the application
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Activity is added to the application successfully:"
+                  application:
+                    type: object
+                    description: Details of the application with the new activity
+                    properties:
+                      _id:
+                        type: string
+                        description: Application ID
+                        example: "617c1f77f0d4c800170d0f67"
+                      activities:
+                        type: array
+                        description: List of activities in the application
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              description: Activity ID
+                              example: "617c1f77f0d4c800170d0f68"
+                            title:
+                              type: string
+                              description: Title of the activity
+                              example: "Added new feature"
+                            comment:
+                              type: string
+                              description: Comment for the activity
+                              example: "Implemented user login feature"
+                            user_name:
+                              type: string
+                              description: Name of the user who added the activity
+                              example: "John Doe"
+        '400':
+          description: Invalid request data or application ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Invalid appId format"
+        '404':
+          description: User or application not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "User not found"
+              examples:
+                user-not-found:
+                  summary: User not found example
+                  value:
+                    message: "User not found"
+                application-not-found:
+                  summary: Application not found example
+                  value:
+                    message: "Application not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Server error"
+                  error:
+                    type: string
+                    description: Detailed error message
+                    example: "Database connection failed"
+              examples:
+                server-error:
+                  summary: Server error example
+                  value:
+                    message: "Server error"
+                    error: "Database connection failed"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
+  /app/duplicate/{id}:
+    post:
+      summary: Duplicate an application
+      description: Creates a duplicate of an existing application with optional copying of related data like tasks and team members.
+      tags:
+        - Application (use by Admin)
+      parameters:
+        - name: id
+          in: path
+          description: ID of the application to be duplicated
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 617c1f77f0d4c800170d0f67
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                includeRelations:
+                  type: boolean
+                  description: Whether to include related data (tasks and team members) in the duplicated application
+                  example: true
+            examples:
+              copy-with-relations:
+                summary: Duplicate with relations
+                value:
+                  includeRelations: true
+              copy-without-relations:
+                summary: Duplicate without relations
+                value:
+                  includeRelations: false
+      responses:
+        '201':
+          description: Application duplicated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Success message
+                    example: "Application duplicated successfully"
+                  application:
+                    type: object
+                    description: Details of the duplicated application
+                    properties:
+                      _id:
+                        type: string
+                        description: Unique ID of the duplicated application
+                        example: "617c1f77f0d4c800170d0f67"
+                      title:
+                        type: string
+                        description: Title of the duplicated application
+                        example: "Existing Application - Copy"
+                      tasks:
+                        type: array
+                        description: List of tasks in the duplicated application
+                        items:
+                          type: object
+                      teamMembers:
+                        type: array
+                        description: List of team members in the duplicated application
+                        items:
+                          type: object
+                      createdAt:
+                        type: string
+                        description: Creation timestamp of the duplicated application
+                        example: "2023-01-01T10:00:00.000Z"
+                      updatedAt:
+                        type: string
+                        description: Last update timestamp of the duplicated application
+                        example: "2023-01-02T12:00:00.000Z"
+        '400':
+          description: Invalid application ID
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Invalid application ID"
+              examples:
+                invalid-id:
+                  summary: Invalid ID example
+                  value:
+                    message: "Invalid application ID"
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Application not found"
+              examples:
+                app-not-found:
+                  summary: Application not found example
+                  value:
+                    message: "Application not found"
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Error message
+                    example: "Server error"
+                  error:
+                    type: string
+                    description: Detailed error message
+                    example: "Error saving application"
+              examples:
+                server-error:
+                  summary: Server error example
+                  value:
+                    message: "Server error"
+                    error: "Database connection failed"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /app/get-all-todo:
+    get:
+      summary: Get all "To Do" applications
+      description: Retrieves all untrashed applications with the status "To Do".
+      tags:
+        - Application
+      responses:
+        '200':
+          description: Successfully retrieved "To Do" applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    description: List of "To Do" applications
+                    items:
+                      type: object
+              examples:
+                todo-applications:
+                  summary: Example response
+                  value:
+                    applications: []
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Unknown error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /app/get-all-implement:
+    get:
+      summary: Get all "Implement" applications
+      description: Retrieves all untrashed applications with the status "Implement".
+      tags:
+        - Application
+      responses:
+        '200':
+          description: Successfully retrieved "Implement" applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    description: List of "Implement" applications
+                    items:
+                      type: object
+              examples:
+                implement-applications:
+                  summary: Example response
+                  value:
+                    applications: []
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Unknown error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /app/get-all-testing:
+    get:
+      summary: Get all "Testing" applications
+      description: Retrieves all untrashed applications with the status "Testing".
+      tags:
+        - Application
+      responses:
+        '200':
+          description: Successfully retrieved "Testing" applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    description: List of "Testing" applications
+                    items:
+                      type: object
+              examples:
+                testing-applications:
+                  summary: Example response
+                  value:
+                    applications: []
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Unknown error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /app/get-all-production:
+    get:
+      summary: Get all "Production" applications
+      description: Retrieves all untrashed applications with the status "Production".
+      tags:
+        - Application
+      responses:
+        '200':
+          description: Successfully retrieved "Production" applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  applications:
+                    type: array
+                    description: List of "Production" applications
+                    items:
+                      type: object
+              examples:
+                production-applications:
+                  summary: Example response
+                  value:
+                    applications: []
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Unknown error"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+
 
 components:
   schemas:

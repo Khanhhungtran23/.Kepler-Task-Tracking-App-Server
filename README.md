@@ -143,5 +143,17 @@ git add .
 git commit -m "Test commit"
 ```
 
+### VSCode Settings for Jest
+Add the following settings to your `.vscode/settings.json`:
 
-
+```json
+{
+  "testing.openTesting": "neverOpen",
+  "jest.runMode": "on-demand",
+  "jest.outputConfig": {
+    "revealOn": "run",
+    "revealWithFocus": "none",
+    "clearOnRun": "none"
+  }
+}
+```
