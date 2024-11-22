@@ -21,8 +21,8 @@ import {
   countApplicationsPerUser,
   addMemberToApplication,
   duplicateApplication,
-  addActivity,
 } from "../controller/application.controller";
+import { addActivity } from "../controller/activity.controller";
 import { validate } from "../middlewares/validate";
 import {
   createApplicationSchema,
