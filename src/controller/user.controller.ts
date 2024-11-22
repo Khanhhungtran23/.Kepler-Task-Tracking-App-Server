@@ -32,7 +32,9 @@ export const registerUser = async (
     if (user) {
       // Create a JWT token
       // createJWT(res, (user._id as mongoose.Types.ObjectId).toString());
+
       await clearUserCache();
+
       res.status(201).json({
         _id: user._id,
         user_name: user.user_name,
@@ -158,6 +160,7 @@ export const changeUserPassword = async (
       console.log("Old password is correct, updating password...");
       user.password = newPassword;
       await user.save();
+      await clearUserCache();
       res.status(200).json({ message: "Password updated successfully" });
       return;
     } else {
@@ -192,7 +195,7 @@ export const logoutUser = (req: Request, res: Response) => {
 
   // Log cookie sau khi thực hiện xóa
   console.log("Cookies after logout cleared.");
-
+  
   // Phản hồi lại cho client
   res.status(200).json({ message: "User logged out successfully." });
 };
@@ -215,6 +218,7 @@ export const updateUserProfile = async (
       user.role = role || user.role;
 
       const updatedUser = await user.save();
+      
       await clearUserCache();
 
       res.status(200).json({

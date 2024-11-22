@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Application from "../models/application.model";
 import User from "../models/user.model";
-import Activity from "../models/activity.model";
 import mongoose from "mongoose";
 import redisClient from "../utils/redis";
 import clearApplicationCache from "../helpers/clearAppCache";
@@ -323,6 +322,7 @@ export const getImplementApplications = async (req: Request, res: Response) => {
       .populate("teamMembers")
       .exec();
 
+    // save cahche
     await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
@@ -357,7 +357,7 @@ export const getTestingApplications = async (req: Request, res: Response) => {
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
-
+    // save cache
     await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
 
     res.status(200).json({ applications });
@@ -395,7 +395,7 @@ export const getProductionApplications = async (
       // .populate('tasks')
       .populate("teamMembers")
       .exec();
-
+    // save cache
     await redisClient.setEx(cacheKey, 3600, JSON.stringify(applications));
     res.status(200).json({ applications });
   } catch (error) {
@@ -435,6 +435,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     }); // Use regex for case-insensitive search
 
     if (apps.length > 0) {
+      // save cache
       await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
@@ -460,7 +461,7 @@ export const searchTodoApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
-    const cacheKey = `TodoApplications:search:${application_title}`;
+    const cacheKey = `applications:search:${application_title}`;
     const cachedApplications = await redisClient.get(cacheKey);
     if (cachedApplications) {
       console.log("Cache hit for search Todo applications");
@@ -481,6 +482,7 @@ export const searchTodoApp = async (
     });
 
     if (apps.length > 0) {
+      // save cache
       await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
@@ -506,7 +508,7 @@ export const searchImplementApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
-    const cacheKey = `ImApplications:search:${application_title}`;
+    const cacheKey = `applications:search:${application_title}`;
     const cachedApplications = await redisClient.get(cacheKey);
     if (cachedApplications) {
       console.log("Cache hit for search Implement applications");
@@ -527,6 +529,7 @@ export const searchImplementApp = async (
     });
 
     if (apps.length > 0) {
+      // save cache
       await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
@@ -552,7 +555,7 @@ export const searchTestingApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
-    const cacheKey = `TestApplications:search:${application_title}`;
+    const cacheKey = `applications:search:${application_title}`;
     const cachedApplications = await redisClient.get(cacheKey);
     if (cachedApplications) {
       console.log("Cache hit for search Test applications");
@@ -572,6 +575,7 @@ export const searchTestingApp = async (
     });
 
     if (apps.length > 0) {
+      // save cache
       await redisClient.setEx(cacheKey, 1800, JSON.stringify(apps));
       res.status(200).json(apps);
     } else {
@@ -597,7 +601,7 @@ export const searchProductionApp = async (
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
 
   try {
-    const cacheKey = `ProdApplications:search:${application_title}`;
+    const cacheKey = `applications:search:${application_title}`;
     const cachedApplications = await redisClient.get(cacheKey);
     if (cachedApplications) {
       console.log("Cache hit for search Production applications");
@@ -688,7 +692,7 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
     const trashedApplications = await Application.find({ isTrashed: true })
       .populate("teamMembers")
       .exec();
-
+    // save cache
     await redisClient.setEx(
       cacheKey,
       1800,
@@ -879,7 +883,7 @@ export const countApplicationsPerUser = async (
         },
       ],
     };
-
+    // save cache
     await redisClient.setEx(cacheKey, 3600, JSON.stringify(counts));
     res.status(200).json(response);
   } catch (error) {
@@ -935,71 +939,15 @@ export const addMemberToApplication = async (
     application.teamMembers.push(userId);
     await application.save();
 
+    // DELETE cache to reset cache
+    await clearApplicationCache();
+
     res.status(200).json({
       message: "User added to application successfully",
       application,
     });
   } catch (error) {
     console.error("Error adding/assigning member to application:", error);
-    if (error instanceof Error) {
-      res.status(500).json({
-        message: "Server error",
-        error: error.message,
-      });
-    } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
-    }
-  }
-};
-
-// Function to add new comment to Application
-export const addActivity = async (
-  req: Request,
-  res: Response,
-): Promise<void> => {
-  try {
-    const { title, comment, appId } = req.body.body || req.body;
-    const userId = req.user?._id;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      res.status(404).json({ message: "User not found" });
-      return;
-    }
-    const user_name = user.user_name;
-
-    if (!mongoose.Types.ObjectId.isValid(appId)) {
-      res.status(400).json({ message: "Invalid appId format" });
-      return;
-    }
-
-    const application = await Application.findById(appId);
-    if (!application) {
-      res.status(404).json({ message: "Application not found" });
-      return;
-    }
-
-    const newActivity = new Activity({
-      title,
-      comment,
-      user_name,
-    });
-    await newActivity.save();
-
-    application.activities.push({
-      _id: newActivity._id,
-      title: newActivity.title,
-      comment: newActivity.comment,
-      user_name: newActivity.user_name,
-    });
-    await application.save();
-
-    res.status(200).json({
-      message: "Acitivity are added to application successfully:",
-      application,
-    });
-  } catch (error) {
-    console.error("Error adding new comment/activity to application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
