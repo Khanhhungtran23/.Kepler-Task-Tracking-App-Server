@@ -17,8 +17,7 @@ dist
 # Coverage
 coverage/
 
-# vscode
-.vscode/
+/src/tests/user.test.ts
 
 # TypeScript cache
 *.tsbuildinfo

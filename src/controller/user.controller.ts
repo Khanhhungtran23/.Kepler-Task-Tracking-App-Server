@@ -3,8 +3,8 @@ import { Request, Response } from "express";
 import User from "../models/user.model";
 import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
-import redisClient from "../utils/redis";
 import clearUserCache from "../helpers/clearUserCache";
+import { getCache, setCache } from "../helpers/cacheHelper";
 
 // Register a new user
 export const registerUser = async (
@@ -297,21 +297,18 @@ export const getAllUsers = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
+  const cacheKey = "users:all";
   try {
-    const cacheKey = "users:all";
-    const cachedUsers = await redisClient.get(cacheKey);
-    if (cachedUsers) {
-      console.log("Cache hit for all users");
-      res.status(200).json(JSON.parse(cachedUsers));
+    const cachedUser = await getCache(cacheKey);
+    if (cachedUser) {
+      res.status(200).json(cachedUser);
       return;
-    } else {
-      console.log("Cache miss for all users");
     }
 
     // Retrieve all users from the database
     const users = await User.find({}).sort({ createdAt: -1 });
-    console.log("All members information:", users);
-    await redisClient.setEx(cacheKey, 3600, JSON.stringify(users));
+    // console.log("All members information:", users);
+    await setCache(cacheKey, users, 3600);
     res.status(200).json(users);
   } catch (err) {
     console.error("Error during get all information of user:", err);
@@ -332,16 +329,12 @@ export const getUserByName = async (
   res: Response,
 ): Promise<void> => {
   const { user_name } = req.params; // Assuming name is passed as a route parameter
-
+  const cacheKey = `users:search:${user_name}`;
   try {
-    const cacheKey = `users:search:${user_name}`;
-    const cachedUsers = await redisClient.get(cacheKey);
-    if (cachedUsers) {
-      console.log("Cache hit for user search");
-      res.status(200).json(JSON.parse(cachedUsers));
+    const cachedUser = await getCache(cacheKey);
+    if (cachedUser) {
+      res.status(200).json(cachedUser);
       return;
-    } else {
-      console.log("Cache miss for user search");
     }
     // Find users matching the provided name (case insensitive)
     const users = await User.find({
@@ -354,7 +347,7 @@ export const getUserByName = async (
     }); // Use regex for case-insensitive search
 
     if (users.length > 0) {
-      await redisClient.setEx(cacheKey, 3600, JSON.stringify(users));
+      await setCache(cacheKey, users, 900);
       res.status(200).json(users);
     } else {
       res.status(404).json({ message: "No users found with that name" });

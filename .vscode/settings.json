@@ -1,0 +1,11 @@
+{
+    "testing.openTesting": "neverOpen",
+    "jest.runMode": "on-demand",
+    "jest.outputConfig": {
+        "revealOn": "run",
+        "revealWithFocus": "none",
+        "clearOnRun": "none"
+    }
+}
+
+
