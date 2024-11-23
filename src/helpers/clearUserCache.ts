@@ -1,13 +1,11 @@
-import redisClient from "../utils/redis";
+import { deleteCache, clearCacheByPattern } from "../helpers/cacheHelper";
 
 const clearUserCache = async () => {
   try {
-    const userKeys = await redisClient.keys("users:*");
-    if (userKeys.length > 0) {
-      await Promise.all(userKeys.map((key) => redisClient.del(key)));
-    }
-
-    await redisClient.del("users:count");
+    await Promise.all([
+      deleteCache("users:all"),
+      clearCacheByPattern("users:search:*"),
+    ]);
     console.log("User cache cleared successfully!");
   } catch (error) {
     console.error("Error clearing user cache:", error);

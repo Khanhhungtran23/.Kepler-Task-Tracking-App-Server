@@ -107,7 +107,4 @@ app.use(routeNotFound);
 // General error handler
 app.use(errorHandler);
 
-// Start the server
-// app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
-
 export default app;
