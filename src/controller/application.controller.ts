@@ -15,12 +15,33 @@ export const createApplication = async (
     const { title, description, assets, status, priority } =
       req.body.body || req.body;
 
+    // const { title, description, assets, status, priority, teamMembers, tasks } =
+    //   req.body.body || req.body;
+
     // Ensure required fields are present
     if (!title || !description || !status || !priority) {
       res.status(400).json({
         message: "Title, description, status, and priority are required",
       });
+      return;
     }
+
+    const existingApplication = await Application.findOne({ title });
+    if (existingApplication) {
+      res.status(409).json({
+        message: `An application with the title "${title}" already exists.`,
+      });
+      return; // Exit early if duplicate found
+    }
+
+    // Validate teamMembers (ensure IDs exist in User collection)
+    // if (teamMembers && teamMembers.length > 0) {
+    //   const validUsers = await User.find({ _id: { $in: teamMembers } });
+    //   if (validUsers.length !== teamMembers.length) {
+    //     res.status(400).json({ message: "Some team members are invalid." });
+    //     return;
+    //   }
+    // }
 
     // Create a new Application without tasks or team members initially
     const newApplication = new Application({
@@ -31,6 +52,8 @@ export const createApplication = async (
       priority,
       tasks: [], // No tasks initially
       teamMembers: [], // No team members initially
+      // teamMembers: teamMembers || [],
+      // tasks: tasks || [], 
     });
 
     // Save the new application to the database
@@ -232,7 +255,7 @@ export const deleteApplication = async (
 
 // Get all untrashed applications (excluding trashed)
 export const getApplications = async (req: Request, res: Response): Promise<void> => {
-  const cacheKey = "application:all";
+  const cacheKey = "applications:all";
   try {
     // check cache first if yes or not
     const cachedApplications = await getCache(cacheKey);
@@ -449,7 +472,7 @@ export const searchTodoApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:tdsearch:${application_title}`;
   try {
     const cachedSTodoApplications = await getCache(cacheKey);
     if (cachedSTodoApplications) {
@@ -494,7 +517,7 @@ export const searchImplementApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:itsearch:${application_title}`;
   try {
     const cachedSImplementApplications = await getCache(cacheKey);
     if (cachedSImplementApplications) {
@@ -539,7 +562,7 @@ export const searchTestingApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:tgsearch:${application_title}`;
   try {
     const cachedSTestingApplications = await getCache(cacheKey);
     if (cachedSTestingApplications) {
@@ -584,7 +607,7 @@ export const searchProductionApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:pnsearch:${application_title}`;
   try {
     const cachedSProductionApplications = await getCache(cacheKey);
     if (cachedSProductionApplications) {

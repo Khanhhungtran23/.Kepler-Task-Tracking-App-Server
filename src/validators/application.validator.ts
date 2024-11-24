@@ -9,6 +9,8 @@ export const createApplicationSchema = Joi.object({
     .valid("To Do", "Implementing", "Testing", "Production")
     .required(),
   priority: Joi.string().valid("High", "Medium", "Low").required(),
+  // teamMembers: Joi.array().items(Joi.string().length(24)).optional(),
+  // tasks: Joi.array().items(Joi.string()).optional(),
 });
 
 // Schema for editing an application
