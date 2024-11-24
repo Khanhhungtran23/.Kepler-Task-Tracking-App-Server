@@ -195,7 +195,7 @@ export const logoutUser = (req: Request, res: Response) => {
 
   // Log cookie sau khi thực hiện xóa
   console.log("Cookies after logout cleared.");
-  
+
   // Phản hồi lại cho client
   res.status(200).json({ message: "User logged out successfully." });
 };
@@ -218,7 +218,7 @@ export const updateUserProfile = async (
       user.role = role || user.role;
 
       const updatedUser = await user.save();
-      
+
       await clearUserCache();
 
       res.status(200).json({

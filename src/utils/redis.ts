@@ -35,5 +35,4 @@ redisClient.on("error", (err) => {
   }
 })();
 
-
 export default redisClient;

@@ -23,6 +23,7 @@ import {
   duplicateApplication,
 } from "../controller/application.controller";
 import { addActivity } from "../controller/activity.controller";
+import { addTaskToApplication } from "../controller/task.controller";
 import { validate } from "../middlewares/validate";
 import {
   createApplicationSchema,
@@ -33,6 +34,8 @@ import {
   titleSchema,
   apptitleSchema,
   duplicateApplicationSchema,
+  paramsApplicationIdSchema, 
+  taskBodySchema
 } from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
@@ -164,6 +167,16 @@ router.post(
     body: duplicateApplicationSchema,
   }),
   duplicateApplication,
+);
+
+router.put(
+  "/add-task/:applicationId",
+  protect,
+  validate({
+    params: paramsApplicationIdSchema,
+    body: taskBodySchema,
+  }),
+  addTaskToApplication,
 );
 
 export default router;

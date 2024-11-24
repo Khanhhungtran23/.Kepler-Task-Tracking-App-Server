@@ -8,7 +8,7 @@ paths:
   /app/add-new:
     post:
       summary: Create a new application
-      description: Creates a new application with provided details. Only admin role can create an application.
+      description: Creates a new application with provided details. Only users with the admin role can create an application.
       tags:
         - Application (use by Admin)
       security:
@@ -27,15 +27,20 @@ paths:
               properties:
                 title:
                   type: string
-                  description: Title of the application
+                  description: Title of the application (must be unique)
+                  example: "New Application"
                 description:
                   type: string
                   description: Detailed description of the application
+                  example: "Detailed application description"
                 assets:
                   type: array
                   items:
                     type: string
                   description: List of asset URLs related to the application
+                  example:
+                    - "http://example.com/asset1"
+                    - "http://example.com/asset2"
                 status:
                   type: string
                   description: Current status of the application
@@ -44,15 +49,34 @@ paths:
                     - Implement
                     - Testing
                     - Production
+                  example: "To Do"
                 priority:
-                  type: integer
-                  description: Priority level of the application (e.g., 1 for highest priority)
+                  type: string
+                  description: Priority level of the application
+                  enum:
+                    - High
+                    - Medium
+                    - Low
+                  example: "High"
+                teamMembers:
+                  type: array
+                  description: List of user IDs to be added as team members
+                  items:
+                    type: string
+                  example:
+                    - "63b6f0a0c6a5f08d4b5e613c"
+                    - "63b6f0a0c6a5f08d4b5e613d"
             example:
               title: "New Application"
-              description: "Detailed application description"
-              assets: ["http://example.com/asset1", "http://example.com/asset2"]
+              description: "A detailed description of the application"
+              assets:
+                - "http://example.com/asset1"
+                - "http://example.com/asset2"
               status: "To Do"
-              priority: 1
+              priority: "High"
+              teamMembers:
+                - "63b6f0a0c6a5f08d4b5e613c"
+                - "63b6f0a0c6a5f08d4b5e613d"
       responses:
         '201':
           description: Application created successfully
@@ -65,35 +89,80 @@ paths:
                     type: string
                     example: "Application created successfully"
                   application:
-                    $ref: '#/components/schemas/Application'
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "63b6f0a0c6a5f08d4b5e613c"
+                      title:
+                        type: string
+                        example: "New Application"
+                      description:
+                        type: string
+                        example: "Detailed application description"
+                      assets:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - "http://example.com/asset1"
+                          - "http://example.com/asset2"
+                      status:
+                        type: string
+                        example: "To Do"
+                      priority:
+                        type: string
+                        example: "High"
+                      teamMembers:
+                        type: array
+                        items:
+                          type: string
+                        example:
+                          - "63b6f0a0c6a5f08d4b5e613c"
+                          - "63b6f0a0c6a5f08d4b5e613d"
         '400':
-          description: Missing required fields
-        '403':
-          description: Only admins can create applications
-        '500':
-          description: Server error with error message 
+          description: Missing required fields or invalid data
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: false
+                  message:
+                    type: string
+                    example: "Some team members are invalid."
+        '403':
+          description: Only admins can create applications
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Forbidden: Admin access required."
+        '409':
+          description: Duplicate application title
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "An application with the title 'New Application' already exists."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
                   message:
                     type: string
                     example: "Server error"
-                  error: 
+                  error:
                     type: string
-                    description: Detailed error message from the server
-                    example: "Error: Cannot connect to database"
-              examples: 
-                server_error:
-                  summary: Server error example
-                  value: 
-                    success: false
-                    message: "Server error"
-                    error: "Database connection failed"
+                    example: "Detailed server error message"
       x-buttons:
         - text: Cancel
           onClick: "window.location.reload()" # Cancel button action
@@ -1558,7 +1627,126 @@ paths:
         - description: "Cancel the request and go back"
           button: "Cancel"
 
-
+  /app/add-task/{applicationId}:
+    put:
+      summary: Add a new task to an application
+      description: Adds a new task to an existing application. The task details are provided in the request body.
+      tags:
+        - Application 
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The ID of the application where the task will be added
+          example: "63b6f0a0c6a5f08d4b5e613c"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - title
+                - deadline
+                - tag
+              properties:
+                title:
+                  type: string
+                  description: Title of the task
+                  example: "Fix bug #1"
+                deadline:
+                  type: string
+                  format: date-time
+                  description: The deadline of the task in ISO 8601 format
+                  example: "2024-12-30T00:00:00Z"
+                tag:
+                  type: string
+                  description: Tag or category of the task
+                  example: "Bug"
+                status:
+                  type: string
+                  description: Status of the task
+                  enum:
+                    - To Do
+                    - In progress
+                    - Done
+                  example: "In progress"
+      responses:
+        '201':
+          description: Task added to application successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task added to application successfully"
+                  task:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "63b6f0a0c6a5f08d4b5e613e"
+                      title:
+                        type: string
+                        example: "Fix bug #1"
+                      deadline:
+                        type: string
+                        format: date-time
+                        example: "2024-12-30T00:00:00Z"
+                      tag:
+                        type: string
+                        example: "Bug"
+                      status:
+                        type: string
+                        example: "In progress"
+        '400':
+          description: Missing or invalid parameters
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task details (title, deadline, tag) are required."
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application not found."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Detailed server error message"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
 
 components:
   schemas:
