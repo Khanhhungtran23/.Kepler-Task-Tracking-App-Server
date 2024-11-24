@@ -23,7 +23,7 @@ import {
   duplicateApplication,
 } from "../controller/application.controller";
 import { addActivity } from "../controller/activity.controller";
-import { addTaskToApplication, updateTaskInApplication } from "../controller/task.controller";
+import { addTaskToApplication, updateTaskInApplication, deleteTaskFromApplication } from "../controller/task.controller";
 import { validate } from "../middlewares/validate";
 import {
   createApplicationSchema,
@@ -183,6 +183,12 @@ router.put(
   "/update-task/:applicationId/:taskId",
   protect,
   updateTaskInApplication 
+);
+
+router.delete(
+  "/delete-task/:applicationId/:taskId",
+  protect,
+  deleteTaskFromApplication
 );
 
 export default router;
