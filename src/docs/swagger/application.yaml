@@ -1753,7 +1753,7 @@ paths:
       summary: Update a task in an application
       description: Updates the details of a specific task within a specified application. Validates both application ID and task ID.
       tags:
-        - Application (Task Management)
+        - Application
       security:
         - bearerAuth: []
       parameters:
@@ -1810,6 +1810,102 @@ paths:
                   message:
                     type: string
                     example: "Task updated successfully."
+                  task:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                        example: "63b6f0a0c6a5f08d4b5e613e"
+                      title:
+                        type: string
+                        example: "Fix bug #101"
+                      deadline:
+                        type: string
+                        format: date-time
+                        example: "2024-12-30T00:00:00Z"
+                      tag:
+                        type: string
+                        example: "Bug"
+                      status:
+                        type: string
+                        example: "In progress"
+        '400':
+          description: Invalid input or task/application ID format
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Application ID and Task ID are required."
+        '404':
+          description: Application or task not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task not found in the application."
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Server error"
+                  error:
+                    type: string
+                    example: "Detailed error message from server"
+      x-execute:
+        - description: "Execute query to test the API"
+          button: "Execute Query"
+      x-reset:
+        - description: "Reset the input parameters and clear the response"
+          button: "Reset"
+      x-cancel:
+        - description: "Cancel the request and go back"
+          button: "Cancel"
+
+  /app/delete-task/{applicationId}/{taskId}:
+    delete:
+      summary: Delete a task from an application
+      description: Removes a specified task from a given application. Validates both application ID and task ID and ensures the task exists within the application.
+      tags:
+        - Application
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: applicationId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The ID of the application where the task exists
+            example: "63b6f0a0c6a5f08d4b5e613c"
+        - name: taskId
+          in: path
+          required: true
+          schema:
+            type: string
+            description: The ID of the task to be deleted
+            example: "63b6f0a0c6a5f08d4b5e613e"
+      responses:
+        '200':
+          description: Task deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Task deleted successfully."
                   task:
                     type: object
                     properties:
