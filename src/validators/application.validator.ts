@@ -65,14 +65,12 @@ export const apptitleSchema = Joi.object({
 });
 
 export const paramsApplicationIdSchema = Joi.object({
-  applicationId: Joi.string().length(24).required(), 
+  applicationId: Joi.string().length(24).required(),
 });
 
 export const taskBodySchema = Joi.object({
-  title: Joi.string().required(), 
-  deadline: Joi.date().iso().required(), 
-  tag: Joi.string().required(), 
-  status: Joi.string().valid("To Do", "In progress", "Done").optional(), 
+  title: Joi.string().required(),
+  deadline: Joi.date().iso().required(),
+  tag: Joi.string().required(),
+  status: Joi.string().valid("To Do", "In progress", "Done").optional(),
 });
-
-

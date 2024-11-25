@@ -23,7 +23,11 @@ import {
   duplicateApplication,
 } from "../controller/application.controller";
 import { addActivity } from "../controller/activity.controller";
-import { addTaskToApplication, updateTaskInApplication, deleteTaskFromApplication } from "../controller/task.controller";
+import {
+  addTaskToApplication,
+  updateTaskInApplication,
+  deleteTaskFromApplication,
+} from "../controller/task.controller";
 import { validate } from "../middlewares/validate";
 import {
   createApplicationSchema,
@@ -34,8 +38,8 @@ import {
   titleSchema,
   apptitleSchema,
   duplicateApplicationSchema,
-  paramsApplicationIdSchema, 
-  taskBodySchema
+  paramsApplicationIdSchema,
+  taskBodySchema,
 } from "../validators/application.validator";
 import { protect, isAdmin } from "../middlewares/auth";
 
@@ -182,13 +186,13 @@ router.put(
 router.put(
   "/update-task/:applicationId/:taskId",
   protect,
-  updateTaskInApplication 
+  updateTaskInApplication,
 );
 
 router.delete(
   "/delete-task/:applicationId/:taskId",
   protect,
-  deleteTaskFromApplication
+  deleteTaskFromApplication,
 );
 
 export default router;

@@ -263,7 +263,7 @@ export const getApplications = async (
     }
     // command to get from db server
     const applications = await Application.find({ isTrashed: false })
-      .populate('tasks')
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
 
