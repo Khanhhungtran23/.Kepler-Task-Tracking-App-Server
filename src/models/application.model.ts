@@ -18,7 +18,15 @@ const applicationSchema = new Schema(
       default: "None",
       required: true,
     },
-    tasks: [{ type: Schema.Types.ObjectId, ref: "Task" }],
+    tasks: [
+      {
+        _id: { type: Schema.Types.ObjectId, ref: "Task" },
+        title: { type: Schema.Types.String },
+        deadline: { type: Schema.Types.Date },
+        tag: { type: Schema.Types.String },
+        status: { type: Schema.Types.String },
+      },
+    ],
     activities: [
       {
         _id: { type: Schema.Types.ObjectId, ref: "Activity" },

@@ -7,10 +7,9 @@ interface MarkAsReadPayload {
   userId: string;
 }
 
-// Hàm để thiết lập WebSocket
 export function setupWebSocket(io: Server) {
   io.on("connection", (socket: Socket) => {
-    console.log("User connected:", socket.id);
+    console.log("User connected by socket:", socket.id);
 
     socket.on(
       "markAsRead",

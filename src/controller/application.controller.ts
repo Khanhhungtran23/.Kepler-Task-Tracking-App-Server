@@ -300,7 +300,10 @@ export const getTodoApplications = async (
     const applications = await Application.find({
       isTrashed: false,
       status: "To Do",
-    });
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     await setCache(cacheKey, applications, 3600);
 
@@ -338,7 +341,7 @@ export const getImplementApplications = async (
       isTrashed: false,
       status: "Implement",
     })
-      // .populate('tasks')
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
 
@@ -376,9 +379,10 @@ export const getTestingApplications = async (
       isTrashed: false,
       status: "Testing",
     })
-      // .populate('tasks')
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
+
     // save cache
     await setCache(cacheKey, applications, 3600);
 
@@ -413,7 +417,7 @@ export const getProductionApplications = async (
       isTrashed: false,
       status: "Production",
     })
-      // .populate('tasks')
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
     // save cache
