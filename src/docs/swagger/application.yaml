@@ -8,7 +8,7 @@ paths:
   /app/add-new:
     post:
       summary: Create a new application
-      description: Creates a new application with provided details. Only users with the admin role can create an application.
+      description: Creates a new application with the provided details. Only users with the admin role can create an application.
       tags:
         - Application (use by Admin)
       security:
@@ -54,9 +54,10 @@ paths:
                   type: string
                   description: Priority level of the application
                   enum:
-                    - High
-                    - Medium
+                    - None
                     - Low
+                    - Medium
+                    - High
                   example: "High"
                 teamMembers:
                   type: array
@@ -113,6 +114,27 @@ paths:
                       priority:
                         type: string
                         example: "High"
+                      tasks:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            _id:
+                              type: string
+                              example: "63b6f0a0c6a5f08d4b5e613c"
+                            title:
+                              type: string
+                              example: "Task title"
+                            deadline:
+                              type: string
+                              format: date-time
+                              example: "2024-12-01T10:00:00Z"
+                            tag:
+                              type: string
+                              example: "Bug"
+                            status:
+                              type: string
+                              example: "To Do"
                       teamMembers:
                         type: array
                         items:

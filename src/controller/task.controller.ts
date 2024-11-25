@@ -44,8 +44,7 @@ export const addTaskToApplication = async (
 
     const savedTask = await newTask.save();
 
-    // Add task ID to application's tasks array
-    application.tasks.push(savedTask._id);
+    application.tasks.push(savedTask);
     await application.save();
 
     // delete cache if have any updating.
@@ -107,10 +106,11 @@ export const updateTaskInApplication = async (
     }
 
     // Check if task exists in the application's tasks array
-    const isTaskInApplication = application.tasks.includes(
-      new mongoose.Types.ObjectId(taskId),
+    const taskIndex = application.tasks.findIndex(
+      (task) => task._id?.toString() === taskId,
     );
-    if (!isTaskInApplication) {
+
+    if (taskIndex === -1) {
       res.status(404).json({ message: "Task not found in the application." });
       return;
     }
@@ -127,6 +127,15 @@ export const updateTaskInApplication = async (
       return;
     }
 
+    application.tasks[taskIndex].set({
+      title: updatedTask.title,
+      deadline: updatedTask.deadline,
+      tag: updatedTask.tag,
+      status: updatedTask.status,
+    });
+
+    // Save the application
+    await application.save();
     // Clear application cache if have any updating.
     await deleteCache("applications:all");
     await deleteCache("applications:todo");
@@ -184,10 +193,14 @@ export const deleteTaskFromApplication = async (
     }
 
     // Check if the task exists in the application
-    const taskIndex = application.tasks.indexOf(
-      new mongoose.Types.ObjectId(taskId),
+    const taskIndex = application.tasks.findIndex(
+      (task) => task._id && task._id.equals(taskId),
     );
+
     if (taskIndex === -1) {
+      console.warn(
+        `Task with ID ${taskId} not found in application ${applicationId}.`,
+      );
       res.status(404).json({ message: "Task not found in the application." });
       return;
     }
