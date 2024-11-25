@@ -9,6 +9,10 @@ const clearApplicationCache = async () => {
       deleteCache("applications:test"),
       deleteCache("applications:production"),
       clearCacheByPattern("applications:search:*"),
+      clearCacheByPattern("applications:tdsearch:*"),
+      clearCacheByPattern("applications:itsearch:*"),
+      clearCacheByPattern("applications:tgsearch:*"),
+      clearCacheByPattern("applications:pnsearch:*"),
       deleteCache("application:status-count"),
       deleteCache("application:priority-count"),
       deleteCache("users:applications-count"),
@@ -18,7 +22,7 @@ const clearApplicationCache = async () => {
     console.log("Application cache cleared successfully!");
   } catch (error) {
     console.error("Error clearing application cache:", error);
-  } 
+  }
 };
 
 export default clearApplicationCache;

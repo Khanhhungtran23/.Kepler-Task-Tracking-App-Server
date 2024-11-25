@@ -2,7 +2,7 @@ import mongoose, { Schema } from "mongoose";
 
 const applicationSchema = new Schema(
   {
-    title: { type: String, required: true },
+    title: { type: String, required: true, unique: true },
     description: { type: String, required: true },
     assets: [{ type: String, description: "URL of document files" }],
     status: {

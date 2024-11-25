@@ -7,6 +7,7 @@ const redisClient = createClient({
   socket: {
     tls: true,
     rejectUnauthorized: false,
+    connectTimeout: 10000,
   },
 });
 
@@ -15,8 +16,12 @@ redisClient.on("connect", () => {
 });
 
 redisClient.on("error", (err) => {
-  console.error("Redis Client Error:", err.message);
-  console.error("Error Details:", err);
+  if (err.name === "ConnectionTimeoutError") {
+    console.warn("Redis connection timeout, retrying...");
+  } else {
+    console.error("Redis Client Error:", err.message);
+    console.error("Error Details:", err);
+  }
 });
 
 // Connecting Redis database
@@ -29,6 +34,5 @@ redisClient.on("error", (err) => {
     console.error("Could not connect to Redis:", error);
   }
 })();
-
 
 export default redisClient;

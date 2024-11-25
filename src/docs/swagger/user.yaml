@@ -889,7 +889,7 @@ paths:
           button: "Cancel"
 
   /user/admin/update-user/{email}:
-    patch:
+    put:
       summary: Update a user's profile by admin
       description: Allows an admin to update user details, such as username, role, and admin rights.
       tags:

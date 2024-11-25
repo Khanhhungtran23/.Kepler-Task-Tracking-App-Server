@@ -4,7 +4,7 @@ const taskSchema = new Schema(
   {
     title: { type: String, required: true },
     deadline: { type: Date, required: true }, // Add the deadline field
-    assets: [{ type: String, description: "URL of document files" }],
+    // assets: [{ type: String, description: "URL of document files" }],
     tag: { type: String, required: true }, // icon for the task
     status: {
       type: String,

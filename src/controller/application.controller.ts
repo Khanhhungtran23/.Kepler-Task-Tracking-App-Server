@@ -4,7 +4,7 @@ import User from "../models/user.model";
 import mongoose from "mongoose";
 import clearApplicationCache from "../helpers/clearAppCache";
 import { getCache, setCache } from "../helpers/cacheHelper";
-
+// import Task from "../models/task.model";
 
 // Create an application
 export const createApplication = async (
@@ -12,7 +12,7 @@ export const createApplication = async (
   res: Response,
 ): Promise<void> => {
   try {
-    const { title, description, assets, status, priority } =
+    const { title, description, assets, status, priority, teamMembers } =
       req.body.body || req.body;
 
     // Ensure required fields are present
@@ -20,6 +20,24 @@ export const createApplication = async (
       res.status(400).json({
         message: "Title, description, status, and priority are required",
       });
+      return;
+    }
+
+    const existingApplication = await Application.findOne({ title });
+    if (existingApplication) {
+      res.status(409).json({
+        message: `An application with the title "${title}" already exists.`,
+      });
+      return; // Exit early if duplicate found
+    }
+
+    // Validate teamMembers (ensure IDs exist in User collection)
+    if (teamMembers && teamMembers.length > 0) {
+      const validUsers = await User.find({ _id: { $in: teamMembers } });
+      if (validUsers.length !== teamMembers.length) {
+        res.status(400).json({ message: "Some team members are invalid." });
+        return;
+      }
     }
 
     // Create a new Application without tasks or team members initially
@@ -30,7 +48,7 @@ export const createApplication = async (
       status,
       priority,
       tasks: [], // No tasks initially
-      teamMembers: [], // No team members initially
+      teamMembers: teamMembers || [],
     });
 
     // Save the new application to the database
@@ -231,8 +249,11 @@ export const deleteApplication = async (
 };
 
 // Get all untrashed applications (excluding trashed)
-export const getApplications = async (req: Request, res: Response): Promise<void> => {
-  const cacheKey = "application:all";
+export const getApplications = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
+  const cacheKey = "applications:all";
   try {
     // check cache first if yes or not
     const cachedApplications = await getCache(cacheKey);
@@ -242,12 +263,12 @@ export const getApplications = async (req: Request, res: Response): Promise<void
     }
     // command to get from db server
     const applications = await Application.find({ isTrashed: false })
-      // .populate('tasks')
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
 
     // store in cache, expire in 1h = 3600s
-    await setCache(cacheKey, applications, 3600); 
+    await setCache(cacheKey, applications, 3600);
 
     res.status(200).json({ applications });
   } catch (error) {
@@ -264,7 +285,10 @@ export const getApplications = async (req: Request, res: Response): Promise<void
 };
 
 // Get all untrashed applications (excluding trashed)
-export const getTodoApplications = async (req: Request, res: Response): Promise<void> => {
+export const getTodoApplications = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const cacheKey = "applications:todo";
   try {
     const cachedTodoApplications = await getCache(cacheKey);
@@ -298,7 +322,10 @@ export const getTodoApplications = async (req: Request, res: Response): Promise<
 };
 
 // Get all untrashed applications (excluding trashed)
-export const getImplementApplications = async (req: Request, res: Response): Promise<void> => {
+export const getImplementApplications = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const cacheKey = "applications:implement";
   try {
     const cachedImplementApplications = await getCache(cacheKey);
@@ -333,7 +360,10 @@ export const getImplementApplications = async (req: Request, res: Response): Pro
 };
 
 // Get all untrashed applications (excluding trashed)
-export const getTestingApplications = async (req: Request, res: Response): Promise<void> => {
+export const getTestingApplications = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const cacheKey = "applications:test";
   try {
     const cachedTestApplications = await getCache(cacheKey);
@@ -449,7 +479,7 @@ export const searchTodoApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:tdsearch:${application_title}`;
   try {
     const cachedSTodoApplications = await getCache(cacheKey);
     if (cachedSTodoApplications) {
@@ -494,7 +524,7 @@ export const searchImplementApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:itsearch:${application_title}`;
   try {
     const cachedSImplementApplications = await getCache(cacheKey);
     if (cachedSImplementApplications) {
@@ -539,7 +569,7 @@ export const searchTestingApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:tgsearch:${application_title}`;
   try {
     const cachedSTestingApplications = await getCache(cacheKey);
     if (cachedSTestingApplications) {
@@ -584,7 +614,7 @@ export const searchProductionApp = async (
   res: Response,
 ): Promise<void> => {
   const { application_title } = req.params; // Assuming application title is passed as a route parameter
-  const cacheKey = `applications:search:${application_title}`;
+  const cacheKey = `applications:pnsearch:${application_title}`;
   try {
     const cachedSProductionApplications = await getCache(cacheKey);
     if (cachedSProductionApplications) {
@@ -748,7 +778,6 @@ export const countApplicationsByStatus = async (
       message: "Applications count by status:",
       ...result,
     });
-
   } catch (error) {
     console.error("Error counting applications by status:", error);
     if (error instanceof Error) {
@@ -923,7 +952,7 @@ export const addMemberToApplication = async (
     if (!application.teamMembers.some((member) => member.equals(userId))) {
       application.teamMembers.push(new mongoose.Types.ObjectId(userId));
     }
-    
+
     try {
       await application.save();
       console.log("Application updated:", application);
@@ -932,7 +961,7 @@ export const addMemberToApplication = async (
       res.status(500).json({ message: "Failed to save application" });
       return;
     }
-    
+
     // DELETE cache to reset cache
     await clearApplicationCache();
 
