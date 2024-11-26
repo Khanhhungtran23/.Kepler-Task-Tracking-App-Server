@@ -45,7 +45,9 @@ export const protect = async (
     next();
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      res.status(401).json({ message: "Token expired, please login again" });
+      res.status(401).json({
+        message: "Token expired, please login again",
+      });
     } else {
       console.error("Token verification failed:", error);
       res.status(401).json({ message: "Not authorized, token failed" });

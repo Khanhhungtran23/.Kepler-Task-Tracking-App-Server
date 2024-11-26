@@ -63,7 +63,10 @@ export const addActivity = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
