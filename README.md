@@ -157,3 +157,16 @@ Add the following settings to your `.vscode/settings.json`:
   }
 }
 ```
+
+
+git stash
+git stash apply
+
+
+callback uri:
+```
+http://localhost:8080/api/auth/facebook/callback
+```
+```
+http://localhost:8080/api/auth/google/callback
+```

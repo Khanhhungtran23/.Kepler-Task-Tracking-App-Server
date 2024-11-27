@@ -1,4 +1,5 @@
 import { deleteCache, clearCacheByPattern } from "../helpers/cacheHelper";
+import logger from "../configs/logger.config";
 
 const clearApplicationCache = async () => {
   try {
@@ -19,9 +20,9 @@ const clearApplicationCache = async () => {
       deleteCache("TrashApplication:all"),
     ]);
 
-    console.log("Application cache cleared successfully!");
+    logger.info("Application cache cleared successfully!");
   } catch (error) {
-    console.error("Error clearing application cache:", error);
+    logger.info("Error clearing application cache:", error);
   }
 };
 

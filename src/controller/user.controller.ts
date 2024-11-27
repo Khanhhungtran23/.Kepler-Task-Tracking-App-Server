@@ -5,6 +5,7 @@ import { createJWT } from "../utils/util";
 import mongoose from "mongoose";
 import clearUserCache from "../helpers/clearUserCache";
 import { getCache, setCache } from "../helpers/cacheHelper";
+import logger from "../configs/logger.config";
 
 // Register a new user
 export const registerUser = async (
@@ -46,7 +47,7 @@ export const registerUser = async (
       res.status(400).json({ message: "Invalid user data" });
     }
   } catch (err) {
-    console.error("Error during user registration:", err);
+    logger.info("Error during user registration:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -67,7 +68,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 
   try {
     // Log the email for debugging purposes
-    console.log("Email received:", email);
+    logger.info("Email received:", email);
 
     // Find the user by email with a case-insensitive query
     const user = await User.findOne({
@@ -100,8 +101,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         (user._id as mongoose.Types.ObjectId).toString(),
         user.isAdmin,
       );
-      console.log("Successfully Login");
-      console.log("Token provided:", token);
+      logger.info("Successfully Login");
+      logger.info("Token provided:", token);
       // Respond with user data, no need to manually return the token as it's in the cookie
       res.json({
         _id: user._id,
@@ -118,7 +119,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     }
   } catch (err) {
     // Return a 500 error if something goes wrong on the server
-    console.error("Error during login:", err);
+    logger.info("Error during login:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -141,11 +142,11 @@ export const changeUserPassword = async (
   const { oldPassword, newPassword } = req.body.body || req.body;
   const userId = req.user?._id; // protect middleware is used and user ID is available in req.user
 
-  console.log("Request body:", req.body.body || req.body);
-  console.log("User ID:", userId);
+  logger.info("Request body:", req.body.body || req.body);
+  logger.info("User ID:", userId);
 
   if (!oldPassword || !newPassword) {
-    console.log("Password fields are missing");
+    logger.info("Password fields are missing");
     res.status(400).json({ message: "Old and new passwords are required" });
     return;
   }
@@ -154,28 +155,28 @@ export const changeUserPassword = async (
     // Find the user by ID
     const user = await User.findById(userId);
     if (!user) {
-      console.log("User not found");
+      logger.info("User not found");
       res.status(404).json({ message: "User not found" });
       return;
     } else {
-      console.log("User found:", user);
+      logger.info("User found:", user);
     }
 
     if (user && (await user.matchPassword(oldPassword))) {
       // If old password matches, hash the new password and save it
-      console.log("Old password is correct, updating password...");
+      logger.info("Old password is correct, updating password...");
       user.password = newPassword;
       await user.save();
       await clearUserCache();
       res.status(200).json({ message: "Password updated successfully" });
       return;
     } else {
-      console.log("Old password is incorrect");
+      logger.info("Old password is incorrect");
       res.status(400).json({ message: "Old password is incorrect" });
       return;
     }
   } catch (err) {
-    console.error("Error in changeUserPassword:", err);
+    logger.info("Error in changeUserPassword:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -192,7 +193,7 @@ export const changeUserPassword = async (
 // Logout user
 export const logoutUser = (req: Request, res: Response) => {
   // Log cookie trước khi thực hiện xóa
-  console.log("Cookies before logout:", req.cookies);
+  logger.info("Cookies before logout:", req.cookies);
 
   res.cookie("token", "", {
     httpOnly: true,
@@ -203,7 +204,7 @@ export const logoutUser = (req: Request, res: Response) => {
   });
 
   // Log cookie sau khi thực hiện xóa
-  console.log("Cookies after logout cleared.");
+  logger.info("Cookies after logout cleared.");
 
   // Phản hồi lại cho client
   res.status(200).json({ message: "User logged out successfully." });
@@ -242,7 +243,7 @@ export const updateUserProfile = async (
       res.status(404).json({ message: "User not found" });
     }
   } catch (err) {
-    console.error("Error in update user profile:", err);
+    logger.info("Error in update user profile:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -292,7 +293,7 @@ export const adminUpdateUser = async (
       },
     });
   } catch (err) {
-    console.error("Error updating user by admin:", err);
+    logger.info("Error updating user by admin:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -322,11 +323,11 @@ export const getAllUsers = async (
 
     // Retrieve all users from the database
     const users = await User.find({}).sort({ createdAt: -1 });
-    // console.log("All members information:", users);
+    // logger.info("All members information:", users);
     await setCache(cacheKey, users, 3600);
     res.status(200).json(users);
   } catch (err) {
-    console.error("Error during get all information of user:", err);
+    logger.info("Error during get all information of user:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -371,7 +372,7 @@ export const getUserByName = async (
       res.status(404).json({ message: "No users found with that name" });
     }
   } catch (err) {
-    console.error("Error during find/get people info by name:", err);
+    logger.info("Error during find/get people info by name:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -418,7 +419,7 @@ export const disableUserAccount = async (
       { new: true, runValidators: true },
     );
 
-    console.log("isActive :", disableUser.isActive);
+    logger.info("isActive :", disableUser.isActive);
     await clearUserCache();
 
     res.status(200).json({
@@ -426,7 +427,7 @@ export const disableUserAccount = async (
       User: disableUser,
     });
   } catch (err) {
-    console.error("Error during disabling account:", err);
+    logger.info("Error during disabling account:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -473,7 +474,7 @@ export const enableUserAccount = async (
       { new: true, runValidators: true },
     );
 
-    console.log("isActive :", enableUser.isActive);
+    logger.info("isActive :", enableUser.isActive);
     await clearUserCache();
 
     res.status(200).json({
@@ -481,7 +482,7 @@ export const enableUserAccount = async (
       User: enableUser,
     });
   } catch (err) {
-    console.error("Error enabling account:", err);
+    logger.info("Error enabling account:", err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -518,7 +519,7 @@ export const deleteAccount = async (
       userAccount,
     });
   } catch (error) {
-    console.error("Error during deleting user account permanently:", error);
+    logger.info("Error during deleting user account permanently:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",

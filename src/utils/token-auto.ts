@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import User from "../models/user.model";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import logger from "../configs/logger.config";
 
 dotenv.config();
 
@@ -15,7 +16,7 @@ const generatePermanentTokens = async () => {
     }
 
     await mongoose.connect(mongoURI);
-    console.log("Mongo Database connection established succesfully!");
+    logger.info("Mongo Database connection established succesfully!");
 
     const admin = await User.findOne({ email: "dev@gmail.com" });
     if (!admin) {
@@ -35,13 +36,13 @@ const generatePermanentTokens = async () => {
       algorithm: "HS256",
     });
 
-    console.log("Pernament token for admin:", adminToken);
-    console.log("Pernament token for user:", userToken);
+    logger.info("Pernament token for admin:", adminToken);
+    logger.info("Pernament token for user:", userToken);
 
     await mongoose.connection.close();
-    console.log("Closed connection to MongoDB.");
+    logger.info("Closed connection to MongoDB.");
   } catch (error) {
-    console.error("Error when token created:", error);
+    logger.info("Error when token created:", error);
     process.exit(1);
   }
 };

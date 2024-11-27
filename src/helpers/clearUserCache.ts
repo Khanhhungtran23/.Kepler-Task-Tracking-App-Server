@@ -1,4 +1,5 @@
 import { deleteCache, clearCacheByPattern } from "../helpers/cacheHelper";
+import logger from "../configs/logger.config";
 
 const clearUserCache = async () => {
   try {
@@ -6,9 +7,9 @@ const clearUserCache = async () => {
       deleteCache("users:all"),
       clearCacheByPattern("users:search:*"),
     ]);
-    console.log("User cache cleared successfully!");
+    logger.info("User cache cleared successfully!");
   } catch (error) {
-    console.error("Error clearing user cache:", error);
+    logger.info("Error clearing user cache:", error);
   }
 };
 

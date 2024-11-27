@@ -1,6 +1,7 @@
 import mongoose from "mongoose";
 import { Response } from "express";
 import jwt from "jsonwebtoken";
+import logger from "../configs/logger.config";
 
 // DB connection with TypeScript
 export const dbConnection = async (): Promise<void> => {
@@ -12,9 +13,9 @@ export const dbConnection = async (): Promise<void> => {
     }
 
     await mongoose.connect(mongoURI);
-    console.log("Mongo Database connection established succesfully!");
+    logger.info("Mongo Database connection established succesfully!");
   } catch (error) {
-    console.log("DB Error: " + error);
+    logger.info("DB Error: " + error);
   }
 };
 
@@ -42,11 +43,11 @@ export const createJWT = (
       maxAge: 1 * 24 * 60 * 60 * 1000, // Set expiration time to 1 day (in milliseconds)
     });
 
-    console.log("Token successfully created:", token);
+    logger.info("Token successfully created:", token);
     // Return the token so it can also be logged or used elsewhere
     return token;
   } catch (error) {
-    console.error("Error when create JWT:", error);
+    logger.info("Error when create JWT:", error);
     throw new Error("Cannot create JWT!");
   }
 };

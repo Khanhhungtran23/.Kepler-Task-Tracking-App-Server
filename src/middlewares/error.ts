@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Request, Response, NextFunction } from "express";
+import logger from "../configs/logger.config";
 
 // Route Not Found Middleware
 const routeNotFound = (req: Request, res: Response, next: NextFunction) => {

@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import Notice from "../models/notification.model"; // Import model Notification
 import mongoose from "mongoose";
+import logger from "../configs/logger.config";
 
 interface MarkAsReadPayload {
   notificationId: string;
@@ -9,7 +10,7 @@ interface MarkAsReadPayload {
 
 export function setupWebSocket(io: Server) {
   io.on("connection", (socket: Socket) => {
-    console.log("User connected by socket:", socket.id);
+    logger.info("User connected by socket:", socket.id);
 
     socket.on(
       "markAsRead",
@@ -32,7 +33,7 @@ export function setupWebSocket(io: Server) {
           // Phát sự kiện đến front-end để cập nhật trạng thái đọc
           socket.emit("notificationRead", { notificationId, userId });
         } catch (error) {
-          console.error("Error marking notification as read:", error);
+          logger.info("Error marking notification as read:", error);
         }
       },
     );

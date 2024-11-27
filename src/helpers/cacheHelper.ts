@@ -1,14 +1,15 @@
 // /* eslint-disable @typescript-eslint/no-explicit-any */
 import redisClient from "../utils/redis";
+import logger from "../configs/logger.config";
 
 export const getCache = async (key: string): Promise<unknown> => {
   try {
     const cachedData = await redisClient.get(key);
     if (cachedData) {
-      console.log(`Cache hit for key: ${key}`);
+      logger.info(`Cache hit for key: ${key}`);
       return JSON.parse(cachedData);
     } else {
-      console.log(`Cache miss for key: ${key}`);
+      logger.info(`Cache miss for key: ${key}`);
       return null;
     }
   } catch (error) {
@@ -24,7 +25,7 @@ export const setCache = async (
 ): Promise<void> => {
   try {
     await redisClient.setEx(key, expiry, JSON.stringify(data));
-    console.log(`Cache set for key: ${key} with expiry: ${expiry}s`);
+    logger.info(`Cache set for key: ${key} with expiry: ${expiry}s`);
   } catch (error) {
     console.error(`Error setting cache for key: ${key}`, error);
   }
@@ -33,7 +34,7 @@ export const setCache = async (
 export const deleteCache = async (key: string): Promise<void> => {
   try {
     await redisClient.del(key);
-    console.log(`Cache deleted for key: ${key}`);
+    logger.info(`Cache deleted for key: ${key}`);
   } catch (error) {
     console.error(`Error deleting cache for key: ${key}`, error);
   }
@@ -44,7 +45,7 @@ export const clearCacheByPattern = async (pattern: string): Promise<void> => {
     const stream = redisClient.scanIterator({ MATCH: pattern });
     for await (const key of stream) {
       await redisClient.del(key);
-      console.log(`Cache deleted for key: ${key}`);
+      logger.info(`Cache deleted for key: ${key}`);
     }
   } catch (error) {
     console.error(`Error clearing cache for pattern: ${pattern}`, error);

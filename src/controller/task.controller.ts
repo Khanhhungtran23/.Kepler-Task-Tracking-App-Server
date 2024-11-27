@@ -3,6 +3,7 @@ import Application from "../models/application.model";
 import Task from "../models/task.model";
 import mongoose from "mongoose";
 import { deleteCache } from "../helpers/cacheHelper";
+import logger from "../configs/logger.config";
 
 // Add task to an application
 export const addTaskToApplication = async (
@@ -59,7 +60,7 @@ export const addTaskToApplication = async (
       task: savedTask,
     });
   } catch (error) {
-    console.error("Error creating task in application:", error);
+    logger.info("Error creating task in application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -155,7 +156,7 @@ export const updateTaskInApplication = async (
       task: updatedTask,
     });
   } catch (error) {
-    console.error("Error updating task in application:", error);
+    logger.info("Error updating task in application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -208,7 +209,7 @@ export const deleteTaskFromApplication = async (
     );
 
     if (taskIndex === -1) {
-      console.warn(
+      logger.warn(
         `Task with ID ${taskId} not found in application ${applicationId}.`,
       );
       res.status(404).json({
@@ -242,7 +243,7 @@ export const deleteTaskFromApplication = async (
       task: deletedTask,
     });
   } catch (error) {
-    console.error("Error deleting task from application:", error);
+    logger.info("Error deleting task from application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",

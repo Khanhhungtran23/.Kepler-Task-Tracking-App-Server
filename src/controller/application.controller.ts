@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 import clearApplicationCache from "../helpers/clearAppCache";
 import { getCache, setCache } from "../helpers/cacheHelper";
 // import Task from "../models/task.model";
+import logger from "../configs/logger.config";
 
 // Create an application
 export const createApplication = async (
@@ -64,7 +65,7 @@ export const createApplication = async (
       application: savedApplication,
     });
   } catch (error) {
-    console.error("Error creating application:", error);
+    logger.info("Error creating application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -85,7 +86,7 @@ export const duplicateApplication = async (
   res: Response,
 ): Promise<void> => {
   try {
-    console.log(req.params);
+    logger.info(req.params);
     const { id } = req.params; // Application ID to be duplicated
     const { includeRelations } = req.body.body || req.body; // boolean value : if user want to copy the relations or not ?
 
@@ -123,7 +124,7 @@ export const duplicateApplication = async (
       application: savedApplication,
     });
   } catch (error) {
-    console.error("Error duplicating application:", error);
+    logger.info("Error duplicating application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -175,7 +176,7 @@ export const editApplication = async (
       application: updatedApplication,
     });
   } catch (error) {
-    console.error("Error during editing application:", error);
+    logger.info("Error during editing application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -217,7 +218,7 @@ export const trashApplication = async (
       application: trashedApplication,
     });
   } catch (error) {
-    console.error("Error during trashing application:", error);
+    logger.info("Error during trashing application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -255,7 +256,7 @@ export const deleteApplication = async (
 
     res.status(200).json({ message: "Application permanently deleted" });
   } catch (error) {
-    console.error("Error during deleting application permanently:", error);
+    logger.info("Error during deleting application permanently:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -294,7 +295,7 @@ export const getApplications = async (
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error("Error during fetching info of all applications:", error);
+    logger.info("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -334,10 +335,7 @@ export const getTodoApplications = async (
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error(
-      "Error during fetching info of all to do applications:",
-      error,
-    );
+    logger.info("Error during fetching info of all to do applications:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -378,7 +376,7 @@ export const getImplementApplications = async (
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error("Error during fetching info of all applications:", error);
+    logger.info("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -419,7 +417,7 @@ export const getTestingApplications = async (
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error("Error during fetching info of all applications:", error);
+    logger.info("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -459,7 +457,7 @@ export const getProductionApplications = async (
 
     res.status(200).json({ applications });
   } catch (error) {
-    console.error("Error during fetching info of all applications:", error);
+    logger.info("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -505,7 +503,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
       });
     }
   } catch (err) {
-    console.log("Error during searching app by title: " + err);
+    logger.info("Error during searching app by title: " + err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -555,7 +553,7 @@ export const searchTodoApp = async (
       });
     }
   } catch (err) {
-    console.log("Error during searching todo app by title: " + err);
+    logger.info("Error during searching todo app by title: " + err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -605,7 +603,7 @@ export const searchImplementApp = async (
       });
     }
   } catch (err) {
-    console.log("Error during seaching implement app by title: " + err);
+    logger.info("Error during seaching implement app by title: " + err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -655,7 +653,7 @@ export const searchTestingApp = async (
       });
     }
   } catch (err) {
-    console.log("Error during searching testing app by title: " + err);
+    logger.info("Error during searching testing app by title: " + err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -704,7 +702,7 @@ export const searchProductionApp = async (
       });
     }
   } catch (err) {
-    console.log("Error during searching production app by title:" + err);
+    logger.info("Error during searching production app by title:" + err);
     if (err instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -745,7 +743,7 @@ export const restoreApplication = async (
       application: restoredApplication,
     });
   } catch (error) {
-    console.error("Error restoring application from trash:", error);
+    logger.info("Error restoring application from trash:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -778,10 +776,7 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
 
     res.status(200).json({ trashedApplications });
   } catch (error) {
-    console.error(
-      "Error during fetching list of applications in trash:",
-      error,
-    );
+    logger.info("Error during fetching list of applications in trash:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -851,7 +846,7 @@ export const countApplicationsByStatus = async (
       ...result,
     });
   } catch (error) {
-    console.error("Error counting applications by status:", error);
+    logger.info("Error counting applications by status:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -894,7 +889,7 @@ export const countApplicationsByPriority = async (
       Statistic: counts,
     });
   } catch (error) {
-    console.error("Error counting applications by priority:", error);
+    logger.info("Error counting applications by priority:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",
@@ -979,7 +974,7 @@ export const countApplicationsPerUser = async (
     await setCache(cacheKey, response, 3600);
     res.status(200).json(response);
   } catch (error) {
-    console.error(
+    logger.info(
       "Error counting number and details of applications per user:",
       error,
     );
@@ -1034,9 +1029,9 @@ export const addMemberToApplication = async (
 
     try {
       await application.save();
-      console.log("Application updated:", application);
+      logger.info("Application updated:", application);
     } catch (error) {
-      console.error("Error saving application:", error);
+      logger.info("Error saving application:", error);
       res.status(500).json({ message: "Failed to save application" });
       return;
     }
@@ -1049,7 +1044,7 @@ export const addMemberToApplication = async (
       application,
     });
   } catch (error) {
-    console.error("Error adding/assigning member to application:", error);
+    logger.info("Error adding/assigning member to application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",

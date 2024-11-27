@@ -5,6 +5,7 @@ import Activity from "../models/activity.model";
 import mongoose from "mongoose";
 // import redisClient from "../utils/redis";
 import clearApplicationCache from "../helpers/clearAppCache";
+import logger from "../configs/logger.config";
 
 // Function to add new activity/comment to Application
 export const addActivity = async (
@@ -13,7 +14,7 @@ export const addActivity = async (
 ): Promise<void> => {
   try {
     const { title, comment, appId } = req.body.body || req.body;
-    const userId = req.user?._id;
+    const userId = (req.user as { _id: string | mongoose.Types.ObjectId })?._id;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -56,7 +57,7 @@ export const addActivity = async (
       application,
     });
   } catch (error) {
-    console.error("Error adding new comment/activity to application:", error);
+    logger.info("Error adding new comment/activity to application:", error);
     if (error instanceof Error) {
       res.status(500).json({
         message: "Server error",

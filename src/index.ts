@@ -13,6 +13,10 @@ import { routeNotFound, errorHandler } from './middlewares/error';
 // import { Server } from "socket.io"; // Import Socket.IO
 // import { setupWebSocket } from "./utils/socket"; // Import hàm setupWebSocket
 import sessionMiddleware from "./middlewares/session";
+import path from "path";
+import helmet from "helmet";
+import passport from "passport";
+import { loggerMiddleware } from "../src/middlewares/logger.middleware";
 
 // db connection
 dotenv.config();
@@ -20,6 +24,8 @@ dbConnection();
 
 // initialize app
 const app = express();
+
+app.use(helmet());
 
 // // Create HTTP server and integrate it with Express
 // const server = http.createServer(app);
@@ -47,6 +53,11 @@ const app = express();
 
 // // Call the function to set up WebSocket events
 // setupWebSocket(io);
+
+
+// Views
+app.set("views", path.join(__dirname, "templates"));
+app.set("view engine", "hbs");
 
 // Set up CORS with the correct options
 app.use(
@@ -78,10 +89,11 @@ app.use(bodyParser.json());
 
 // Parse cookies
 app.use(cookieParser());
-
+app.use(loggerMiddleware);
 // Using session
 app.use(sessionMiddleware);
-
+app.use(passport.initialize());
+app.use(passport.session());
 // Logging HTTP requests
 // Configure Morgan for logging
 const logFormat = process.env.NODE_ENV === "production" ? "combined" : "dev";
@@ -95,6 +107,12 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get("/hello", (req, res) => {
+  res.render("helloworld", {
+    title: "Hello, World!",
+    message: "Welcome to our application!",
+  });
+});
 
 app.use("/api", routes);
 
