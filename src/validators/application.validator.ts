@@ -6,7 +6,7 @@ export const createApplicationSchema = Joi.object({
   description: Joi.string().required(),
   assets: Joi.array().items(Joi.string()).optional(),
   status: Joi.string()
-    .valid("To Do", "Implementing", "Testing", "Production")
+    .valid("To Do", "Implement", "Testing", "Production")
     .required(),
   priority: Joi.string().valid("High", "Medium", "Low").required(),
   teamMembers: Joi.array().items(Joi.string().length(24)).optional(),
