@@ -19,9 +19,9 @@ export const addTaskToApplication = async (
       return;
     }
     if (!title || !deadline || !tag) {
-      res
-        .status(400)
-        .json({ message: "Task details (title, deadline, tag) are required." });
+      res.status(400).json({
+        message: "Task details (title, deadline, tag) are required.",
+      });
       return;
     }
 
@@ -66,7 +66,10 @@ export const addTaskToApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -82,9 +85,9 @@ export const updateTaskInApplication = async (
 
     // Validate input
     if (!applicationId || !taskId) {
-      res
-        .status(400)
-        .json({ message: "Application ID and Task ID are required." });
+      res.status(400).json({
+        message: "Application ID and Task ID are required.",
+      });
       return;
     }
 
@@ -111,7 +114,9 @@ export const updateTaskInApplication = async (
     );
 
     if (taskIndex === -1) {
-      res.status(404).json({ message: "Task not found in the application." });
+      res.status(404).json({
+        message: "Task not found in the application.",
+      });
       return;
     }
 
@@ -123,7 +128,9 @@ export const updateTaskInApplication = async (
     );
 
     if (!updatedTask) {
-      res.status(404).json({ message: "Task not updating successfully." });
+      res.status(404).json({
+        message: "Task not updating successfully.",
+      });
       return;
     }
 
@@ -155,7 +162,10 @@ export const updateTaskInApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -169,9 +179,9 @@ export const deleteTaskFromApplication = async (
 
     // Validate input
     if (!applicationId || !taskId) {
-      res
-        .status(400)
-        .json({ message: "Application ID and Task ID are required." });
+      res.status(400).json({
+        message: "Application ID and Task ID are required.",
+      });
       return;
     }
 
@@ -201,7 +211,9 @@ export const deleteTaskFromApplication = async (
       console.warn(
         `Task with ID ${taskId} not found in application ${applicationId}.`,
       );
-      res.status(404).json({ message: "Task not found in the application." });
+      res.status(404).json({
+        message: "Task not found in the application.",
+      });
       return;
     }
 
@@ -212,9 +224,9 @@ export const deleteTaskFromApplication = async (
     // Delete the task from the database
     const deletedTask = await Task.findByIdAndDelete(taskId);
     if (!deletedTask) {
-      res
-        .status(404)
-        .json({ message: "Task not found or could not be deleted." });
+      res.status(404).json({
+        message: "Task not found or could not be deleted.",
+      });
       return;
     }
 
@@ -237,7 +249,10 @@ export const deleteTaskFromApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };

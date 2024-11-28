@@ -35,7 +35,9 @@ export const createApplication = async (
     if (teamMembers && teamMembers.length > 0) {
       const validUsers = await User.find({ _id: { $in: teamMembers } });
       if (validUsers.length !== teamMembers.length) {
-        res.status(400).json({ message: "Some team members are invalid." });
+        res.status(400).json({
+          message: "Some team members are invalid.",
+        });
         return;
       }
     }
@@ -69,7 +71,10 @@ export const createApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -125,7 +130,10 @@ export const duplicateApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -143,7 +151,15 @@ export const editApplication = async (
     // Find and update the application
     const updatedApplication = await Application.findByIdAndUpdate(
       id,
-      { title, description, assets, status, priority, tasks, teamMembers },
+      {
+        title,
+        description,
+        assets,
+        status,
+        priority,
+        tasks,
+        teamMembers,
+      },
       { new: true },
     );
 
@@ -166,7 +182,10 @@ export const editApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -206,9 +225,9 @@ export const trashApplication = async (
       });
     }
     if (!res.headersSent) {
-      res
-        .status(500)
-        .json({ message: "Server error while trashing application" });
+      res.status(500).json({
+        message: "Server error while trashing application",
+      });
     }
   }
 };
@@ -224,9 +243,9 @@ export const deleteApplication = async (
     const application = await Application.findById(id);
 
     if (!application || !application.isTrashed) {
-      res
-        .status(404)
-        .json({ message: "Application not found or not in trash" });
+      res.status(404).json({
+        message: "Application not found or not in trash",
+      });
     }
 
     await Application.findByIdAndDelete(id);
@@ -243,7 +262,10 @@ export const deleteApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -279,7 +301,10 @@ export const getApplications = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -319,7 +344,10 @@ export const getTodoApplications = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -357,7 +385,10 @@ export const getImplementApplications = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -395,7 +426,10 @@ export const getTestingApplications = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -432,7 +466,10 @@ export const getProductionApplications = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -463,7 +500,9 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
       await setCache(cacheKey, apps, 900);
       res.status(200).json(apps);
     } else {
-      res.status(404).json({ message: "No application found with that title" });
+      res.status(404).json({
+        message: "No application found with that title",
+      });
     }
   } catch (err) {
     console.log("Error during searching app by title: " + err);
@@ -473,7 +512,10 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -508,7 +550,9 @@ export const searchTodoApp = async (
       await setCache(cacheKey, apps, 900);
       res.status(200).json(apps);
     } else {
-      res.status(404).json({ message: "No application found with that title" });
+      res.status(404).json({
+        message: "No application found with that title",
+      });
     }
   } catch (err) {
     console.log("Error during searching todo app by title: " + err);
@@ -518,7 +562,10 @@ export const searchTodoApp = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -553,7 +600,9 @@ export const searchImplementApp = async (
       await setCache(cacheKey, apps, 900);
       res.status(200).json(apps);
     } else {
-      res.status(404).json({ message: "No application found with that title" });
+      res.status(404).json({
+        message: "No application found with that title",
+      });
     }
   } catch (err) {
     console.log("Error during seaching implement app by title: " + err);
@@ -563,7 +612,10 @@ export const searchImplementApp = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -598,7 +650,9 @@ export const searchTestingApp = async (
       await setCache(cacheKey, apps, 900);
       res.status(200).json(apps);
     } else {
-      res.status(404).json({ message: "No application found with that title" });
+      res.status(404).json({
+        message: "No application found with that title",
+      });
     }
   } catch (err) {
     console.log("Error during searching testing app by title: " + err);
@@ -608,7 +662,10 @@ export const searchTestingApp = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -642,7 +699,9 @@ export const searchProductionApp = async (
       await setCache(cacheKey, apps, 900);
       res.status(200).json(apps);
     } else {
-      res.status(404).json({ message: "No application found with that title" });
+      res.status(404).json({
+        message: "No application found with that title",
+      });
     }
   } catch (err) {
     console.log("Error during searching production app by title:" + err);
@@ -652,7 +711,10 @@ export const searchProductionApp = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -690,7 +752,10 @@ export const restoreApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -723,7 +788,10 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -790,7 +858,10 @@ export const countApplicationsByStatus = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -818,9 +889,10 @@ export const countApplicationsByPriority = async (
     ]);
 
     await setCache(cacheKey, counts, 3600);
-    res
-      .status(200)
-      .json({ message: "Applications count by priority", Statistic: counts });
+    res.status(200).json({
+      message: "Applications count by priority",
+      Statistic: counts,
+    });
   } catch (error) {
     console.error("Error counting applications by priority:", error);
     if (error instanceof Error) {
@@ -829,7 +901,10 @@ export const countApplicationsByPriority = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -927,9 +1002,9 @@ export const addMemberToApplication = async (
       !mongoose.Types.ObjectId.isValid(appId) ||
       !mongoose.Types.ObjectId.isValid(userId)
     ) {
-      res
-        .status(400)
-        .json({ message: "Invalid application ID or user ID format" });
+      res.status(400).json({
+        message: "Invalid application ID or user ID format",
+      });
       return;
     }
 
@@ -946,9 +1021,9 @@ export const addMemberToApplication = async (
     }
 
     if (application.teamMembers.some((member) => member.equals(userId))) {
-      res
-        .status(400)
-        .json({ message: "User is already a member of this application" });
+      res.status(400).json({
+        message: "User is already a member of this application",
+      });
       return;
     }
 
@@ -981,7 +1056,10 @@ export const addMemberToApplication = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };

@@ -53,7 +53,10 @@ export const registerUser = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -122,7 +125,10 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -176,7 +182,10 @@ export const changeUserPassword = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -240,7 +249,10 @@ export const updateUserProfile = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -287,7 +299,10 @@ export const adminUpdateUser = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -318,7 +333,10 @@ export const getAllUsers = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -360,7 +378,10 @@ export const getUserByName = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -383,7 +404,9 @@ export const disableUserAccount = async (
 
     // Verify if this account is already disabled
     if (!disableUser.isActive) {
-      res.status(400).json({ message: "This account is already disabled" });
+      res.status(400).json({
+        message: "This account is already disabled",
+      });
       return;
     }
 
@@ -410,7 +433,10 @@ export const disableUserAccount = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -433,7 +459,9 @@ export const enableUserAccount = async (
 
     // Verify if this account is already enabled
     if (enableUser.isActive) {
-      res.status(400).json({ message: "This account is already enabled" });
+      res.status(400).json({
+        message: "This account is already enabled",
+      });
       return;
     }
 
@@ -460,7 +488,10 @@ export const enableUserAccount = async (
         error: err.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
@@ -482,9 +513,10 @@ export const deleteAccount = async (
     await User.deleteOne({ email });
     await clearUserCache();
 
-    res
-      .status(200)
-      .json({ message: "User account permanently deleted", userAccount });
+    res.status(200).json({
+      message: "User account permanently deleted",
+      userAccount,
+    });
   } catch (error) {
     console.error("Error during deleting user account permanently:", error);
     if (error instanceof Error) {
@@ -493,7 +525,10 @@ export const deleteAccount = async (
         error: error.message,
       });
     } else {
-      res.status(500).json({ message: "Server error", error: "Unknown error" });
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
     }
   }
 };
