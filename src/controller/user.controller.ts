@@ -86,6 +86,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       res.status(403).json({
         message: "Your account is disabled. Please contact your manager.",
       });
+      return;
     }
     res.clearCookie("token", {
       httpOnly: true,
@@ -240,6 +241,7 @@ export const updateUserProfile = async (
       });
     } else {
       res.status(404).json({ message: "User not found" });
+      return;
     }
   } catch (err) {
     console.error("Error in update user profile:", err);

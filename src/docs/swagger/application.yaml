@@ -462,6 +462,83 @@ paths:
           onClick: "resetForm()" # Reset button (front-end should define resetForm())
       x-execute-query: true # Show Execute Query button to test API
 
+  /app/get-app-id/{id}:
+    get:
+      summary: Retrieve an application by ID
+      tags:
+        - Application
+      security:
+        - bearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          description: The unique identifier of the application
+      responses:
+        '200':
+          description: Application retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Application'
+              example:
+                _id: "6383b82797ae5f174c04a905"
+                title: "Sample Application"
+                description: "Description of the sample application"
+                status: "To Do"
+                priority: 1
+                tasks: []
+                teamMembers: []
+                isTrashed: false
+                createdAt: "2024-12-01T08:00:00Z"
+                updatedAt: "2024-12-01T08:00:00Z"
+        '404':
+          description: Application not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "No application found with that id of app"
+        '500':
+          description: Server error with error message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Server error"
+                  error: 
+                    type: string
+                    description: Detailed error message from the server
+                    example: "Error: Cannot connect to database"
+              examples: 
+                server_error:
+                  summary: Server error example
+                  value: 
+                    success: false
+                    message: "Server error"
+                    error: "Database connection failed"
+      x-buttons:
+        - text: Cancel
+          onClick: "window.location.reload()" # Cancel button action
+        - text: Reset
+          onClick: "resetForm()" # Reset button (front-end should define resetForm())
+      x-execute-query: true # Show Execute Query button to test API
+
+
   /app/search-app/{application_title}:
     get:
       summary: Search an application by title

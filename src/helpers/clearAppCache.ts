@@ -13,6 +13,7 @@ const clearApplicationCache = async () => {
       clearCacheByPattern("applications:itsearch:*"),
       clearCacheByPattern("applications:tgsearch:*"),
       clearCacheByPattern("applications:pnsearch:*"),
+      clearCacheByPattern("applications:getById:*"),
       deleteCache("application:status-count"),
       deleteCache("application:priority-count"),
       deleteCache("users:applications-count"),
