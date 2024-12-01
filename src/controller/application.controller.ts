@@ -520,6 +520,48 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
+export const getAppById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params; // Assuming application id is passed as a route parameter
+  const cacheKey = `application:getById:${ id }`;
+  try {
+    const cachedApplication = await getCache(cacheKey);
+    if (cachedApplication) {
+      res.status(200).json(cachedApplication);
+      return;
+    }
+
+    // Find application matching the provided application_id
+    const app = await Application.findOne({
+      _id: id,
+      isTrashed: false,
+    }); 
+
+    //If can find the app
+    if (app) {
+      // save cache
+      await setCache(cacheKey, app, 900);
+      res.status(200).json(app);
+    } else {
+      res.status(404).json({
+        message: "No application found with that title",
+      });
+    }
+  } catch (err) {
+    console.log("Error during getting app by Id: " + err);
+    if (err instanceof Error) {
+      res.status(500).json({
+        message: "Server error",
+        error: err.message,
+      });
+    } else {
+      res.status(500).json({
+        message: "Server error",
+        error: "Unknown error",
+      });
+    }
+  }
+};
+
 export const searchTodoApp = async (
   req: Request,
   res: Response,
