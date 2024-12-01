@@ -32,7 +32,7 @@ router.post("/login", validate({ body: loginUserSchema }), loginUser);
 router.put(
   "/change-password",
   protect,
-  validate({ body: changePasswordSchema }),
+  // validate({ body: changePasswordSchema }),
   changeUserPassword,
 );
 
