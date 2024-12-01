@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Application from "../models/application.model";
 import Task from "../models/task.model";
 import mongoose from "mongoose";
-import { deleteCache } from "../helpers/cacheHelper";
+import { deleteCache, clearCacheByPattern } from "../helpers/cacheHelper";
 
 // Add task to an application
 export const addTaskToApplication = async (
@@ -53,6 +53,12 @@ export const addTaskToApplication = async (
     await deleteCache("applications:implement");
     await deleteCache("applications:test");
     await deleteCache("applications:production");
+    await clearCacheByPattern("applications:search:*");
+    await clearCacheByPattern("applications:tdsearch:*");
+    await clearCacheByPattern("applications:itsearch:*");
+    await clearCacheByPattern("applications:tgsearch:*");
+    await clearCacheByPattern("applications:pnsearch:*");
+    await clearCacheByPattern("applications:getById:*");
 
     res.status(201).json({
       message: "Task added to application successfully",
@@ -149,6 +155,12 @@ export const updateTaskInApplication = async (
     await deleteCache("applications:implement");
     await deleteCache("applications:test");
     await deleteCache("applications:production");
+    await clearCacheByPattern("applications:search:*");
+    await clearCacheByPattern("applications:tdsearch:*");
+    await clearCacheByPattern("applications:itsearch:*");
+    await clearCacheByPattern("applications:tgsearch:*");
+    await clearCacheByPattern("applications:pnsearch:*");
+    await clearCacheByPattern("applications:getById:*");
 
     res.status(200).json({
       message: "Task updated successfully.",
@@ -236,6 +248,12 @@ export const deleteTaskFromApplication = async (
     await deleteCache("applications:implement");
     await deleteCache("applications:test");
     await deleteCache("applications:production");
+    await clearCacheByPattern("applications:search:*");
+    await clearCacheByPattern("applications:tdsearch:*");
+    await clearCacheByPattern("applications:itsearch:*");
+    await clearCacheByPattern("applications:tgsearch:*");
+    await clearCacheByPattern("applications:pnsearch:*");
+    await clearCacheByPattern("applications:getById:*");
 
     res.status(200).json({
       message: "Task deleted successfully.",

@@ -219,10 +219,12 @@ export const trashApplication = async (
   } catch (error) {
     console.error("Error during trashing application:", error);
     if (error instanceof Error) {
-      res.status(500).json({
-        message: "Server error",
-        error: error.message,
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          message: "Server error",
+          error: error.message,
+        });
+      }
     }
     if (!res.headersSent) {
       res.status(500).json({
@@ -243,9 +245,12 @@ export const deleteApplication = async (
     const application = await Application.findById(id);
 
     if (!application || !application.isTrashed) {
-      res.status(404).json({
-        message: "Application not found or not in trash",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "Application not found or not in trash",
+        });
+      }
+      return;
     }
 
     await Application.findByIdAndDelete(id);
@@ -257,15 +262,19 @@ export const deleteApplication = async (
   } catch (error) {
     console.error("Error during deleting application permanently:", error);
     if (error instanceof Error) {
-      res.status(500).json({
-        message: "Server error",
-        error: error.message,
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          message: "Server error",
+          error: error.message,
+        });
+      }
     } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          message: "Server error",
+          error: "Unknown error",
+        });
+      }
     }
   }
 };
@@ -480,7 +489,9 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   try {
     const cachedApplications = await getCache(cacheKey);
     if (cachedApplications) {
-      res.status(200).json(cachedApplications);
+      if (!res.headersSent) {
+        res.status(200).json(cachedApplications);
+      }
       return;
     }
 
@@ -498,23 +509,61 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     if (apps.length > 0) {
       // save cache
       await setCache(cacheKey, apps, 900);
-      res.status(200).json(apps);
+      if (!res.headersSent) {
+        res.status(200).json(apps);
+      }
     } else {
-      res.status(404).json({
-        message: "No application found with that title",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "No application found with that title",
+        });
+      }
     }
   } catch (err) {
     console.log("Error during searching app by title: " + err);
-    if (err instanceof Error) {
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err.message,
+        error: err instanceof Error ? err.message : "Unknown error",
       });
+    }
+  }
+};
+
+export const getAppById = async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params; // Assuming application id is passed as a route parameter
+  const cacheKey = `application:getById:${ id }`;
+  try {
+    const cachedApplication = await getCache(cacheKey);
+    if (cachedApplication) {
+      if (!res.headersSent) {
+        res.status(200).json(cachedApplication);
+      }
+      return;
+    }
+
+    // Find application matching the provided application_id
+    const app = await Application.findOne({
+      _id: id,
+      isTrashed: false,
+    }); 
+
+    // If can find the app
+    if (app) {
+      // save cache
+      await setCache(cacheKey, app, 3600);
+      res.status(200).json(app);
     } else {
+      res.status(404).json({
+        message: "No application found with that id of app",
+      });
+    }
+  } catch (err) {
+    console.log("Error during getting app by Id: " + err);
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -529,7 +578,9 @@ export const searchTodoApp = async (
   try {
     const cachedSTodoApplications = await getCache(cacheKey);
     if (cachedSTodoApplications) {
-      res.status(200).json(cachedSTodoApplications);
+      if (!res.headersSent) {
+        res.status(200).json(cachedSTodoApplications);
+      }
       return;
     }
 
@@ -548,23 +599,22 @@ export const searchTodoApp = async (
     if (apps.length > 0) {
       // save cache
       await setCache(cacheKey, apps, 900);
-      res.status(200).json(apps);
+      if (!res.headersSent) {
+        res.status(200).json(apps);
+      }
     } else {
-      res.status(404).json({
-        message: "No application found with that title",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "No application found with that title",
+        });
+      }
     }
   } catch (err) {
-    console.log("Error during searching todo app by title: " + err);
-    if (err instanceof Error) {
+    console.error("Error during searching todo app by title: " + err);
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err.message,
-      });
-    } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -579,7 +629,9 @@ export const searchImplementApp = async (
   try {
     const cachedSImplementApplications = await getCache(cacheKey);
     if (cachedSImplementApplications) {
-      res.status(200).json(cachedSImplementApplications);
+      if (!res.headersSent) {
+        res.status(200).json(cachedSImplementApplications);
+      }
       return;
     }
 
@@ -598,23 +650,22 @@ export const searchImplementApp = async (
     if (apps.length > 0) {
       // save cache
       await setCache(cacheKey, apps, 900);
-      res.status(200).json(apps);
+      if (!res.headersSent) {
+        res.status(200).json(apps);
+      }
     } else {
-      res.status(404).json({
-        message: "No application found with that title",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "No application found with that title",
+        });
+      }
     }
   } catch (err) {
-    console.log("Error during seaching implement app by title: " + err);
-    if (err instanceof Error) {
+    console.error("Error during searching implement app by title: " + err);
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err.message,
-      });
-    } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -629,7 +680,9 @@ export const searchTestingApp = async (
   try {
     const cachedSTestingApplications = await getCache(cacheKey);
     if (cachedSTestingApplications) {
-      res.status(200).json(cachedSTestingApplications);
+      if (!res.headersSent) {
+        res.status(200).json(cachedSTestingApplications);
+      }
       return;
     }
 
@@ -648,23 +701,22 @@ export const searchTestingApp = async (
     if (apps.length > 0) {
       // save cache
       await setCache(cacheKey, apps, 900);
-      res.status(200).json(apps);
+      if (!res.headersSent) {
+        res.status(200).json(apps);
+      }
     } else {
-      res.status(404).json({
-        message: "No application found with that title",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "No application found with that title",
+        });
+      }
     }
   } catch (err) {
-    console.log("Error during searching testing app by title: " + err);
-    if (err instanceof Error) {
+    console.error("Error during searching testing app by title: " + err);
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err.message,
-      });
-    } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -679,7 +731,9 @@ export const searchProductionApp = async (
   try {
     const cachedSProductionApplications = await getCache(cacheKey);
     if (cachedSProductionApplications) {
-      res.status(200).json(cachedSProductionApplications);
+      if (!res.headersSent) {
+        res.status(200).json(cachedSProductionApplications);
+      }
       return;
     }
 
@@ -697,23 +751,22 @@ export const searchProductionApp = async (
 
     if (apps.length > 0) {
       await setCache(cacheKey, apps, 900);
-      res.status(200).json(apps);
+      if (!res.headersSent) {
+        res.status(200).json(apps);
+      }
     } else {
-      res.status(404).json({
-        message: "No application found with that title",
-      });
+      if (!res.headersSent) {
+        res.status(404).json({
+          message: "No application found with that title",
+        });
+      }
     }
   } catch (err) {
-    console.log("Error during searching production app by title:" + err);
-    if (err instanceof Error) {
+    console.error("Error during searching production app by title: " + err);
+    if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err.message,
-      });
-    } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -734,7 +787,10 @@ export const restoreApplication = async (
     );
 
     if (!restoredApplication) {
-      res.status(404).json({ message: "Application not found" });
+      if (!res.headersSent) {
+        res.status(404).json({ message: "Application not found" });
+      }
+      return;
     }
 
     // DELETE cache to reset cache
@@ -747,15 +803,19 @@ export const restoreApplication = async (
   } catch (error) {
     console.error("Error restoring application from trash:", error);
     if (error instanceof Error) {
-      res.status(500).json({
-        message: "Server error",
-        error: error.message,
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          message: "Server error",
+          error: error.message,
+        });
+      }
     } else {
-      res.status(500).json({
-        message: "Server error",
-        error: "Unknown error",
-      });
+      if (!res.headersSent) {
+        res.status(500).json({
+          message: "Server error",
+          error: "Unknown error",
+        });
+      }
     }
   }
 };

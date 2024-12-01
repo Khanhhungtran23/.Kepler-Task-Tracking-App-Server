@@ -21,6 +21,7 @@ import {
   countApplicationsPerUser,
   addMemberToApplication,
   duplicateApplication,
+  getAppById
 } from "../controller/application.controller";
 import { addActivity } from "../controller/activity.controller";
 import {
@@ -93,6 +94,15 @@ router.get("/get-all-implement", protect, getImplementApplications);
 router.get("/get-all-testing", protect, getTestingApplications);
 
 router.get("/get-all-production", protect, getProductionApplications);
+
+router.get(
+  "/get-app-id/:id",
+  protect,
+  validate({
+    params: paramsIdSchema,
+  }),
+  getAppById,
+);
 
 router.get(
   "/search-app/:application_title",
