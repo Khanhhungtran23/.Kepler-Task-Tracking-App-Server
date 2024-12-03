@@ -831,12 +831,13 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
     }
 
     const trashedApplications = await Application.find({ isTrashed: true })
+      .populate("tasks")
       .populate("teamMembers")
       .exec();
     // save cache
     await setCache(cacheKey, trashedApplications, 3600);
 
-    res.status(200).json({ trashedApplications });
+    res.status(200).json( trashedApplications );
   } catch (error) {
     console.error(
       "Error during fetching list of applications in trash:",
