@@ -301,7 +301,7 @@ export const getApplications = async (
     // store in cache, expire in 1h = 3600s
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json({ applications });
+    res.status(200).json( applications );
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -341,7 +341,7 @@ export const getTodoApplications = async (
 
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json({ applications });
+    res.status(200).json( applications );
   } catch (error) {
     console.error(
       "Error during fetching info of all to do applications:",
@@ -385,7 +385,7 @@ export const getImplementApplications = async (
     // save cahche
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json({ applications });
+    res.status(200).json( applications );
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -426,7 +426,7 @@ export const getTestingApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json({ applications });
+    res.status(200).json( applications );
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -466,7 +466,7 @@ export const getProductionApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json({ applications });
+    res.status(200).json( applications );
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -864,11 +864,16 @@ export const countApplicationsByStatus = async (
 ): Promise<void> => {
   const cacheKey = "application:status-count";
   try {
-    const cachedCounts = await getCache(cacheKey);
+    interface CachedCounts {
+      untrashedStatistic: any[];  
+      trashedStatistic: any[];     
+    }
+    const cachedCounts = await getCache(cacheKey) as CachedCounts;
     if (cachedCounts) {
       res.status(200).json({
         message: "Applications count by status:",
-        ...cachedCounts,
+        untrashedStatistic: cachedCounts.untrashedStatistic,
+        trashedStatistic: cachedCounts.trashedStatistic,
       });
       return;
     }
@@ -909,7 +914,8 @@ export const countApplicationsByStatus = async (
 
     res.status(200).json({
       message: "Applications count by status:",
-      ...result,
+      untrashedStatistic: untrashedCounts,
+      trashedStatistic: trashedCounts,
     });
   } catch (error) {
     console.error("Error counting applications by status:", error);
