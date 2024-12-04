@@ -301,7 +301,7 @@ export const getApplications = async (
     // store in cache, expire in 1h = 3600s
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -341,7 +341,7 @@ export const getTodoApplications = async (
 
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error(
       "Error during fetching info of all to do applications:",
@@ -385,7 +385,7 @@ export const getImplementApplications = async (
     // save cahche
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -426,7 +426,7 @@ export const getTestingApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -466,7 +466,7 @@ export const getProductionApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -530,9 +530,12 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getAppById = async (req: Request, res: Response): Promise<void> => {
+export const getAppById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { id } = req.params; // Assuming application id is passed as a route parameter
-  const cacheKey = `application:getById:${ id }`;
+  const cacheKey = `application:getById:${id}`;
   try {
     const cachedApplication = await getCache(cacheKey);
     if (cachedApplication) {
@@ -546,7 +549,7 @@ export const getAppById = async (req: Request, res: Response): Promise<void> => 
     const app = await Application.findOne({
       _id: id,
       isTrashed: false,
-    }); 
+    });
 
     // If can find the app
     if (app) {
@@ -837,7 +840,7 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
     // save cache
     await setCache(cacheKey, trashedApplications, 3600);
 
-    res.status(200).json( trashedApplications );
+    res.status(200).json(trashedApplications);
   } catch (error) {
     console.error(
       "Error during fetching list of applications in trash:",
@@ -865,10 +868,10 @@ export const countApplicationsByStatus = async (
   const cacheKey = "application:status-count";
   try {
     interface CachedCounts {
-      untrashedStatistic: any[];  
-      trashedStatistic: any[];     
+      untrashedStatistic: any[];
+      trashedStatistic: any[];
     }
-    const cachedCounts = await getCache(cacheKey) as CachedCounts;
+    const cachedCounts = (await getCache(cacheKey)) as CachedCounts;
     if (cachedCounts) {
       res.status(200).json({
         message: "Applications count by status:",

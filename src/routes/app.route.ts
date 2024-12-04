@@ -21,7 +21,7 @@ import {
   countApplicationsPerUser,
   addMemberToApplication,
   duplicateApplication,
-  getAppById
+  getAppById,
 } from "../controller/application.controller";
 import { addActivity } from "../controller/activity.controller";
 import {
