@@ -301,7 +301,7 @@ export const getApplications = async (
     // store in cache, expire in 1h = 3600s
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -341,7 +341,7 @@ export const getTodoApplications = async (
 
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error(
       "Error during fetching info of all to do applications:",
@@ -385,7 +385,7 @@ export const getImplementApplications = async (
     // save cahche
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -426,7 +426,7 @@ export const getTestingApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -466,7 +466,7 @@ export const getProductionApplications = async (
     // save cache
     await setCache(cacheKey, applications, 3600);
 
-    res.status(200).json( applications );
+    res.status(200).json(applications);
   } catch (error) {
     console.error("Error during fetching info of all applications:", error);
     if (error instanceof Error) {
@@ -504,7 +504,10 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
         ),
       },
       isTrashed: false,
-    }); // Use regex for case-insensitive search
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -530,9 +533,12 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
   }
 };
 
-export const getAppById = async (req: Request, res: Response): Promise<void> => {
+export const getAppById = async (
+  req: Request,
+  res: Response,
+): Promise<void> => {
   const { id } = req.params; // Assuming application id is passed as a route parameter
-  const cacheKey = `application:getById:${ id }`;
+  const cacheKey = `application:getById:${id}`;
   try {
     const cachedApplication = await getCache(cacheKey);
     if (cachedApplication) {
@@ -546,7 +552,10 @@ export const getAppById = async (req: Request, res: Response): Promise<void> => 
     const app = await Application.findOne({
       _id: id,
       isTrashed: false,
-    }); 
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     // If can find the app
     if (app) {
@@ -594,7 +603,10 @@ export const searchTodoApp = async (
       },
       status: "To Do",
       isTrashed: false,
-    });
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -645,7 +657,10 @@ export const searchImplementApp = async (
       },
       status: "Implement",
       isTrashed: false,
-    });
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -696,7 +711,10 @@ export const searchTestingApp = async (
       },
       status: "Testing",
       isTrashed: false,
-    });
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -747,7 +765,10 @@ export const searchProductionApp = async (
       },
       status: "Production",
       isTrashed: false,
-    });
+    })
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       await setCache(cacheKey, apps, 900);
@@ -837,7 +858,7 @@ export const getTrashedApplications = async (req: Request, res: Response) => {
     // save cache
     await setCache(cacheKey, trashedApplications, 3600);
 
-    res.status(200).json( trashedApplications );
+    res.status(200).json(trashedApplications);
   } catch (error) {
     console.error(
       "Error during fetching list of applications in trash:",
@@ -865,10 +886,10 @@ export const countApplicationsByStatus = async (
   const cacheKey = "application:status-count";
   try {
     interface CachedCounts {
-      untrashedStatistic: any[];  
-      trashedStatistic: any[];     
+      untrashedStatistic: any;
+      trashedStatistic: any;
     }
-    const cachedCounts = await getCache(cacheKey) as CachedCounts;
+    const cachedCounts = (await getCache(cacheKey)) as CachedCounts;
     if (cachedCounts) {
       res.status(200).json({
         message: "Applications count by status:",
@@ -879,43 +900,69 @@ export const countApplicationsByStatus = async (
     }
 
     const untrashedCounts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: true } } }, // exclude trashed applications
-      { $group: { _id: "$status", count: { $sum: 1 } } }, // group by status and count
+      { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
+      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by status and count
 
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, // Calculate the total count of all applications
-          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+          total: { $sum: "$count" },
+          detail: { $push: { status: "$_id", count: "$count" } },
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
     const trashedCounts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: false } } }, // Include trashed applications
-      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by priority and count
+      { $match: { isTrashed: { $ne: false } } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, // Calculate the total count of all applications
-          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+          total: { $sum: "$count" },
+          detail: { $push: { status: "$_id", count: "$count" } },
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
+    const transformToObject = (data: any[]): Record<string, number> => {
+      const result: Record<string, number> = {};
+      data.forEach((item) => {
+        result[item.status] = item.count;
+      });
+      return result;
+    };
+
+    const untrashedStatistic =
+      untrashedCounts.length > 0 ? untrashedCounts[0].detail : [];
+    const trashedStatistic =
+      trashedCounts.length > 0 ? trashedCounts[0].detail : [];
+
+    const untrashedData = transformToObject(untrashedStatistic);
+    const trashedData = transformToObject(trashedStatistic);
+
     const result = {
-      untrashedStatistic: untrashedCounts,
-      trashedStatistic: trashedCounts,
+      untrashedStatistic: [
+        {
+          total: untrashedCounts[0]?.total || 0,
+          ...untrashedData,
+        },
+      ],
+      trashedStatistic: [
+        {
+          total: trashedCounts[0]?.total || 0,
+          ...trashedData,
+        },
+      ],
     };
 
     await setCache(cacheKey, result, 3600);
 
     res.status(200).json({
       message: "Applications count by status:",
-      untrashedStatistic: untrashedCounts,
-      trashedStatistic: trashedCounts,
+      untrashedStatistic: result.untrashedStatistic,
+      trashedStatistic: result.trashedStatistic,
     });
   } catch (error) {
     console.error("Error counting applications by status:", error);
