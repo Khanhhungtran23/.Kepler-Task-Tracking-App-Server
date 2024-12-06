@@ -202,10 +202,7 @@ export const trashApplication = async (
       { title: title },
       { isTrashed: true },
       { new: true },
-    )
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+    );
 
     if (!trashedApplication) {
       res.status(404).json({ message: "Application not found" });
@@ -507,7 +504,10 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
         ),
       },
       isTrashed: false,
-    }); // Use regex for case-insensitive search
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -603,7 +603,10 @@ export const searchTodoApp = async (
       },
       status: "To Do",
       isTrashed: false,
-    });
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -654,7 +657,10 @@ export const searchImplementApp = async (
       },
       status: "Implement",
       isTrashed: false,
-    });
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -705,7 +711,10 @@ export const searchTestingApp = async (
       },
       status: "Testing",
       isTrashed: false,
-    });
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -756,7 +765,10 @@ export const searchProductionApp = async (
       },
       status: "Production",
       isTrashed: false,
-    });
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (apps.length > 0) {
       await setCache(cacheKey, apps, 900);
@@ -793,10 +805,7 @@ export const restoreApplication = async (
       { title: title },
       { isTrashed: false },
       { new: true },
-    )
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+    );
 
     if (!restoredApplication) {
       if (!res.headersSent) {
