@@ -31,4 +31,5 @@ const noticeSchema = new Schema(
 const Room = mongoose.model("Room", roomSchema);
 const Notice = mongoose.model("Notice", noticeSchema);
 
-export default { Notice, Room };
+export { Room, Notice };
+

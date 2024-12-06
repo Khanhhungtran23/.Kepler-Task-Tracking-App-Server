@@ -2,6 +2,7 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
+import http from "http";
 import morgan from "morgan";
 import routes from "./routes/index"; 
 import { dbConnection } from "./utils/util"; 
@@ -10,43 +11,42 @@ import swaggerUi from "swagger-ui-express";
 import swaggerJsDoc from "swagger-jsdoc";
 import swaggerOptions from "./swagger/swagger.config";
 import { routeNotFound, errorHandler } from './middlewares/error';
-// import { Server } from "socket.io"; // Import Socket.IO
-// import { setupWebSocket } from "./utils/socket"; // Import hàm setupWebSocket
+import { Server } from "socket.io";
+import { setupWebSocket } from "./utils/socket"; 
 import sessionMiddleware from "./middlewares/session";
 
 // db connection
 dotenv.config();
 dbConnection();
-
 // initialize app
 const app = express();
 
-// // Create HTTP server and integrate it with Express
-// const server = http.createServer(app);
+// Create HTTP server and integrate it with Express
+const server = http.createServer(app);
 
-// // Initialize Socket.IO and attach it to the server
-// const io = new Server(server, {
-//   cors: {
-//     origin: (origin, callback) => {
-//       const allowedOrigins = [
-//         /^http:\/\/localhost:\d+$/,  // Allow any localhost port
-//         /^https:\/\/dotkepler\.vercel\.app$/,
-//         /^https:\/\/task-tracking-application-diw35wak6-vo-minh-khangs-projects\.vercel\.app$/
-//       ];
+// Initialize Socket.IO and attach it to the server
+const io = new Server(server, {
+  cors: {
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        /^http:\/\/localhost:\d+$/,  
+        /^https:\/\/dotkepler\.vercel\.app$/,
+        /^https:\/\/task-tracking-application-diw35wak6-vo-minh-khangs-projects\.vercel\.app$/
+      ];
 
-//       if (!origin || allowedOrigins.some(regex => regex.test(origin))) {
-//         callback(null, true);
-//       } else {
-//         callback(new Error("Not allowed by CORS"));
-//       }
-//     },
-//     methods: ["GET", "POST", "DELETE", "PUT", "HEAD"],
-//     credentials: true,
-//   }
-// });
+      if (!origin || allowedOrigins.some(regex => regex.test(origin))) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["GET", "POST", "DELETE", "PUT", "HEAD"],
+    credentials: true,
+  }
+});
 
-// // Call the function to set up WebSocket events
-// setupWebSocket(io);
+// Call the function to set up WebSocket events
+setupWebSocket(io);
 
 // Set up CORS with the correct options
 app.use(
