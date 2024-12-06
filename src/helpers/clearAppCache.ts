@@ -1,4 +1,8 @@
-import { deleteCache, clearCacheByPattern, flushAllCache } from "../helpers/cacheHelper";
+import {
+  deleteCache,
+  clearCacheByPattern,
+  flushAllCache,
+} from "../helpers/cacheHelper";
 
 const clearApplicationCache = async () => {
   try {

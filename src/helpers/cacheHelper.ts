@@ -41,9 +41,9 @@ export const deleteCache = async (key: string): Promise<void> => {
 
 export const clearCacheByPattern = async (pattern: string): Promise<void> => {
   try {
-    const stream = redisClient.scanIterator({ 
+    const stream = redisClient.scanIterator({
       MATCH: pattern,
-      COUNT: 100, 
+      COUNT: 100,
     });
     let keyCount = 0;
     for await (const key of stream) {
@@ -57,7 +57,6 @@ export const clearCacheByPattern = async (pattern: string): Promise<void> => {
     console.error(`Error clearing cache for pattern: ${pattern}`, error);
   }
 };
-
 
 export const flushAllCache = async (): Promise<void> => {
   try {

@@ -505,9 +505,9 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
       },
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -527,7 +527,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err instanceof Error ? err.message : "Unknown error"
+        error: err instanceof Error ? err.message : "Unknown error",
       });
     }
   }
@@ -553,9 +553,9 @@ export const getAppById = async (
       _id: id,
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     // If can find the app
     if (app) {
@@ -604,9 +604,9 @@ export const searchTodoApp = async (
       status: "To Do",
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -658,9 +658,9 @@ export const searchImplementApp = async (
       status: "Implement",
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -712,9 +712,9 @@ export const searchTestingApp = async (
       status: "Testing",
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       // save cache
@@ -766,9 +766,9 @@ export const searchProductionApp = async (
       status: "Production",
       isTrashed: false,
     })
-    .populate("tasks")
-    .populate("teamMembers")
-    .exec();
+      .populate("tasks")
+      .populate("teamMembers")
+      .exec();
 
     if (apps.length > 0) {
       await setCache(cacheKey, apps, 900);
@@ -906,21 +906,21 @@ export const countApplicationsByStatus = async (
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, 
-          detail: { $push: { status: "$_id", count: "$count" } }, 
+          total: { $sum: "$count" },
+          detail: { $push: { status: "$_id", count: "$count" } },
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
     const trashedCounts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: false } } }, 
-      { $group: { _id: "$status", count: { $sum: 1 } } }, 
+      { $match: { isTrashed: { $ne: false } } },
+      { $group: { _id: "$status", count: { $sum: 1 } } },
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, 
-          detail: { $push: { status: "$_id", count: "$count" } }, 
+          total: { $sum: "$count" },
+          detail: { $push: { status: "$_id", count: "$count" } },
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
@@ -928,30 +928,36 @@ export const countApplicationsByStatus = async (
 
     const transformToObject = (data: any[]): Record<string, number> => {
       const result: Record<string, number> = {};
-      data.forEach(item => {
+      data.forEach((item) => {
         result[item.status] = item.count;
       });
       return result;
     };
 
-    const untrashedStatistic = untrashedCounts.length > 0 ? untrashedCounts[0].detail : [];
-    const trashedStatistic = trashedCounts.length > 0 ? trashedCounts[0].detail : [];
+    const untrashedStatistic =
+      untrashedCounts.length > 0 ? untrashedCounts[0].detail : [];
+    const trashedStatistic =
+      trashedCounts.length > 0 ? trashedCounts[0].detail : [];
 
     const untrashedData = transformToObject(untrashedStatistic);
     const trashedData = transformToObject(trashedStatistic);
 
     const result = {
-      untrashedStatistic: [{
-        total: untrashedCounts[0]?.total || 0,
-        ...untrashedData,
-      }],
-      trashedStatistic: [{
-        total: trashedCounts[0]?.total || 0,
-        ...trashedData,
-      }],
+      untrashedStatistic: [
+        {
+          total: untrashedCounts[0]?.total || 0,
+          ...untrashedData,
+        },
+      ],
+      trashedStatistic: [
+        {
+          total: trashedCounts[0]?.total || 0,
+          ...trashedData,
+        },
+      ],
     };
 
-    await setCache(cacheKey, result, 3600); 
+    await setCache(cacheKey, result, 3600);
 
     res.status(200).json({
       message: "Applications count by status:",
