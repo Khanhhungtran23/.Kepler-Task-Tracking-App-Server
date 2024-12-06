@@ -49,15 +49,7 @@ Make sure you have the following installed:
     ```
 3. **Set up environment variables:**
   ```bash
-  cp .env.example .env
-
-  # open .env and modify the environment variables (if needed)
-  ```
-  ```bash
-  NODE_ENV=development
-  PORT=3000
-  MONGODB_URI = mongodb+srv://tvkhhung03:3i3S12iiLQD3v6mH@task-management-web-app.nlqtw.mongodb.net/?retryWrites=true&w=majority&appName=Task-management-web-app 
-  JWT_SECRET = "in .env file"
+  create an .env file
   ```
 4. **Run the application:**
 - Run locally:
