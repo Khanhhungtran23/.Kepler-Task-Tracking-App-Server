@@ -41,12 +41,29 @@ export const deleteCache = async (key: string): Promise<void> => {
 
 export const clearCacheByPattern = async (pattern: string): Promise<void> => {
   try {
-    const stream = redisClient.scanIterator({ MATCH: pattern });
+    const stream = redisClient.scanIterator({ 
+      MATCH: pattern,
+      COUNT: 100, 
+    });
+    let keyCount = 0;
     for await (const key of stream) {
-      await redisClient.del(key);
-      console.log(`Cache deleted for key: ${key}`);
+      if (key) {
+        await redisClient.del(key);
+        console.log(`Cache deleted for key: ${key}`);
+        keyCount++;
+      }
     }
   } catch (error) {
     console.error(`Error clearing cache for pattern: ${pattern}`, error);
+  }
+};
+
+
+export const flushAllCache = async (): Promise<void> => {
+  try {
+    await redisClient.flushAll();
+    console.log("All cache cleared.");
+  } catch (error) {
+    console.error("Error flushing all cache:", error);
   }
 };

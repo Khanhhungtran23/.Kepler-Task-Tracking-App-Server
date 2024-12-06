@@ -202,7 +202,10 @@ export const trashApplication = async (
       { title: title },
       { isTrashed: true },
       { new: true },
-    );
+    )
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (!trashedApplication) {
       res.status(404).json({ message: "Application not found" });
@@ -524,7 +527,7 @@ export const searchApp = async (req: Request, res: Response): Promise<void> => {
     if (!res.headersSent) {
       res.status(500).json({
         message: "Server error",
-        error: err instanceof Error ? err.message : "Unknown error",
+        error: err instanceof Error ? err.message : "Unknown error"
       });
     }
   }
@@ -549,7 +552,10 @@ export const getAppById = async (
     const app = await Application.findOne({
       _id: id,
       isTrashed: false,
-    });
+    })
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     // If can find the app
     if (app) {
@@ -787,7 +793,10 @@ export const restoreApplication = async (
       { title: title },
       { isTrashed: false },
       { new: true },
-    );
+    )
+    .populate("tasks")
+    .populate("teamMembers")
+    .exec();
 
     if (!restoredApplication) {
       if (!res.headersSent) {
