@@ -965,22 +965,38 @@ paths:
                 properties:
                   message:
                     type: string
-                  Statistic:
+                    example: "Applications count by status:"
+                  untrashedStatistic:
                     type: array
                     items:
                       type: object
                       properties:
                         total:
                           type: integer
-                        detail:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              status:
-                                type: string
-                              count:
-                                type: integer
+                          example: 22
+                        Production:
+                          type: integer
+                          example: 7
+                        Implement:
+                          type: integer
+                          example: 6
+                        "To Do":
+                          type: integer
+                          example: 3
+                        Testing:
+                          type: integer
+                          example: 6
+                  trashedStatistic:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total:
+                          type: integer
+                          example: 3
+                        Implement:
+                          type: integer
+                          example: 3
         '500':
           description: Server error with error message 
           content:
@@ -1007,10 +1023,10 @@ paths:
                     error: "Database connection failed"
       x-buttons:
         - text: Cancel
-          onClick: "window.location.reload()" # Cancel button action
+          onClick: "window.location.reload()" 
         - text: Reset
-          onClick: "resetForm()" # Reset button (front-end should define resetForm())
-      x-execute-query: true # Show Execute Query button to test API
+          onClick: "resetForm()" 
+      x-execute-query: true 
 
   /app/get-priority-statistic:
     get:

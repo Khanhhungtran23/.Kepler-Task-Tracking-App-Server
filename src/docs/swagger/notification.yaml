@@ -1,7 +1,38 @@
-
-
 components:
   schemas:
+    Room:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Auto-generated room ID
+        name:
+          type: string
+          description: Name of the room
+          example: "Project Team A"
+        members:
+          type: array
+          items:
+            type: string
+            description: User ID of members who belong to the room
+          description: List of user IDs who are members of the room
+        socketIds:
+          type: array
+          items:
+            type: string
+            description: Socket IDs of the members in the room
+          description: List of socket IDs of the users in the room
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the room was created
+          example: "2023-01-01T00:00:00Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the room was last updated
+          example: "2023-01-01T00:00:00Z"
+
     Notification:
       type: object
       properties:
@@ -12,12 +43,12 @@ components:
           type: array
           items:
             type: string
-            description: User ID
-          description: List of team members who will receive the notification
+            description: User ID of the team members who will receive the notification
+          description: List of team member IDs who will receive the notification
         text:
           type: string
-          description: Notification content
-          example: "You have been assigned to a new task."
+          description: The content of the notification
+          example: "You have been assigned a new task."
         application:
           type: string
           description: Application ID related to the notification
@@ -33,7 +64,7 @@ components:
         notiType:
           type: string
           enum: ["alert", "message", "assignment"]
-          description: "Type of notification: alert, message, or assignment"
+          description: The type of notification
           example: "alert"
         isRead:
           type: array
@@ -41,6 +72,10 @@ components:
             type: string
             description: User ID of those who have read the notification
           description: List of users who have read the notification
+        room:
+          type: string
+          description: The room ID related to the notification (if applicable)
+          example: "603d2149e6c5c019d4fbdbd7"
         createdAt:
           type: string
           format: date-time
