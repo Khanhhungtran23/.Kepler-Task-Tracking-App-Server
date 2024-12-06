@@ -1,13 +1,12 @@
 import mongoose, { Schema } from "mongoose";
 
-
 const roomSchema = new Schema(
   {
-    name: { type: String, required: true }, 
-    members: [{ type: Schema.Types.ObjectId, ref: "User" }], 
-    socketIds: [{ type: String }], 
+    name: { type: String, required: true },
+    members: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    socketIds: [{ type: String }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 const noticeSchema = new Schema(
@@ -32,4 +31,3 @@ const Room = mongoose.model("Room", roomSchema);
 const Notice = mongoose.model("Notice", noticeSchema);
 
 export { Room, Notice };
-
