@@ -77,17 +77,6 @@ Make sure you have the following installed:
   # run test coverage
   npm run coverage
   ```
-- Docker:
-  ```bash
-  # run docker container in development mode
-  npm run docker:dev
-
-  # run docker container in production mode
-  npm run docker:prod
-
-  # run all tests in a docker container
-  npm run docker:test
-  ```
 - Linting:
   ```bash
   # run ESLint

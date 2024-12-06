@@ -886,8 +886,8 @@ export const countApplicationsByStatus = async (
   const cacheKey = "application:status-count";
   try {
     interface CachedCounts {
-      untrashedStatistic: any[];
-      trashedStatistic: any[];
+      untrashedStatistic: any;
+      trashedStatistic: any;
     }
     const cachedCounts = (await getCache(cacheKey)) as CachedCounts;
     if (cachedCounts) {
@@ -900,43 +900,63 @@ export const countApplicationsByStatus = async (
     }
 
     const untrashedCounts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: true } } }, // exclude trashed applications
-      { $group: { _id: "$status", count: { $sum: 1 } } }, // group by status and count
+      { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
+      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by status and count
 
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, // Calculate the total count of all applications
-          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+          total: { $sum: "$count" }, 
+          detail: { $push: { status: "$_id", count: "$count" } }, 
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
     const trashedCounts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: false } } }, // Include trashed applications
-      { $group: { _id: "$status", count: { $sum: 1 } } }, // Group by priority and count
+      { $match: { isTrashed: { $ne: false } } }, 
+      { $group: { _id: "$status", count: { $sum: 1 } } }, 
       {
         $group: {
           _id: null,
-          total: { $sum: "$count" }, // Calculate the total count of all applications
-          detail: { $push: { status: "$_id", count: "$count" } }, // Collect data into an array
+          total: { $sum: "$count" }, 
+          detail: { $push: { status: "$_id", count: "$count" } }, 
         },
       },
       { $project: { _id: 0, total: 1, detail: 1 } },
     ]);
 
-    const result = {
-      untrashedStatistic: untrashedCounts,
-      trashedStatistic: trashedCounts,
+    const transformToObject = (data: any[]): Record<string, number> => {
+      const result: Record<string, number> = {};
+      data.forEach(item => {
+        result[item.status] = item.count;
+      });
+      return result;
     };
 
-    await setCache(cacheKey, result, 3600);
+    const untrashedStatistic = untrashedCounts.length > 0 ? untrashedCounts[0].detail : [];
+    const trashedStatistic = trashedCounts.length > 0 ? trashedCounts[0].detail : [];
+
+    const untrashedData = transformToObject(untrashedStatistic);
+    const trashedData = transformToObject(trashedStatistic);
+
+    const result = {
+      untrashedStatistic: [{
+        total: untrashedCounts[0]?.total || 0,
+        ...untrashedData,
+      }],
+      trashedStatistic: [{
+        total: trashedCounts[0]?.total || 0,
+        ...trashedData,
+      }],
+    };
+
+    await setCache(cacheKey, result, 3600); 
 
     res.status(200).json({
       message: "Applications count by status:",
-      untrashedStatistic: untrashedCounts,
-      trashedStatistic: trashedCounts,
+      untrashedStatistic: result.untrashedStatistic,
+      trashedStatistic: result.trashedStatistic,
     });
   } catch (error) {
     console.error("Error counting applications by status:", error);
