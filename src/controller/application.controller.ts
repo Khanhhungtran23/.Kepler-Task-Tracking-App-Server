@@ -1023,7 +1023,87 @@ export const countApplicationsByPriority = async (
   }
 };
 
-// Get number of applications for each user
+// // Get number of applications for each user
+// export const countApplicationsPerUser = async (
+//   req: Request,
+//   res: Response,
+// ): Promise<void> => {
+//   const cacheKey = "users:applications-count";
+//   try {
+//     const cachedCounts = await getCache(cacheKey);
+//     if (cachedCounts) {
+//       res.status(200).json(cachedCounts);
+//       return;
+//     }
+
+//     const counts = await Application.aggregate([
+//       { $match: { isTrashed: { $ne: true } } },
+//       {
+//         $lookup: {
+//           from: "users",
+//           localField: "teamMembers",
+//           foreignField: "_id",
+//           as: "userDetails",
+//         },
+//       },
+//       { $unwind: "$userDetails" },
+//       { $match: { "userDetails.user_name": { $ne: null } } },
+//       {
+//         $group: {
+//           _id: "$userDetails._id",
+//           user_name: { $first: "$userDetails.user_name" },
+//           total_app: { $sum: 1 },
+//           details: {
+//             $push: {
+//               status: "$status",
+//               count: { $sum: 1 },
+//             },
+//           },
+//         },
+//       },
+//       {
+//         $project: {
+//           _id: 0,
+//           user_name: 1,
+//           total_app: 1,
+//           details: 1,
+//         },
+//       },
+//     ]);
+
+//     if (!counts || counts.length === 0) {
+//       res.status(200).json({
+//         message: "No data available for applications count",
+//         Statistic: [],
+//       });
+//     }
+
+//     const totalUsers = counts.length;
+
+//     const response = {
+//       message: "Applications count for each member",
+//       Statistic: [
+//         {
+//           "total user": totalUsers,
+//           detail: counts,
+//         },
+//       ],
+//     };
+//     // save cache
+//     await setCache(cacheKey, response, 3600);
+//     res.status(200).json(response);
+//   } catch (error) {
+//     console.error(
+//       "Error counting number and details of applications per user:",
+//       error,
+//     );
+//     res.status(500).json({
+//       message: "Server error",
+//       error: error instanceof Error ? error.message : "Unknown error",
+//     });
+//   }
+// };
+
 export const countApplicationsPerUser = async (
   req: Request,
   res: Response,
@@ -1037,26 +1117,33 @@ export const countApplicationsPerUser = async (
     }
 
     const counts = await Application.aggregate([
-      { $match: { isTrashed: { $ne: true } } },
+      { $match: { isTrashed: { $ne: true } } }, // Exclude trashed applications
       {
         $lookup: {
-          from: "users",
+          from: "users", // Join with the users collection
           localField: "teamMembers",
           foreignField: "_id",
           as: "userDetails",
         },
       },
-      { $unwind: "$userDetails" },
-      { $match: { "userDetails.user_name": { $ne: null } } },
+      { $unwind: "$userDetails" }, // Flatten the user details array
+      { $match: { "userDetails.user_name": { $ne: null } } }, // Exclude null user names
       {
         $group: {
-          _id: "$userDetails._id",
-          user_name: { $first: "$userDetails.user_name" },
-          total_app: { $sum: 1 },
-          details: {
-            $push: {
-              status: "$status",
-              count: { $sum: 1 },
+          _id: "$userDetails.user_name", // Group by user name
+          todo: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "To Do"] }, 1, 0],
+            },
+          },
+          inProgress: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Implement"] }, 1, 0],
+            },
+          },
+          completed: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Production"] }, 1, 0],
             },
           },
         },
@@ -1064,9 +1151,10 @@ export const countApplicationsPerUser = async (
       {
         $project: {
           _id: 0,
-          user_name: 1,
-          total_app: 1,
-          details: 1,
+          name: "$_id", // Rename _id to name
+          todo: 1,
+          inProgress: 1,
+          completed: 1,
         },
       },
     ]);
@@ -1074,22 +1162,17 @@ export const countApplicationsPerUser = async (
     if (!counts || counts.length === 0) {
       res.status(200).json({
         message: "No data available for applications count",
-        Statistic: [],
+        users: [],
       });
+      return;
     }
-
-    const totalUsers = counts.length;
 
     const response = {
       message: "Applications count for each member",
-      Statistic: [
-        {
-          "total user": totalUsers,
-          detail: counts,
-        },
-      ],
+      users: counts,
     };
-    // save cache
+
+    // Save to cache
     await setCache(cacheKey, response, 3600);
     res.status(200).json(response);
   } catch (error) {
