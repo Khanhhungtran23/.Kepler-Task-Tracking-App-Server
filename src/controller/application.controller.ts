@@ -1108,7 +1108,7 @@ export const countApplicationsPerUser = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const cacheKey = "user:application-count";
+  const cacheKey = "users:applications-count";
   try {
     const cachedCounts = await getCache(cacheKey);
     if (cachedCounts) {
