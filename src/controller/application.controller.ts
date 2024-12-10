@@ -1131,17 +1131,22 @@ export const countApplicationsPerUser = async (
       {
         $group: {
           _id: "$userDetails.user_name", // Group by user name
-          todo: {
+          Todo: {
             $sum: {
               $cond: [{ $eq: ["$status", "To Do"] }, 1, 0],
             },
           },
-          inProgress: {
+          Implement: {
             $sum: {
               $cond: [{ $eq: ["$status", "Implement"] }, 1, 0],
             },
           },
-          completed: {
+          Testing: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "Testing"] }, 1, 0],
+            },
+          },
+          Production: {
             $sum: {
               $cond: [{ $eq: ["$status", "Production"] }, 1, 0],
             },
@@ -1152,9 +1157,10 @@ export const countApplicationsPerUser = async (
         $project: {
           _id: 0,
           name: "$_id", // Rename _id to name
-          todo: 1,
-          inProgress: 1,
-          completed: 1,
+          Todo: 1,
+          Implement: 1,
+          Testing:1,
+          Production: 1,
         },
       },
     ]);
