@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import Application from "../models/application.model";
 import Task from "../models/task.model";
 import mongoose from "mongoose";
-import { deleteCache, clearCacheByPattern } from "../helpers/cacheHelper";
+import clearApplicationCache from "../helpers/clearAppCache";
 
 // Add task to an application
 export const addTaskToApplication = async (
@@ -47,18 +47,8 @@ export const addTaskToApplication = async (
     application.tasks.push(savedTask);
     await application.save();
 
-    // delete cache if have any updating.
-    await deleteCache("applications:all");
-    await deleteCache("applications:todo");
-    await deleteCache("applications:implement");
-    await deleteCache("applications:test");
-    await deleteCache("applications:production");
-    await clearCacheByPattern("applications:search:*");
-    await clearCacheByPattern("applications:tdsearch:*");
-    await clearCacheByPattern("applications:itsearch:*");
-    await clearCacheByPattern("applications:tgsearch:*");
-    await clearCacheByPattern("applications:pnsearch:*");
-    await clearCacheByPattern("applications:getById:*");
+    // delete cache if add task.
+    await clearApplicationCache();
 
     res.status(201).json({
       message: "Task added to application successfully",
@@ -150,17 +140,7 @@ export const updateTaskInApplication = async (
     // Save the application
     await application.save();
     // Clear application cache if have any updating.
-    await deleteCache("applications:all");
-    await deleteCache("applications:todo");
-    await deleteCache("applications:implement");
-    await deleteCache("applications:test");
-    await deleteCache("applications:production");
-    await clearCacheByPattern("applications:search:*");
-    await clearCacheByPattern("applications:tdsearch:*");
-    await clearCacheByPattern("applications:itsearch:*");
-    await clearCacheByPattern("applications:tgsearch:*");
-    await clearCacheByPattern("applications:pnsearch:*");
-    await clearCacheByPattern("applications:getById:*");
+    await clearApplicationCache();
 
     res.status(200).json({
       message: "Task updated successfully.",
@@ -243,17 +223,7 @@ export const deleteTaskFromApplication = async (
     }
 
     // Clear cache if there are updates
-    await deleteCache("applications:all");
-    await deleteCache("applications:todo");
-    await deleteCache("applications:implement");
-    await deleteCache("applications:test");
-    await deleteCache("applications:production");
-    await clearCacheByPattern("applications:search:*");
-    await clearCacheByPattern("applications:tdsearch:*");
-    await clearCacheByPattern("applications:itsearch:*");
-    await clearCacheByPattern("applications:tgsearch:*");
-    await clearCacheByPattern("applications:pnsearch:*");
-    await clearCacheByPattern("applications:getById:*");
+    await clearApplicationCache();
 
     res.status(200).json({
       message: "Task deleted successfully.",
